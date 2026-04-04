@@ -1,0 +1,96 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0a0a0f;
+  color: #c0c0c0;
+  font-family: monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 18px;
+  color: #8888cc;
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+#canvas-wrapper {
+  position: relative;
+  border: 3px solid #333;
+  box-shadow: 0 0 20px rgba(80, 80, 160, 0.3);
+  background: #000;
+  cursor: pointer;
+}
+
+#display-canvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#controls {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+#controls label {
+  font-size: 13px;
+  color: #888;
+}
+
+#script-file {
+  font-family: monospace;
+  font-size: 13px;
+  background: #1a1a2e;
+  color: #c0c0c0;
+  border: 1px solid #333;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+#script-file::file-selector-button {
+  font-family: monospace;
+  font-size: 12px;
+  background: #2a2a4e;
+  color: #aaa;
+  border: 1px solid #444;
+  padding: 4px 10px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+#script-file::file-selector-button:hover {
+  background: #3a3a5e;
+}
+
+button {
+  font-family: monospace;
+  font-size: 13px;
+  background: #2a2a4e;
+  color: #aaa;
+  border: 1px solid #444;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #3a3a5e;
+  color: #ccc;
+}
+
+#hint {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #555;
+}

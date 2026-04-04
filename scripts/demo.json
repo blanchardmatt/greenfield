@@ -1,0 +1,106 @@
+{
+  "title": "The Quest Begins",
+  "settings": {
+    "resolution": [256, 224],
+    "textSpeed": 35,
+    "defaultTransition": "fade"
+  },
+  "characters": {
+    "hero": {
+      "sprite": "warrior",
+      "name": "Aldric",
+      "nameColor": "#55aaff"
+    },
+    "elder": {
+      "sprite": "oldman",
+      "name": "Elder Morin",
+      "nameColor": "#ffaa55"
+    },
+    "villain": {
+      "sprite": "villain",
+      "name": "Lord Malachar",
+      "nameColor": "#ff4444"
+    },
+    "princess": {
+      "sprite": "princess",
+      "name": "Princess Elara",
+      "nameColor": "#ff88cc"
+    }
+  },
+  "scenes": [
+    {
+      "id": "opening",
+      "background": "castle_hall",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 1500 },
+        { "type": "enter", "character": "elder", "from": "left", "to": { "x": 60, "y": 130 }, "duration": 1000 },
+        { "type": "wait", "duration": 400 },
+        { "type": "dialogue", "character": "elder", "text": "The ancient seals are breaking. I can feel the darkness stirring once more." },
+        { "type": "enter", "character": "hero", "from": "right", "to": { "x": 170, "y": 130 }, "duration": 800 },
+        { "type": "dialogue", "character": "hero", "text": "Elder Morin! I came as fast as I could. What has happened?" },
+        { "type": "dialogue", "character": "elder", "text": "Lord Malachar has returned. His dark tower rises again in the eastern wastes." },
+        { "type": "shake", "intensity": 4, "duration": 600 },
+        { "type": "emote", "character": "hero", "emote": "surprise", "duration": 1200 },
+        { "type": "dialogue", "character": "hero", "text": "That is impossible! He was sealed away a thousand years ago!" },
+        { "type": "dialogue", "character": "elder", "text": "Nothing is impossible for one who commands the Void. You must stop him, Aldric." },
+        { "type": "dialogue", "character": "hero", "text": "I will not fail you, Elder. I swear it." },
+        { "type": "exit", "character": "hero", "to": "right", "duration": 800 },
+        { "type": "wait", "duration": 500 },
+        { "type": "transition", "effect": "fadeOut", "duration": 1000 }
+      ]
+    },
+    {
+      "id": "forest_encounter",
+      "background": "forest",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 1200 },
+        { "type": "enter", "character": "hero", "from": "left", "to": { "x": 80, "y": 115 }, "duration": 800 },
+        { "type": "wait", "duration": 600 },
+        { "type": "enter", "character": "princess", "from": "right", "to": { "x": 160, "y": 115 }, "duration": 600 },
+        { "type": "dialogue", "character": "princess", "text": "Wait! You are the one they call Aldric, are you not?" },
+        { "type": "dialogue", "character": "hero", "text": "Princess Elara? What are you doing this far from the castle?" },
+        { "type": "dialogue", "character": "princess", "text": "I have a map to the Dark Tower. You will need it." },
+        { "type": "emote", "character": "hero", "emote": "happy", "duration": 1000 },
+        { "type": "dialogue", "character": "hero", "text": "Thank you, Your Highness. This will be invaluable." },
+        { "type": "dialogue", "character": "princess", "text": "Be careful, Aldric. Malachar is not to be underestimated." },
+        { "type": "exit", "character": "princess", "to": "right", "duration": 800 },
+        { "type": "wait", "duration": 300 },
+        { "type": "exit", "character": "hero", "to": "right", "duration": 600 },
+        { "type": "transition", "effect": "fadeOut", "duration": 1000 }
+      ]
+    },
+    {
+      "id": "dark_tower",
+      "background": "dark_tower",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 1500 },
+        { "type": "wait", "duration": 800 },
+        { "type": "enter", "character": "villain", "from": "left", "to": { "x": 120, "y": 110 }, "duration": 1200 },
+        { "type": "dialogue", "character": "villain", "text": "So... the mortals send a single warrior to challenge me." },
+        { "type": "shake", "intensity": 6, "duration": 800 },
+        { "type": "dialogue", "character": "villain", "text": "The Void consumes all. Your quest ends here." },
+        { "type": "emote", "character": "villain", "emote": "anger", "duration": 1500 },
+        { "type": "wait", "duration": 500 },
+        { "type": "enter", "character": "hero", "from": "right", "to": { "x": 180, "y": 130 }, "duration": 800 },
+        { "type": "dialogue", "character": "hero", "text": "I have crossed mountains and forests to reach you, Malachar." },
+        { "type": "dialogue", "character": "hero", "text": "Your reign of darkness ends today!" },
+        { "type": "shake", "intensity": 8, "duration": 1000 },
+        { "type": "wait", "duration": 300 },
+        { "type": "transition", "effect": "fadeOut", "duration": 2000 }
+      ]
+    },
+    {
+      "id": "epilogue",
+      "background": "night_sky",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 2000 },
+        { "type": "wait", "duration": 1000 },
+        { "type": "enter", "character": "hero", "from": "bottom", "to": { "x": 120, "y": 140 }, "duration": 1000 },
+        { "type": "dialogue", "character": "hero", "text": "It is done. The darkness has been vanquished..." },
+        { "type": "dialogue", "character": "hero", "text": "...for now." },
+        { "type": "wait", "duration": 1500 },
+        { "type": "transition", "effect": "fadeOut", "duration": 2500 }
+      ]
+    }
+  ]
+}
