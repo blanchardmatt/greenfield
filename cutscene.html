@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Pixel Cutscene Renderer</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0a0a0f;
+  color: #c0c0c0;
+  font-family: monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 18px;
+  color: #8888cc;
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+#canvas-wrapper {
+  position: relative;
+  border: 3px solid #333;
+  box-shadow: 0 0 20px rgba(80, 80, 160, 0.3);
+  background: #000;
+  cursor: pointer;
+}
+
+#display-canvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#controls {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+#controls label {
+  font-size: 13px;
+  color: #888;
+}
+
+#script-file {
+  font-family: monospace;
+  font-size: 13px;
+  background: #1a1a2e;
+  color: #c0c0c0;
+  border: 1px solid #333;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+#script-file::file-selector-button {
+  font-family: monospace;
+  font-size: 12px;
+  background: #2a2a4e;
+  color: #aaa;
+  border: 1px solid #444;
+  padding: 4px 10px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+#script-file::file-selector-button:hover {
+  background: #3a3a5e;
+}
+
+button {
+  font-family: monospace;
+  font-size: 13px;
+  background: #2a2a4e;
+  color: #aaa;
+  border: 1px solid #444;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #3a3a5e;
+  color: #ccc;
+}
+
+#hint {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #555;
+}
+
+</style>
+</head>
+<body>
+<h1>Pixel Cutscene Renderer</h1>
+<div id="canvas-wrapper">
+<canvas id="display-canvas" width="768" height="672"></canvas>
+</div>
+<div id="controls">
+<button id="btn-demo">Play Demo</button>
+<button id="btn-restart">Restart</button>
+</div>
+<div id="hint">Tap / Space to advance dialogue</div>
+<script>
+/**
+ * PixelFont — 5x7 bitmap font for retro text rendering.
+ * Each character is 7 rows of 5-bit values (MSB = leftmost pixel).
+ */
+const PixelFont = (() => {
+  // Font data: ASCII 32 (space) through 126 (~)
+  // Each entry is an array of 7 numbers, each representing a 5-bit row.
+  const glyphs = {
+    32: [0x00,0x00,0x00,0x00,0x00,0x00,0x00], // space
+    33: [0x04,0x04,0x04,0x04,0x04,0x00,0x04], // !
+    34: [0x0A,0x0A,0x00,0x00,0x00,0x00,0x00], // "
+    35: [0x0A,0x1F,0x0A,0x0A,0x0A,0x1F,0x0A], // #
+    36: [0x04,0x0F,0x14,0x0E,0x05,0x1E,0x04], // $
+    37: [0x18,0x19,0x02,0x04,0x08,0x13,0x03], // %
+    38: [0x08,0x14,0x14,0x08,0x15,0x12,0x0D], // &
+    39: [0x04,0x04,0x00,0x00,0x00,0x00,0x00], // '
+    40: [0x02,0x04,0x08,0x08,0x08,0x04,0x02], // (
+    41: [0x08,0x04,0x02,0x02,0x02,0x04,0x08], // )
+    42: [0x00,0x04,0x15,0x0E,0x15,0x04,0x00], // *
+    43: [0x00,0x04,0x04,0x1F,0x04,0x04,0x00], // +
+    44: [0x00,0x00,0x00,0x00,0x00,0x04,0x08], // ,
+    45: [0x00,0x00,0x00,0x1F,0x00,0x00,0x00], // -
+    46: [0x00,0x00,0x00,0x00,0x00,0x00,0x04], // .
+    47: [0x01,0x01,0x02,0x04,0x08,0x10,0x10], // /
+    48: [0x0E,0x11,0x13,0x15,0x19,0x11,0x0E], // 0
+    49: [0x04,0x0C,0x04,0x04,0x04,0x04,0x0E], // 1
+    50: [0x0E,0x11,0x01,0x06,0x08,0x10,0x1F], // 2
+    51: [0x0E,0x11,0x01,0x06,0x01,0x11,0x0E], // 3
+    52: [0x02,0x06,0x0A,0x12,0x1F,0x02,0x02], // 4
+    53: [0x1F,0x10,0x1E,0x01,0x01,0x11,0x0E], // 5
+    54: [0x06,0x08,0x10,0x1E,0x11,0x11,0x0E], // 6
+    55: [0x1F,0x01,0x02,0x04,0x08,0x08,0x08], // 7
+    56: [0x0E,0x11,0x11,0x0E,0x11,0x11,0x0E], // 8
+    57: [0x0E,0x11,0x11,0x0F,0x01,0x02,0x0C], // 9
+    58: [0x00,0x00,0x04,0x00,0x00,0x04,0x00], // :
+    59: [0x00,0x00,0x04,0x00,0x00,0x04,0x08], // ;
+    60: [0x02,0x04,0x08,0x10,0x08,0x04,0x02], // <
+    61: [0x00,0x00,0x1F,0x00,0x1F,0x00,0x00], // =
+    62: [0x08,0x04,0x02,0x01,0x02,0x04,0x08], // >
+    63: [0x0E,0x11,0x01,0x02,0x04,0x00,0x04], // ?
+    64: [0x0E,0x11,0x17,0x15,0x17,0x10,0x0E], // @
+    65: [0x0E,0x11,0x11,0x1F,0x11,0x11,0x11], // A
+    66: [0x1E,0x11,0x11,0x1E,0x11,0x11,0x1E], // B
+    67: [0x0E,0x11,0x10,0x10,0x10,0x11,0x0E], // C
+    68: [0x1E,0x11,0x11,0x11,0x11,0x11,0x1E], // D
+    69: [0x1F,0x10,0x10,0x1E,0x10,0x10,0x1F], // E
+    70: [0x1F,0x10,0x10,0x1E,0x10,0x10,0x10], // F
+    71: [0x0E,0x11,0x10,0x17,0x11,0x11,0x0F], // G
+    72: [0x11,0x11,0x11,0x1F,0x11,0x11,0x11], // H
+    73: [0x0E,0x04,0x04,0x04,0x04,0x04,0x0E], // I
+    74: [0x07,0x02,0x02,0x02,0x02,0x12,0x0C], // J
+    75: [0x11,0x12,0x14,0x18,0x14,0x12,0x11], // K
+    76: [0x10,0x10,0x10,0x10,0x10,0x10,0x1F], // L
+    77: [0x11,0x1B,0x15,0x15,0x11,0x11,0x11], // M
+    78: [0x11,0x19,0x15,0x13,0x11,0x11,0x11], // N
+    79: [0x0E,0x11,0x11,0x11,0x11,0x11,0x0E], // O
+    80: [0x1E,0x11,0x11,0x1E,0x10,0x10,0x10], // P
+    81: [0x0E,0x11,0x11,0x11,0x15,0x12,0x0D], // Q
+    82: [0x1E,0x11,0x11,0x1E,0x14,0x12,0x11], // R
+    83: [0x0E,0x11,0x10,0x0E,0x01,0x11,0x0E], // S
+    84: [0x1F,0x04,0x04,0x04,0x04,0x04,0x04], // T
+    85: [0x11,0x11,0x11,0x11,0x11,0x11,0x0E], // U
+    86: [0x11,0x11,0x11,0x11,0x0A,0x0A,0x04], // V
+    87: [0x11,0x11,0x11,0x15,0x15,0x1B,0x11], // W
+    88: [0x11,0x11,0x0A,0x04,0x0A,0x11,0x11], // X
+    89: [0x11,0x11,0x0A,0x04,0x04,0x04,0x04], // Y
+    90: [0x1F,0x01,0x02,0x04,0x08,0x10,0x1F], // Z
+    91: [0x0E,0x08,0x08,0x08,0x08,0x08,0x0E], // [
+    92: [0x10,0x10,0x08,0x04,0x02,0x01,0x01], // backslash
+    93: [0x0E,0x02,0x02,0x02,0x02,0x02,0x0E], // ]
+    94: [0x04,0x0A,0x11,0x00,0x00,0x00,0x00], // ^
+    95: [0x00,0x00,0x00,0x00,0x00,0x00,0x1F], // _
+    96: [0x08,0x04,0x00,0x00,0x00,0x00,0x00], // `
+    97: [0x00,0x00,0x0E,0x01,0x0F,0x11,0x0F], // a
+    98: [0x10,0x10,0x1E,0x11,0x11,0x11,0x1E], // b
+    99: [0x00,0x00,0x0E,0x11,0x10,0x11,0x0E], // c
+    100:[0x01,0x01,0x0F,0x11,0x11,0x11,0x0F], // d
+    101:[0x00,0x00,0x0E,0x11,0x1F,0x10,0x0E], // e
+    102:[0x06,0x09,0x08,0x1C,0x08,0x08,0x08], // f
+    103:[0x00,0x00,0x0F,0x11,0x0F,0x01,0x0E], // g
+    104:[0x10,0x10,0x16,0x19,0x11,0x11,0x11], // h
+    105:[0x04,0x00,0x0C,0x04,0x04,0x04,0x0E], // i
+    106:[0x02,0x00,0x06,0x02,0x02,0x12,0x0C], // j
+    107:[0x10,0x10,0x12,0x14,0x18,0x14,0x12], // k
+    108:[0x0C,0x04,0x04,0x04,0x04,0x04,0x0E], // l
+    109:[0x00,0x00,0x1A,0x15,0x15,0x11,0x11], // m
+    110:[0x00,0x00,0x16,0x19,0x11,0x11,0x11], // n
+    111:[0x00,0x00,0x0E,0x11,0x11,0x11,0x0E], // o
+    112:[0x00,0x00,0x1E,0x11,0x1E,0x10,0x10], // p
+    113:[0x00,0x00,0x0F,0x11,0x0F,0x01,0x01], // q
+    114:[0x00,0x00,0x16,0x19,0x10,0x10,0x10], // r
+    115:[0x00,0x00,0x0F,0x10,0x0E,0x01,0x1E], // s
+    116:[0x08,0x08,0x1C,0x08,0x08,0x09,0x06], // t
+    117:[0x00,0x00,0x11,0x11,0x11,0x13,0x0D], // u
+    118:[0x00,0x00,0x11,0x11,0x11,0x0A,0x04], // v
+    119:[0x00,0x00,0x11,0x11,0x15,0x15,0x0A], // w
+    120:[0x00,0x00,0x11,0x0A,0x04,0x0A,0x11], // x
+    121:[0x00,0x00,0x11,0x11,0x0F,0x01,0x0E], // y
+    122:[0x00,0x00,0x1F,0x02,0x04,0x08,0x1F], // z
+    123:[0x02,0x04,0x04,0x08,0x04,0x04,0x02], // {
+    124:[0x04,0x04,0x04,0x04,0x04,0x04,0x04], // |
+    125:[0x08,0x04,0x04,0x02,0x04,0x04,0x08], // }
+    126:[0x00,0x00,0x08,0x15,0x02,0x00,0x00], // ~
+  };
+
+  const CHAR_W = 5;
+  const CHAR_H = 7;
+
+  function drawChar(ctx, code, x, y, color, scale) {
+    const glyph = glyphs[code];
+    if (!glyph) return;
+    ctx.fillStyle = color;
+    for (let row = 0; row < CHAR_H; row++) {
+      for (let col = 0; col < CHAR_W; col++) {
+        if (glyph[row] & (1 << (CHAR_W - 1 - col))) {
+          ctx.fillRect(
+            x + col * scale,
+            y + row * scale,
+            scale,
+            scale
+          );
+        }
+      }
+    }
+  }
+
+  function drawText(ctx, text, x, y, color, scale = 1) {
+    const spacing = (CHAR_W + 1) * scale;
+    for (let i = 0; i < text.length; i++) {
+      const code = text.charCodeAt(i);
+      drawChar(ctx, code, x + i * spacing, y, color, scale);
+    }
+  }
+
+  function measureText(text, scale = 1) {
+    const spacing = (CHAR_W + 1) * scale;
+    return {
+      width: text.length * spacing - scale,
+      height: CHAR_H * scale,
+    };
+  }
+
+  function wrapText(text, maxWidth, scale = 1) {
+    const spacing = (CHAR_W + 1) * scale;
+    const maxChars = Math.floor((maxWidth + scale) / spacing);
+    const words = text.split(' ');
+    const lines = [];
+    let current = '';
+
+    for (const word of words) {
+      const test = current ? current + ' ' + word : word;
+      if (test.length > maxChars && current) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = test;
+      }
+    }
+    if (current) lines.push(current);
+    return lines;
+  }
+
+  return { drawText, measureText, wrapText, CHAR_W, CHAR_H };
+})();
+
+/**
+ * SpriteLibrary — Built-in 16x24 pixel character sprites.
+ * Each sprite has 2 animation frames (idle toggle).
+ * Pixel data is stored as arrays of hex color strings; null = transparent.
+ */
+const SpriteLibrary = (() => {
+  const W = 16;
+  const H = 24;
+  const _ = null; // transparent
+
+  // Color shortcuts
+  const BK = '#111111'; // black outlines
+  const SK = '#f0b888'; // skin
+  const SD = '#c08060'; // skin dark
+  const WH = '#eeeeee'; // white
+  const BR = '#885522'; // brown
+  const BD = '#663311'; // brown dark
+  const BL = '#4444cc'; // blue
+  const BU = '#3333aa'; // blue dark
+  const RD = '#cc3333'; // red
+  const GR = '#338833'; // green
+  const GD = '#226622'; // green dark
+  const GY = '#888888'; // gray
+  const GK = '#555555'; // gray dark
+  const YL = '#ddcc44'; // yellow
+  const PP = '#8844aa'; // purple
+  const PD = '#663388'; // purple dark
+  const OR = '#dd8833'; // orange
+
+  // Warrior — blue armor, brown hair
+  const warrior_f1 = [
+    [_,_,_,_,_,_,BK,BK,BK,BK,_,_,_,_,_,_],
+    [_,_,_,_,_,BK,BR,BR,BR,BR,BK,_,_,_,_,_],
+    [_,_,_,_,BK,BR,BR,BR,BR,BR,BR,BK,_,_,_,_],
+    [_,_,_,_,BK,SK,SK,SK,SK,SK,SK,BK,_,_,_,_],
+    [_,_,_,_,BK,SK,BK,SK,SK,BK,SK,BK,_,_,_,_],
+    [_,_,_,_,BK,SK,SK,SK,SK,SK,SK,BK,_,_,_,_],
+    [_,_,_,_,_,BK,SK,SD,SD,SK,BK,_,_,_,_,_],
+    [_,_,_,_,_,_,BK,BK,BK,BK,_,_,_,_,_,_],
+    [_,_,_,BK,BK,BL,BL,BL,BL,BL,BL,BK,BK,_,_,_],
+    [_,_,BK,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,BK,_,_],
+    [_,_,BK,BU,BL,BL,BL,BL,BL,BL,BL,BL,BU,BK,_,_],
+    [_,_,BK,SK,BK,BL,BL,YL,BL,BL,BL,BK,SK,BK,_,_],
+    [_,_,_,BK,_,BK,BL,BL,BL,BL,BK,_,BK,_,_,_],
+    [_,_,_,_,_,BK,BU,BU,BU,BU,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BU,BU,BU,BU,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BL,BL,BL,BL,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BL,BK,BK,BL,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BL,BK,BK,BL,BK,_,_,_,_,_],
+    [_,_,_,_,BK,BL,BL,BK,BK,BL,BL,BK,_,_,_,_],
+    [_,_,_,_,BK,BR,BR,BK,BK,BR,BR,BK,_,_,_,_],
+    [_,_,_,_,BK,BK,BK,_,_,BK,BK,BK,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+  ];
+
+  const warrior_f2 = [
+    [_,_,_,_,_,_,BK,BK,BK,BK,_,_,_,_,_,_],
+    [_,_,_,_,_,BK,BR,BR,BR,BR,BK,_,_,_,_,_],
+    [_,_,_,_,BK,BR,BR,BR,BR,BR,BR,BK,_,_,_,_],
+    [_,_,_,_,BK,SK,SK,SK,SK,SK,SK,BK,_,_,_,_],
+    [_,_,_,_,BK,SK,BK,SK,SK,BK,SK,BK,_,_,_,_],
+    [_,_,_,_,BK,SK,SK,SK,SK,SK,SK,BK,_,_,_,_],
+    [_,_,_,_,_,BK,SK,SD,SD,SK,BK,_,_,_,_,_],
+    [_,_,_,_,_,_,BK,BK,BK,BK,_,_,_,_,_,_],
+    [_,_,_,BK,BK,BL,BL,BL,BL,BL,BL,BK,BK,_,_,_],
+    [_,_,BK,BL,BL,BL,BL,BL,BL,BL,BL,BL,BL,BK,_,_],
+    [_,_,BK,BU,BL,BL,BL,BL,BL,BL,BL,BL,BU,BK,_,_],
+    [_,_,BK,SK,BK,BL,BL,YL,BL,BL,BL,BK,SK,BK,_,_],
+    [_,_,_,BK,_,BK,BL,BL,BL,BL,BK,_,BK,_,_,_],
+    [_,_,_,_,_,BK,BU,BU,BU,BU,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BU,BU,BU,BU,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BL,BL,BL,BL,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BK,BL,BL,BK,BK,_,_,_,_,_],
+    [_,_,_,_,BK,BL,BK,_,_,BK,BL,BK,_,_,_,_],
+    [_,_,_,_,BK,BR,BK,_,_,BK,BR,BK,_,_,_,_],
+    [_,_,_,_,BK,BK,BK,_,_,BK,BK,BK,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+  ];
+
+  // Old man — gray hair, green robe
+  const oldman_f1 = [
+    [_,_,_,_,_,BK,BK,BK,BK,BK,BK,_,_,_,_,_],
+    [_,_,_,_,BK,WH,WH,WH,WH,WH,WH,BK,_,_,_,_],
+    [_,_,_,BK,WH,WH,WH,WH,WH,WH,WH,WH,BK,_,_,_],
+    [_,_,_,BK,SK,SK,SK,SK,SK,SK,SK,SK,BK,_,_,_],
+    [_,_,_,BK,SK,BK,SK,SK,SK,BK,SK,SK,BK,_,_,_],
+    [_,_,_,BK,SK,SK,SK,SK,SK,SK,SK,SK,BK,_,_,_],
+    [_,_,_,_,BK,SK,SK,SD,SD,SK,SK,BK,_,_,_,_],
+    [_,_,_,_,BK,WH,BK,BK,BK,BK,WH,BK,_,_,_,_],
+    [_,_,_,BK,GR,GR,GR,GR,GR,GR,GR,GR,BK,_,_,_],
+    [_,_,BK,GR,GR,GR,GR,GR,GR,GR,GR,GR,GR,BK,_,_],
+    [_,_,BK,GD,GR,GR,GR,GR,GR,GR,GR,GR,GD,BK,_,_],
+    [_,_,BK,SK,BK,GR,GR,GR,GR,GR,GR,BK,SK,BK,_,_],
+    [_,_,_,BK,_,BK,GR,GR,GR,GR,BK,_,BK,_,_,_],
+    [_,_,_,_,_,BK,GD,GD,GD,GD,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,GR,GR,GR,GR,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,GR,GR,GR,GR,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,GR,GR,GR,GR,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,GR,GR,GR,GR,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,GR,BK,BK,GR,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BR,BK,BK,BR,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BK,_,_,BK,BK,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+  ];
+
+  const oldman_f2 = oldman_f1; // elder barely moves
+
+  // Mage — purple robe, staff implied
+  const mage_f1 = [
+    [_,_,_,_,_,_,BK,BK,BK,_,_,_,_,_,_,_],
+    [_,_,_,_,_,BK,PP,PP,PP,BK,_,_,_,_,_,_],
+    [_,_,_,_,BK,PP,PP,PP,PP,PP,BK,_,_,_,_,_],
+    [_,_,_,_,BK,SK,SK,SK,SK,SK,BK,_,_,_,_,_],
+    [_,_,_,_,BK,SK,BK,SK,SK,BK,SK,BK,_,_,_,_],
+    [_,_,_,_,BK,SK,SK,SK,SK,SK,SK,BK,_,_,_,_],
+    [_,_,_,_,_,BK,SK,SD,SD,SK,BK,_,_,_,_,_],
+    [_,_,_,_,_,_,BK,BK,BK,BK,_,_,_,_,_,_],
+    [_,_,_,BK,PP,PP,PP,PP,PP,PP,PP,PP,BK,_,_,_],
+    [_,_,BK,PP,PP,PP,PP,PP,PP,PP,PP,PP,PP,BK,_,_],
+    [_,_,BK,PD,PP,PP,PP,PP,PP,PP,PP,PP,PD,BK,_,_],
+    [_,_,BK,SK,BK,PP,PP,PP,PP,PP,PP,BK,SK,BK,_,_],
+    [_,_,_,BK,_,BK,PP,PP,PP,PP,BK,_,BK,_,_,_],
+    [_,_,_,_,_,BK,PD,PD,PD,PD,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,PP,PP,PP,PP,BK,_,_,_,_,_],
+    [_,_,_,_,BK,PP,PP,PP,PP,PP,PP,BK,_,_,_,_],
+    [_,_,_,BK,PP,PP,PP,PP,PP,PP,PP,PP,BK,_,_,_],
+    [_,_,_,BK,PP,PP,PP,BK,PP,PP,PP,PP,BK,_,_,_],
+    [_,_,_,_,BK,BK,BK,_,BK,BK,BK,BK,_,_,_,_],
+    [_,_,_,_,_,BK,BR,_,_,BR,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BK,_,_,BK,BK,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+  ];
+
+  const mage_f2 = mage_f1;
+
+  // Princess — yellow hair, red dress
+  const princess_f1 = [
+    [_,_,_,_,_,BK,BK,BK,BK,BK,BK,_,_,_,_,_],
+    [_,_,_,_,BK,YL,YL,YL,YL,YL,YL,BK,_,_,_,_],
+    [_,_,_,BK,YL,YL,YL,YL,YL,YL,YL,YL,BK,_,_,_],
+    [_,_,_,BK,YL,SK,SK,SK,SK,SK,SK,YL,BK,_,_,_],
+    [_,_,_,BK,YL,SK,BK,SK,SK,BK,SK,YL,BK,_,_,_],
+    [_,_,_,BK,YL,SK,SK,SK,SK,SK,SK,YL,BK,_,_,_],
+    [_,_,_,_,BK,SK,SK,RD,RD,SK,SK,BK,_,_,_,_],
+    [_,_,_,_,BK,YL,BK,BK,BK,BK,YL,BK,_,_,_,_],
+    [_,_,_,BK,RD,RD,RD,RD,RD,RD,RD,RD,BK,_,_,_],
+    [_,_,BK,RD,RD,RD,RD,RD,RD,RD,RD,RD,RD,BK,_,_],
+    [_,_,BK,RD,RD,RD,RD,RD,RD,RD,RD,RD,RD,BK,_,_],
+    [_,_,BK,SK,BK,RD,RD,RD,RD,RD,RD,BK,SK,BK,_,_],
+    [_,_,_,BK,_,BK,RD,RD,RD,RD,BK,_,BK,_,_,_],
+    [_,_,_,_,_,BK,RD,RD,RD,RD,BK,_,_,_,_,_],
+    [_,_,_,_,BK,RD,RD,RD,RD,RD,RD,BK,_,_,_,_],
+    [_,_,_,BK,RD,RD,RD,RD,RD,RD,RD,RD,BK,_,_,_],
+    [_,_,BK,RD,RD,RD,RD,RD,RD,RD,RD,RD,RD,BK,_,_],
+    [_,_,BK,RD,RD,RD,RD,RD,RD,RD,RD,RD,RD,BK,_,_],
+    [_,_,BK,BK,BK,BK,BK,BK,BK,BK,BK,BK,BK,BK,_,_],
+    [_,_,_,_,_,BK,BR,BK,BK,BR,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BK,_,_,BK,BK,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+  ];
+
+  const princess_f2 = princess_f1;
+
+  // Villain — dark armor, red eyes
+  const villain_f1 = [
+    [_,_,_,_,_,BK,BK,BK,BK,BK,BK,_,_,_,_,_],
+    [_,_,_,_,BK,GK,GK,GK,GK,GK,GK,BK,_,_,_,_],
+    [_,_,_,BK,GK,BK,GK,GK,GK,BK,GK,GK,BK,_,_,_],
+    [_,_,_,BK,GK,GK,GK,GK,GK,GK,GK,GK,BK,_,_,_],
+    [_,_,_,BK,SK,SK,SK,SK,SK,SK,SK,SK,BK,_,_,_],
+    [_,_,_,BK,SK,RD,SK,SK,SK,RD,SK,SK,BK,_,_,_],
+    [_,_,_,_,BK,SK,SK,BK,BK,SK,SK,BK,_,_,_,_],
+    [_,_,_,_,_,BK,BK,BK,BK,BK,BK,_,_,_,_,_],
+    [_,_,BK,BK,GK,GK,GK,GK,GK,GK,GK,GK,BK,BK,_,_],
+    [_,BK,GK,GK,GK,GK,GK,GK,GK,GK,GK,GK,GK,GK,BK,_],
+    [_,BK,BK,GK,GK,GK,GK,GK,GK,GK,GK,GK,GK,BK,BK,_],
+    [_,_,BK,SK,BK,GK,GK,RD,GK,GK,GK,BK,SK,BK,_,_],
+    [_,_,_,BK,_,BK,GK,GK,GK,GK,BK,_,BK,_,_,_],
+    [_,_,_,_,_,BK,BK,BK,BK,BK,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,GK,GK,GK,GK,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,GK,GK,GK,GK,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,GK,BK,BK,GK,BK,_,_,_,_,_],
+    [_,_,_,_,BK,GK,GK,BK,BK,GK,GK,BK,_,_,_,_],
+    [_,_,_,_,BK,BK,BK,_,_,BK,BK,BK,_,_,_,_],
+    [_,_,_,_,BK,BK,BK,_,_,BK,BK,BK,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+  ];
+
+  const villain_f2 = villain_f1;
+
+  const sprites = {
+    warrior:  [warrior_f1, warrior_f2],
+    oldman:   [oldman_f1, oldman_f2],
+    mage:     [mage_f1, mage_f2],
+    princess: [princess_f1, princess_f2],
+    villain:  [villain_f1, villain_f2],
+  };
+
+  // Emote bubbles — 8x8 pixel art
+  const emotes = {
+    surprise: [
+      [_,_,BK,BK,BK,BK,_,_],
+      [_,BK,WH,WH,WH,WH,BK,_],
+      [BK,WH,WH,BK,BK,WH,WH,BK],
+      [BK,WH,WH,BK,BK,WH,WH,BK],
+      [BK,WH,WH,WH,WH,WH,WH,BK],
+      [BK,WH,WH,BK,BK,WH,WH,BK],
+      [_,BK,WH,WH,WH,WH,BK,_],
+      [_,_,BK,BK,BK,BK,_,_],
+    ],
+    anger: [
+      [_,_,BK,BK,BK,BK,_,_],
+      [_,BK,RD,WH,WH,RD,BK,_],
+      [BK,WH,RD,WH,WH,RD,WH,BK],
+      [BK,WH,WH,RD,RD,WH,WH,BK],
+      [BK,WH,WH,RD,RD,WH,WH,BK],
+      [BK,WH,RD,WH,WH,RD,WH,BK],
+      [_,BK,RD,WH,WH,RD,BK,_],
+      [_,_,BK,BK,BK,BK,_,_],
+    ],
+    happy: [
+      [_,_,BK,BK,BK,BK,_,_],
+      [_,BK,WH,WH,WH,WH,BK,_],
+      [BK,WH,YL,WH,WH,YL,WH,BK],
+      [BK,WH,WH,WH,WH,WH,WH,BK],
+      [BK,WH,YL,WH,WH,YL,WH,BK],
+      [BK,WH,WH,YL,YL,WH,WH,BK],
+      [_,BK,WH,WH,WH,WH,BK,_],
+      [_,_,BK,BK,BK,BK,_,_],
+    ],
+  };
+
+  function drawSprite(ctx, spriteName, x, y, frame) {
+    const spriteFrames = sprites[spriteName];
+    if (!spriteFrames) return;
+    const data = spriteFrames[frame % spriteFrames.length];
+    for (let row = 0; row < H; row++) {
+      for (let col = 0; col < W; col++) {
+        const color = data[row][col];
+        if (color) {
+          ctx.fillStyle = color;
+          ctx.fillRect(x + col, y + row, 1, 1);
+        }
+      }
+    }
+  }
+
+  function drawEmote(ctx, emoteName, x, y) {
+    const data = emotes[emoteName];
+    if (!data) return;
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const color = data[row][col];
+        if (color) {
+          ctx.fillStyle = color;
+          ctx.fillRect(x + col, y + row, 1, 1);
+        }
+      }
+    }
+  }
+
+  function getSpriteNames() {
+    return Object.keys(sprites);
+  }
+
+  return { drawSprite, drawEmote, getSpriteNames, W, H };
+})();
+
+/**
+ * AnimationSystem — Manages tweens, screen effects, and typewriter text.
+ */
+const AnimationSystem = (() => {
+  const activeTweens = [];
+
+  // Camera state for shake effect
+  const camera = { offsetX: 0, offsetY: 0 };
+  let shakeIntensity = 0;
+  let shakeDuration = 0;
+  let shakeElapsed = 0;
+
+  // Fade overlay
+  let fadeAlpha = 1.0; // start black
+  let fadeTween = null;
+
+  // Typewriter state
+  const typewriter = {
+    text: '',
+    revealedCount: 0,
+    speed: 30, // ms per character
+    elapsed: 0,
+    done: true,
+    lines: [],
+    maxWidth: 0,
+    scale: 1,
+  };
+
+  function addTween(target, property, from, to, duration, easing = 'linear') {
+    const tween = { target, property, from, to, duration, elapsed: 0, easing, done: false };
+    target[property] = from;
+    activeTweens.push(tween);
+    return tween;
+  }
+
+  function ease(t, type) {
+    switch (type) {
+      case 'easeIn': return t * t;
+      case 'easeOut': return 1 - (1 - t) * (1 - t);
+      case 'easeInOut': return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      default: return t; // linear
+    }
+  }
+
+  function update(dt) {
+    // Update tweens
+    for (let i = activeTweens.length - 1; i >= 0; i--) {
+      const tw = activeTweens[i];
+      tw.elapsed += dt;
+      const progress = Math.min(tw.elapsed / tw.duration, 1);
+      const t = ease(progress, tw.easing);
+      tw.target[tw.property] = tw.from + (tw.to - tw.from) * t;
+      if (progress >= 1) {
+        tw.done = true;
+        activeTweens.splice(i, 1);
+      }
+    }
+
+    // Update shake
+    if (shakeElapsed < shakeDuration) {
+      shakeElapsed += dt;
+      const remaining = 1 - shakeElapsed / shakeDuration;
+      camera.offsetX = (Math.random() * 2 - 1) * shakeIntensity * remaining;
+      camera.offsetY = (Math.random() * 2 - 1) * shakeIntensity * remaining;
+    } else {
+      camera.offsetX = 0;
+      camera.offsetY = 0;
+    }
+
+    // Update fade tween
+    if (fadeTween && !fadeTween.done) {
+      // handled by tween system via fadeState
+    }
+
+    // Update typewriter
+    if (!typewriter.done) {
+      typewriter.elapsed += dt;
+      const charsToReveal = Math.floor(typewriter.elapsed / typewriter.speed);
+      typewriter.revealedCount = Math.min(charsToReveal, typewriter.text.length);
+      if (typewriter.revealedCount >= typewriter.text.length) {
+        typewriter.done = true;
+      }
+    }
+  }
+
+  // Fade state object that tween system can target
+  const fadeState = { alpha: 1.0 };
+
+  function startFade(fromAlpha, toAlpha, duration) {
+    fadeState.alpha = fromAlpha;
+    fadeTween = addTween(fadeState, 'alpha', fromAlpha, toAlpha, duration, 'easeInOut');
+    return fadeTween;
+  }
+
+  function getFadeAlpha() {
+    return fadeState.alpha;
+  }
+
+  function startShake(intensity, duration) {
+    shakeIntensity = intensity;
+    shakeDuration = duration;
+    shakeElapsed = 0;
+  }
+
+  function isShaking() {
+    return shakeElapsed < shakeDuration;
+  }
+
+  function startTypewriter(text, speed, maxWidth, scale) {
+    typewriter.text = text;
+    typewriter.revealedCount = 0;
+    typewriter.speed = speed;
+    typewriter.elapsed = 0;
+    typewriter.done = false;
+    typewriter.maxWidth = maxWidth;
+    typewriter.scale = scale;
+    typewriter.lines = PixelFont.wrapText(text, maxWidth, scale);
+  }
+
+  function completeTypewriter() {
+    typewriter.revealedCount = typewriter.text.length;
+    typewriter.done = true;
+  }
+
+  function getTypewriterState() {
+    return {
+      lines: typewriter.lines,
+      revealedCount: typewriter.revealedCount,
+      done: typewriter.done,
+      text: typewriter.text,
+      scale: typewriter.scale,
+    };
+  }
+
+  function getCamera() {
+    return camera;
+  }
+
+  function isTweenActive(tween) {
+    return tween && !tween.done;
+  }
+
+  function clear() {
+    activeTweens.length = 0;
+    camera.offsetX = 0;
+    camera.offsetY = 0;
+    shakeElapsed = shakeDuration;
+    fadeState.alpha = 0;
+    fadeTween = null;
+    typewriter.done = true;
+  }
+
+  return {
+    addTween, update, startFade, getFadeAlpha, startShake, isShaking,
+    startTypewriter, completeTypewriter, getTypewriterState,
+    getCamera, isTweenActive, clear,
+  };
+})();
+
+/**
+ * Renderer — Canvas rendering for backgrounds, sprites, dialogue, and effects.
+ */
+const Renderer = (() => {
+  const INTERNAL_W = 256;
+  const INTERNAL_H = 224;
+  const SCALE = 3; // 256*3 = 768, 224*3 = 672
+
+  let displayCanvas, displayCtx;
+  let offscreen, ctx;
+
+  // Dialogue box dimensions (in internal resolution)
+  const DIALOG_MARGIN = 8;
+  const DIALOG_HEIGHT = 56;
+  const DIALOG_Y = INTERNAL_H - DIALOG_HEIGHT - DIALOG_MARGIN;
+  const TEXT_PADDING = 8;
+  const TEXT_SCALE = 1;
+
+  function init(canvasElement) {
+    displayCanvas = canvasElement;
+    displayCanvas.width = INTERNAL_W * SCALE;
+    displayCanvas.height = INTERNAL_H * SCALE;
+    displayCtx = displayCanvas.getContext('2d');
+    displayCtx.imageSmoothingEnabled = false;
+
+    offscreen = document.createElement('canvas');
+    offscreen.width = INTERNAL_W;
+    offscreen.height = INTERNAL_H;
+    ctx = offscreen.getContext('2d');
+  }
+
+  // --- Background drawing ---
+
+  const backgrounds = {
+    castle_hall(ctx) {
+      // Gray stone walls
+      ctx.fillStyle = '#444455';
+      ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+
+      // Floor
+      ctx.fillStyle = '#555566';
+      ctx.fillRect(0, 140, INTERNAL_W, INTERNAL_H - 140);
+
+      // Stone tile pattern
+      ctx.fillStyle = '#3a3a4a';
+      for (let y = 0; y < INTERNAL_H; y += 16) {
+        for (let x = 0; x < INTERNAL_W; x += 24) {
+          const offset = (Math.floor(y / 16) % 2) * 12;
+          ctx.fillRect(x + offset, y, 23, 15);
+          ctx.fillStyle = '#505060';
+          ctx.fillRect(x + offset + 1, y + 1, 21, 13);
+          ctx.fillStyle = '#3a3a4a';
+        }
+      }
+
+      // Torches
+      for (let tx = 40; tx < INTERNAL_W; tx += 80) {
+        ctx.fillStyle = '#665533';
+        ctx.fillRect(tx, 40, 3, 20);
+        ctx.fillStyle = '#ff8833';
+        ctx.fillRect(tx - 2, 32, 7, 8);
+        ctx.fillStyle = '#ffcc44';
+        ctx.fillRect(tx - 1, 34, 5, 4);
+      }
+    },
+
+    forest(ctx) {
+      // Sky gradient (manual)
+      for (let y = 0; y < 100; y++) {
+        const t = y / 100;
+        const r = Math.floor(20 + t * 30);
+        const g = Math.floor(40 + t * 60);
+        const b = Math.floor(80 + t * 40);
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fillRect(0, y, INTERNAL_W, 1);
+      }
+
+      // Ground
+      ctx.fillStyle = '#2a5a2a';
+      ctx.fillRect(0, 100, INTERNAL_W, INTERNAL_H - 100);
+      ctx.fillStyle = '#1a4a1a';
+      ctx.fillRect(0, 140, INTERNAL_W, INTERNAL_H - 140);
+
+      // Trees (simple triangles)
+      const treePositions = [20, 60, 110, 170, 210];
+      for (const tx of treePositions) {
+        const h = 40 + Math.floor(Math.sin(tx) * 15);
+        ctx.fillStyle = '#553322';
+        ctx.fillRect(tx + 6, 100 - h + 30, 6, h - 20);
+        ctx.fillStyle = '#226633';
+        for (let i = 0; i < 3; i++) {
+          const w = 24 - i * 4;
+          const ty = 100 - h + i * 14;
+          ctx.fillRect(tx + 9 - w / 2, ty, w, 18);
+        }
+      }
+    },
+
+    night_sky(ctx) {
+      // Dark sky
+      ctx.fillStyle = '#0a0a22';
+      ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+
+      // Stars (seeded pseudo-random for consistency)
+      ctx.fillStyle = '#ffffff';
+      let seed = 12345;
+      for (let i = 0; i < 60; i++) {
+        seed = (seed * 16807 + 0) % 2147483647;
+        const sx = seed % INTERNAL_W;
+        seed = (seed * 16807 + 0) % 2147483647;
+        const sy = seed % (INTERNAL_H - 60);
+        seed = (seed * 16807 + 0) % 2147483647;
+        const bright = 0.3 + (seed % 70) / 100;
+        ctx.globalAlpha = bright;
+        ctx.fillRect(sx, sy, 1, 1);
+      }
+      ctx.globalAlpha = 1.0;
+
+      // Moon
+      ctx.fillStyle = '#ddeeff';
+      fillCircle(ctx, 200, 30, 12);
+      ctx.fillStyle = '#0a0a22';
+      fillCircle(ctx, 204, 27, 10);
+
+      // Ground
+      ctx.fillStyle = '#111122';
+      ctx.fillRect(0, 170, INTERNAL_W, INTERNAL_H - 170);
+    },
+
+    dark_tower(ctx) {
+      // Dark stormy sky
+      ctx.fillStyle = '#1a1028';
+      ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+
+      // Purple clouds
+      ctx.fillStyle = '#2a1a38';
+      for (let i = 0; i < 5; i++) {
+        const cx = 30 + i * 50;
+        fillCircle(ctx, cx, 30 + (i % 3) * 10, 20 + (i % 2) * 10);
+      }
+
+      // Tower silhouette
+      ctx.fillStyle = '#0a0a10';
+      ctx.fillRect(100, 40, 56, 180);
+      ctx.fillRect(90, 160, 76, 64);
+      // Battlements
+      for (let bx = 90; bx < 166; bx += 12) {
+        ctx.fillRect(bx, 152, 8, 8);
+      }
+      // Tower top
+      ctx.fillRect(108, 20, 40, 20);
+      ctx.fillRect(116, 10, 24, 10);
+      // Window (glowing)
+      ctx.fillStyle = '#884488';
+      ctx.fillRect(122, 60, 12, 16);
+      ctx.fillStyle = '#aa66aa';
+      ctx.fillRect(124, 62, 8, 12);
+
+      // Ground
+      ctx.fillStyle = '#0a0812';
+      ctx.fillRect(0, 180, INTERNAL_W, INTERNAL_H - 180);
+    },
+
+    village(ctx) {
+      // Sky
+      ctx.fillStyle = '#6688bb';
+      ctx.fillRect(0, 0, INTERNAL_W, 120);
+
+      // Clouds
+      ctx.fillStyle = '#99aaccdd';
+      fillCircle(ctx, 40, 30, 15);
+      fillCircle(ctx, 55, 25, 18);
+      fillCircle(ctx, 70, 30, 14);
+      fillCircle(ctx, 180, 40, 12);
+      fillCircle(ctx, 195, 35, 16);
+
+      // Ground
+      ctx.fillStyle = '#7a9944';
+      ctx.fillRect(0, 120, INTERNAL_W, INTERNAL_H - 120);
+      ctx.fillStyle = '#8a6633';
+      ctx.fillRect(0, 160, INTERNAL_W, 10); // path
+
+      // Houses
+      const housePositions = [30, 130, 200];
+      for (const hx of housePositions) {
+        // Walls
+        ctx.fillStyle = '#bb8844';
+        ctx.fillRect(hx, 95, 40, 30);
+        // Roof
+        ctx.fillStyle = '#884422';
+        ctx.fillRect(hx - 4, 85, 48, 12);
+        // Door
+        ctx.fillStyle = '#553311';
+        ctx.fillRect(hx + 15, 108, 10, 17);
+        // Window
+        ctx.fillStyle = '#aaddff';
+        ctx.fillRect(hx + 5, 100, 7, 7);
+      }
+    },
+  };
+
+  function fillCircle(ctx, cx, cy, r) {
+    for (let y = -r; y <= r; y++) {
+      for (let x = -r; x <= r; x++) {
+        if (x * x + y * y <= r * r) {
+          ctx.fillRect(cx + x, cy + y, 1, 1);
+        }
+      }
+    }
+  }
+
+  function drawBackground(name) {
+    if (backgrounds[name]) {
+      backgrounds[name](ctx);
+    } else {
+      // Default: solid dark color
+      ctx.fillStyle = '#1a1a2e';
+      ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+    }
+  }
+
+  // --- Character rendering ---
+
+  function drawCharacter(char, animFrame) {
+    if (!char.visible) return;
+    SpriteLibrary.drawSprite(ctx, char.sprite, Math.round(char.x), Math.round(char.y), animFrame);
+  }
+
+  // --- Emote rendering ---
+
+  function drawEmoteBubble(char, emoteName, bobOffset) {
+    const ex = Math.round(char.x) + SpriteLibrary.W / 2 - 4;
+    const ey = Math.round(char.y) - 12 + bobOffset;
+    SpriteLibrary.drawEmote(ctx, emoteName, ex, ey);
+  }
+
+  // --- Dialogue box ---
+
+  function drawDialogueBox(characterName, nameColor) {
+    const x = DIALOG_MARGIN;
+    const y = DIALOG_Y;
+    const w = INTERNAL_W - DIALOG_MARGIN * 2;
+    const h = DIALOG_HEIGHT;
+
+    // Box background
+    ctx.fillStyle = 'rgba(0, 0, 20, 0.85)';
+    ctx.fillRect(x, y, w, h);
+
+    // Border
+    ctx.strokeStyle = '#6666aa';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+
+    // Inner border
+    ctx.strokeStyle = '#333366';
+    ctx.strokeRect(x + 1.5, y + 1.5, w - 3, h - 3);
+
+    // Character name
+    if (characterName) {
+      PixelFont.drawText(ctx, characterName, x + TEXT_PADDING, y + TEXT_PADDING, nameColor || '#ffffff', TEXT_SCALE);
+    }
+  }
+
+  function drawDialogueText(twState, nameColor) {
+    const x = DIALOG_MARGIN + TEXT_PADDING;
+    const startY = DIALOG_Y + TEXT_PADDING + (PixelFont.CHAR_H + 3) * TEXT_SCALE; // below name
+    const lineHeight = (PixelFont.CHAR_H + 2) * TEXT_SCALE;
+
+    let charsRemaining = twState.revealedCount;
+    for (let i = 0; i < twState.lines.length; i++) {
+      const line = twState.lines[i];
+      const showChars = Math.min(charsRemaining, line.length);
+      if (showChars > 0) {
+        PixelFont.drawText(ctx, line.substring(0, showChars), x, startY + i * lineHeight, '#ffffff', TEXT_SCALE);
+      }
+      charsRemaining -= line.length;
+      if (charsRemaining <= 0) break;
+    }
+
+    // Blinking advance indicator when done
+    if (twState.done) {
+      const blinkOn = Math.floor(Date.now() / 400) % 2 === 0;
+      if (blinkOn) {
+        const indicatorX = INTERNAL_W - DIALOG_MARGIN - TEXT_PADDING - 6;
+        const indicatorY = DIALOG_Y + DIALOG_HEIGHT - TEXT_PADDING - 4;
+        ctx.fillStyle = '#8888cc';
+        // Small down arrow
+        ctx.fillRect(indicatorX + 1, indicatorY, 3, 1);
+        ctx.fillRect(indicatorX + 2, indicatorY + 1, 1, 1);
+      }
+    }
+  }
+
+  // --- Transition overlay ---
+
+  function drawFadeOverlay(alpha) {
+    if (alpha <= 0) return;
+    ctx.fillStyle = `rgba(0, 0, 0, ${Math.min(alpha, 1)})`;
+    ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+  }
+
+  // --- Frame pipeline ---
+
+  function beginFrame() {
+    ctx.clearRect(0, 0, INTERNAL_W, INTERNAL_H);
+  }
+
+  function applyCamera(camera) {
+    ctx.save();
+    ctx.translate(Math.round(camera.offsetX), Math.round(camera.offsetY));
+  }
+
+  function restoreCamera() {
+    ctx.restore();
+  }
+
+  function present() {
+    displayCtx.clearRect(0, 0, displayCanvas.width, displayCanvas.height);
+    displayCtx.drawImage(offscreen, 0, 0, displayCanvas.width, displayCanvas.height);
+  }
+
+  function getTextMaxWidth() {
+    return INTERNAL_W - DIALOG_MARGIN * 2 - TEXT_PADDING * 2;
+  }
+
+  function getTextScale() {
+    return TEXT_SCALE;
+  }
+
+  function getInternalSize() {
+    return { width: INTERNAL_W, height: INTERNAL_H };
+  }
+
+  return {
+    init, beginFrame, applyCamera, restoreCamera, present,
+    drawBackground, drawCharacter, drawEmoteBubble,
+    drawDialogueBox, drawDialogueText, drawFadeOverlay,
+    getTextMaxWidth, getTextScale, getInternalSize,
+  };
+})();
+
+/**
+ * ScriptParser — Loads, validates, and normalizes cutscene JSON scripts.
+ */
+const ScriptParser = (() => {
+  const VALID_ACTIONS = [
+    'transition', 'enter', 'exit', 'dialogue', 'wait',
+    'shake', 'emote', 'move', 'setBackground',
+  ];
+
+  const VALID_DIRECTIONS = ['left', 'right', 'top', 'bottom'];
+  const VALID_EFFECTS = ['fadeIn', 'fadeOut', 'cut'];
+  const VALID_EMOTES = ['surprise', 'anger', 'happy'];
+
+  function validate(script) {
+    const errors = [];
+
+    if (!script.scenes || !Array.isArray(script.scenes) || script.scenes.length === 0) {
+      errors.push('Script must have at least one scene.');
+    }
+
+    if (!script.characters || typeof script.characters !== 'object') {
+      errors.push('Script must define a characters object.');
+    }
+
+    if (script.scenes) {
+      for (let si = 0; si < script.scenes.length; si++) {
+        const scene = script.scenes[si];
+        if (!scene.actions || !Array.isArray(scene.actions)) {
+          errors.push(`Scene ${si} must have an actions array.`);
+          continue;
+        }
+        for (let ai = 0; ai < scene.actions.length; ai++) {
+          const action = scene.actions[ai];
+          if (!VALID_ACTIONS.includes(action.type)) {
+            errors.push(`Scene ${si}, action ${ai}: unknown type "${action.type}".`);
+          }
+          if (action.character && !script.characters[action.character]) {
+            errors.push(`Scene ${si}, action ${ai}: unknown character "${action.character}".`);
+          }
+        }
+      }
+    }
+
+    return errors;
+  }
+
+  function normalize(script) {
+    // Apply defaults
+    const settings = Object.assign({
+      resolution: [256, 224],
+      textSpeed: 30,
+      defaultTransition: 'fade',
+    }, script.settings || {});
+
+    const characters = {};
+    for (const [id, def] of Object.entries(script.characters || {})) {
+      characters[id] = {
+        sprite: def.sprite || 'warrior',
+        name: def.name || id,
+        nameColor: def.nameColor || '#ffffff',
+      };
+    }
+
+    const scenes = (script.scenes || []).map((scene, i) => ({
+      id: scene.id || `scene_${i}`,
+      background: scene.background || null,
+      actions: scene.actions || [],
+    }));
+
+    return {
+      title: script.title || 'Untitled Cutscene',
+      settings,
+      characters,
+      scenes,
+    };
+  }
+
+  async function loadFromUrl(url) {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to load script: ${response.statusText}`);
+    const script = await response.json();
+    return parse(script);
+  }
+
+  function loadFromObject(obj) {
+    return parse(obj);
+  }
+
+  function parse(script) {
+    const errors = validate(script);
+    if (errors.length > 0) {
+      throw new Error('Script validation errors:\n' + errors.join('\n'));
+    }
+    return normalize(script);
+  }
+
+  return { loadFromUrl, loadFromObject, validate };
+})();
+
+const DEMO_SCRIPT = {
+  "title": "The Quest Begins",
+  "settings": {
+    "resolution": [256, 224],
+    "textSpeed": 35,
+    "defaultTransition": "fade"
+  },
+  "characters": {
+    "hero": {
+      "sprite": "warrior",
+      "name": "Aldric",
+      "nameColor": "#55aaff"
+    },
+    "elder": {
+      "sprite": "oldman",
+      "name": "Elder Morin",
+      "nameColor": "#ffaa55"
+    },
+    "villain": {
+      "sprite": "villain",
+      "name": "Lord Malachar",
+      "nameColor": "#ff4444"
+    },
+    "princess": {
+      "sprite": "princess",
+      "name": "Princess Elara",
+      "nameColor": "#ff88cc"
+    }
+  },
+  "scenes": [
+    {
+      "id": "opening",
+      "background": "castle_hall",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 1500 },
+        { "type": "enter", "character": "elder", "from": "left", "to": { "x": 60, "y": 130 }, "duration": 1000 },
+        { "type": "wait", "duration": 400 },
+        { "type": "dialogue", "character": "elder", "text": "The ancient seals are breaking. I can feel the darkness stirring once more." },
+        { "type": "enter", "character": "hero", "from": "right", "to": { "x": 170, "y": 130 }, "duration": 800 },
+        { "type": "dialogue", "character": "hero", "text": "Elder Morin! I came as fast as I could. What has happened?" },
+        { "type": "dialogue", "character": "elder", "text": "Lord Malachar has returned. His dark tower rises again in the eastern wastes." },
+        { "type": "shake", "intensity": 4, "duration": 600 },
+        { "type": "emote", "character": "hero", "emote": "surprise", "duration": 1200 },
+        { "type": "dialogue", "character": "hero", "text": "That is impossible! He was sealed away a thousand years ago!" },
+        { "type": "dialogue", "character": "elder", "text": "Nothing is impossible for one who commands the Void. You must stop him, Aldric." },
+        { "type": "dialogue", "character": "hero", "text": "I will not fail you, Elder. I swear it." },
+        { "type": "exit", "character": "hero", "to": "right", "duration": 800 },
+        { "type": "wait", "duration": 500 },
+        { "type": "transition", "effect": "fadeOut", "duration": 1000 }
+      ]
+    },
+    {
+      "id": "forest_encounter",
+      "background": "forest",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 1200 },
+        { "type": "enter", "character": "hero", "from": "left", "to": { "x": 80, "y": 115 }, "duration": 800 },
+        { "type": "wait", "duration": 600 },
+        { "type": "enter", "character": "princess", "from": "right", "to": { "x": 160, "y": 115 }, "duration": 600 },
+        { "type": "dialogue", "character": "princess", "text": "Wait! You are the one they call Aldric, are you not?" },
+        { "type": "dialogue", "character": "hero", "text": "Princess Elara? What are you doing this far from the castle?" },
+        { "type": "dialogue", "character": "princess", "text": "I have a map to the Dark Tower. You will need it." },
+        { "type": "emote", "character": "hero", "emote": "happy", "duration": 1000 },
+        { "type": "dialogue", "character": "hero", "text": "Thank you, Your Highness. This will be invaluable." },
+        { "type": "dialogue", "character": "princess", "text": "Be careful, Aldric. Malachar is not to be underestimated." },
+        { "type": "exit", "character": "princess", "to": "right", "duration": 800 },
+        { "type": "wait", "duration": 300 },
+        { "type": "exit", "character": "hero", "to": "right", "duration": 600 },
+        { "type": "transition", "effect": "fadeOut", "duration": 1000 }
+      ]
+    },
+    {
+      "id": "dark_tower",
+      "background": "dark_tower",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 1500 },
+        { "type": "wait", "duration": 800 },
+        { "type": "enter", "character": "villain", "from": "left", "to": { "x": 120, "y": 110 }, "duration": 1200 },
+        { "type": "dialogue", "character": "villain", "text": "So... the mortals send a single warrior to challenge me." },
+        { "type": "shake", "intensity": 6, "duration": 800 },
+        { "type": "dialogue", "character": "villain", "text": "The Void consumes all. Your quest ends here." },
+        { "type": "emote", "character": "villain", "emote": "anger", "duration": 1500 },
+        { "type": "wait", "duration": 500 },
+        { "type": "enter", "character": "hero", "from": "right", "to": { "x": 180, "y": 130 }, "duration": 800 },
+        { "type": "dialogue", "character": "hero", "text": "I have crossed mountains and forests to reach you, Malachar." },
+        { "type": "dialogue", "character": "hero", "text": "Your reign of darkness ends today!" },
+        { "type": "shake", "intensity": 8, "duration": 1000 },
+        { "type": "wait", "duration": 300 },
+        { "type": "transition", "effect": "fadeOut", "duration": 2000 }
+      ]
+    },
+    {
+      "id": "epilogue",
+      "background": "night_sky",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 2000 },
+        { "type": "wait", "duration": 1000 },
+        { "type": "enter", "character": "hero", "from": "bottom", "to": { "x": 120, "y": 140 }, "duration": 1000 },
+        { "type": "dialogue", "character": "hero", "text": "It is done. The darkness has been vanquished..." },
+        { "type": "dialogue", "character": "hero", "text": "...for now." },
+        { "type": "wait", "duration": 1500 },
+        { "type": "transition", "effect": "fadeOut", "duration": 2500 }
+      ]
+    }
+  ]
+}
+;
+/**
+ * CutsceneEngine — Main game loop, action sequencing, input handling.
+ */
+const CutsceneEngine = (() => {
+  let script = null;
+  let sceneIndex = 0;
+  let actionIndex = 0;
+  let running = false;
+  let lastTime = 0;
+  let animFrame = 0;
+  let animTimer = 0;
+  const ANIM_INTERVAL = 500; // ms per sprite frame toggle
+
+  // Active characters on screen
+  const characters = {};
+
+  // Current state
+  let currentBackground = null;
+  let waitingForInput = false;
+  let waitTimer = 0;
+  let currentActionTween = null;
+  let activeEmote = null;
+  let emoteTimer = 0;
+
+  // Input state
+  let advancePressed = false;
+  let skipPressed = false;
+
+  const { getInternalSize } = Renderer;
+
+  function getOffscreenPos(direction) {
+    const size = getInternalSize();
+    switch (direction) {
+      case 'left': return { x: -20, y: null };
+      case 'right': return { x: size.width + 4, y: null };
+      case 'top': return { x: null, y: -28 };
+      case 'bottom': return { x: null, y: size.height + 4 };
+      default: return { x: -20, y: null };
+    }
+  }
+
+  function getOrCreateCharacter(charId) {
+    if (!characters[charId]) {
+      const def = script.characters[charId];
+      characters[charId] = {
+        id: charId,
+        sprite: def.sprite,
+        name: def.name,
+        nameColor: def.nameColor,
+        x: 0, y: 0,
+        visible: false,
+      };
+    }
+    return characters[charId];
+  }
+
+  // --- Action processors ---
+
+  function beginAction(action) {
+    switch (action.type) {
+      case 'transition':
+        return beginTransition(action);
+      case 'enter':
+        return beginEnter(action);
+      case 'exit':
+        return beginExit(action);
+      case 'dialogue':
+        return beginDialogue(action);
+      case 'wait':
+        return beginWait(action);
+      case 'shake':
+        return beginShake(action);
+      case 'emote':
+        return beginEmote(action);
+      case 'move':
+        return beginMove(action);
+      case 'setBackground':
+        return beginSetBackground(action);
+      default:
+        return { done: true };
+    }
+  }
+
+  function beginTransition(action) {
+    const duration = action.duration || 1000;
+    if (action.effect === 'fadeIn') {
+      AnimationSystem.startFade(1.0, 0.0, duration);
+    } else if (action.effect === 'fadeOut') {
+      AnimationSystem.startFade(0.0, 1.0, duration);
+    } else if (action.effect === 'cut') {
+      return { done: true };
+    }
+    waitTimer = duration;
+    return { done: false, type: 'timed' };
+  }
+
+  function beginEnter(action) {
+    const char = getOrCreateCharacter(action.character);
+    const from = getOffscreenPos(action.from || 'left');
+    const to = action.to || { x: 128, y: 120 };
+    const duration = action.duration || 800;
+
+    char.x = from.x !== null ? from.x : to.x;
+    char.y = from.y !== null ? from.y : to.y;
+    char.visible = true;
+
+    const tweenX = AnimationSystem.addTween(char, 'x', char.x, to.x, duration, 'easeOut');
+    const tweenY = AnimationSystem.addTween(char, 'y', char.y, to.y, duration, 'easeOut');
+
+    waitTimer = duration;
+    return { done: false, type: 'timed' };
+  }
+
+  function beginExit(action) {
+    const char = getOrCreateCharacter(action.character);
+    const toDir = getOffscreenPos(action.to || 'right');
+    const duration = action.duration || 800;
+
+    const targetX = toDir.x !== null ? toDir.x : char.x;
+    const targetY = toDir.y !== null ? toDir.y : char.y;
+
+    AnimationSystem.addTween(char, 'x', char.x, targetX, duration, 'easeIn');
+    AnimationSystem.addTween(char, 'y', char.y, targetY, duration, 'easeIn');
+
+    waitTimer = duration;
+    return { done: false, type: 'timed', onDone: () => { char.visible = false; } };
+  }
+
+  function beginDialogue(action) {
+    const charDef = script.characters[action.character];
+    const maxWidth = Renderer.getTextMaxWidth();
+    const scale = Renderer.getTextScale();
+    const speed = script.settings.textSpeed || 30;
+
+    AnimationSystem.startTypewriter(action.text, speed, maxWidth, scale);
+    waitingForInput = true;
+
+    return { done: false, type: 'dialogue', character: action.character };
+  }
+
+  function beginWait(action) {
+    waitTimer = action.duration || 500;
+    return { done: false, type: 'timed' };
+  }
+
+  function beginShake(action) {
+    AnimationSystem.startShake(action.intensity || 3, action.duration || 500);
+    waitTimer = action.duration || 500;
+    return { done: false, type: 'timed' };
+  }
+
+  function beginEmote(action) {
+    const char = getOrCreateCharacter(action.character);
+    activeEmote = { character: char, emote: action.emote || 'surprise' };
+    emoteTimer = action.duration || 1500;
+    waitTimer = emoteTimer;
+    return { done: false, type: 'timed', onDone: () => { activeEmote = null; } };
+  }
+
+  function beginMove(action) {
+    const char = getOrCreateCharacter(action.character);
+    const to = action.to || { x: char.x, y: char.y };
+    const duration = action.duration || 600;
+
+    AnimationSystem.addTween(char, 'x', char.x, to.x, duration, 'linear');
+    AnimationSystem.addTween(char, 'y', char.y, to.y, duration, 'linear');
+
+    waitTimer = duration;
+    return { done: false, type: 'timed' };
+  }
+
+  function beginSetBackground(action) {
+    currentBackground = action.background;
+    return { done: true };
+  }
+
+  // --- Main loop ---
+
+  let currentActionState = null;
+
+  function processNextAction() {
+    const scene = script.scenes[sceneIndex];
+    if (!scene) {
+      // All scenes done
+      running = false;
+      return;
+    }
+
+    if (actionIndex >= scene.actions.length) {
+      // Move to next scene
+      sceneIndex++;
+      actionIndex = 0;
+      if (sceneIndex < script.scenes.length) {
+        const nextScene = script.scenes[sceneIndex];
+        if (nextScene.background) {
+          currentBackground = nextScene.background;
+        }
+      }
+      processNextAction();
+      return;
+    }
+
+    const action = scene.actions[actionIndex];
+    currentActionState = beginAction(action);
+
+    if (currentActionState.done) {
+      actionIndex++;
+      processNextAction();
+    }
+  }
+
+  function update(dt) {
+    if (!running || !currentActionState) return;
+
+    AnimationSystem.update(dt);
+
+    // Sprite animation
+    animTimer += dt;
+    if (animTimer >= ANIM_INTERVAL) {
+      animTimer -= ANIM_INTERVAL;
+      animFrame = (animFrame + 1) % 2;
+    }
+
+    // Emote bob
+    if (activeEmote) {
+      emoteTimer -= dt;
+      if (emoteTimer <= 0) {
+        activeEmote = null;
+      }
+    }
+
+    if (currentActionState.type === 'timed') {
+      waitTimer -= dt;
+      if (waitTimer <= 0 || skipPressed) {
+        if (currentActionState.onDone) currentActionState.onDone();
+        skipPressed = false;
+        actionIndex++;
+        processNextAction();
+      }
+    } else if (currentActionState.type === 'dialogue') {
+      if (advancePressed) {
+        const twState = AnimationSystem.getTypewriterState();
+        if (!twState.done) {
+          AnimationSystem.completeTypewriter();
+        } else {
+          waitingForInput = false;
+          advancePressed = false;
+          actionIndex++;
+          processNextAction();
+        }
+        advancePressed = false;
+      }
+    }
+  }
+
+  function render() {
+    Renderer.beginFrame();
+
+    // Background
+    if (currentBackground) {
+      Renderer.drawBackground(currentBackground);
+    }
+
+    // Camera (shake)
+    const camera = AnimationSystem.getCamera();
+    Renderer.applyCamera(camera);
+
+    // Characters
+    for (const char of Object.values(characters)) {
+      Renderer.drawCharacter(char, animFrame);
+    }
+
+    // Emote
+    if (activeEmote) {
+      const bob = Math.sin(Date.now() / 200) * 2;
+      Renderer.drawEmoteBubble(activeEmote.character, activeEmote.emote, bob);
+    }
+
+    Renderer.restoreCamera();
+
+    // Dialogue box
+    if (waitingForInput) {
+      const charId = script.scenes[sceneIndex]?.actions[actionIndex]?.character;
+      const charDef = charId ? script.characters[charId] : null;
+      Renderer.drawDialogueBox(
+        charDef ? charDef.name : '',
+        charDef ? charDef.nameColor : '#ffffff'
+      );
+      Renderer.drawDialogueText(AnimationSystem.getTypewriterState());
+    }
+
+    // Fade overlay
+    const fadeAlpha = AnimationSystem.getFadeAlpha();
+    Renderer.drawFadeOverlay(fadeAlpha);
+
+    // Present to display canvas
+    Renderer.present();
+  }
+
+  function gameLoop(timestamp) {
+    if (!running) return;
+    const dt = lastTime ? timestamp - lastTime : 16;
+    lastTime = timestamp;
+
+    update(dt);
+    render();
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  // --- Public API ---
+
+  function play(cutsceneScript) {
+    script = cutsceneScript;
+    sceneIndex = 0;
+    actionIndex = 0;
+    running = true;
+    lastTime = 0;
+    animFrame = 0;
+    animTimer = 0;
+    waitingForInput = false;
+    waitTimer = 0;
+    activeEmote = null;
+    currentActionState = null;
+
+    // Clear characters
+    for (const key of Object.keys(characters)) {
+      delete characters[key];
+    }
+
+    AnimationSystem.clear();
+
+    // Set initial background from first scene
+    if (script.scenes[0] && script.scenes[0].background) {
+      currentBackground = script.scenes[0].background;
+    } else {
+      currentBackground = null;
+    }
+
+    // Start processing
+    processNextAction();
+    requestAnimationFrame(gameLoop);
+  }
+
+  function stop() {
+    running = false;
+  }
+
+  function handleInput(type) {
+    if (type === 'advance') {
+      advancePressed = true;
+    } else if (type === 'skip') {
+      skipPressed = true;
+    }
+  }
+
+  return { play, stop, handleInput };
+})();
+
+
+
+// --- Page initialization ---
+(function initPage() {
+  const canvas = document.getElementById('display-canvas');
+  Renderer.init(canvas);
+  canvas.addEventListener('click', () => CutsceneEngine.handleInput('advance'));
+  canvas.addEventListener('touchstart', (e) => { e.preventDefault(); CutsceneEngine.handleInput('advance'); });
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); CutsceneEngine.handleInput('advance'); }
+    else if (e.code === 'Escape') CutsceneEngine.handleInput('skip');
+  });
+  document.getElementById('btn-demo').addEventListener('click', () => loadDemo());
+  document.getElementById('btn-restart').addEventListener('click', () => { if (window._lastScript) { CutsceneEngine.stop(); CutsceneEngine.play(window._lastScript); } });
+  loadDemo();
+  function loadDemo() {
+    const parsed = ScriptParser.loadFromObject(DEMO_SCRIPT);
+    window._lastScript = parsed;
+    CutsceneEngine.stop();
+    CutsceneEngine.play(parsed);
+  }
+})();
+
+</script>
+</body>
+</html>
