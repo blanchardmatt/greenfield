@@ -641,22 +641,38 @@ const CutsceneEngine = (() => {
     for (const char of sortedChars) {
       const idleBob = (!char.dancing && !char.milling) ? Math.sin(t / 600 + char.idleSeed * 10) * 1.5 : 0;
 
-      // Face toward points of interest: Lyra, fire, or neighbors
+      // Face direction based on state
       if (!char.pinned) {
         const charCenterX = char.x + SpriteLibrary.W * (char.renderScale || 1) / 2;
-        // Cycle attention: Lyra, fire, random direction
-        const attentionCycle = 8000 + char.idleSeed * 3000;
-        const attentionPhase = ((t + char.idleSeed * 5000) % attentionCycle) / attentionCycle;
-        let lookAtX;
-        if (attentionPhase < 0.5) {
-          lookAtX = lyraX; // look at Lyra
-        } else if (attentionPhase < 0.8) {
-          lookAtX = 145; // look at fire
+
+        if (char.dancing) {
+          // Dancing: face direction of movement (tangent to orbit)
+          // If moving right (cos component positive), face right (not flipped)
+          const dancingChars = sortedChars.filter(c => c.dancing);
+          const di = dancingChars.indexOf(char);
+          const totalDancers = dancingChars.length || 1;
+          const angle = (t / 2500 + (di / totalDancers) * Math.PI * 2) % (Math.PI * 2);
+          // Tangent direction: -sin(angle) for x velocity
+          char.flipped = Math.sin(angle) > 0;
         } else {
-          // Glance at a neighbor or random direction
-          lookAtX = charCenterX + Math.sin(t / 1000 + char.idleSeed * 7) * 60;
+          // Milling/idle: look at Lyra, fire, or neighbors
+          const attentionCycle = 8000 + char.idleSeed * 3000;
+          const attentionPhase = ((t + char.idleSeed * 5000) % attentionCycle) / attentionCycle;
+          let lookAtX;
+          if (attentionPhase < 0.4) {
+            lookAtX = lyraX; // look at Lyra
+          } else if (attentionPhase < 0.65) {
+            lookAtX = 115; // look at fire
+          } else if (attentionPhase < 0.85) {
+            // Look at a nearby character
+            const nearIdx = Math.floor(char.idleSeed * sortedChars.length) % sortedChars.length;
+            lookAtX = sortedChars[nearIdx].x + 16;
+          } else {
+            // Glance around randomly
+            lookAtX = charCenterX + Math.sin(t / 800 + char.idleSeed * 7) * 80;
+          }
+          char.flipped = charCenterX > lookAtX;
         }
-        char.flipped = charCenterX > lookAtX;
       }
 
       Renderer.drawCharacterWithOffset(char, animFrame, 0, idleBob);
