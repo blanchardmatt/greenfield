@@ -1646,11 +1646,183 @@ const Renderer = (() => {
     if (backgrounds[name]) {
       backgrounds[name](ctx);
     } else {
-      // Default: solid dark color
       ctx.fillStyle = '#1a1a2e';
       ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
     }
+    // Animated overlays
+    if (bgAnimations[name]) {
+      bgAnimations[name](ctx, Date.now());
+    }
   }
+
+  // --- Background animations ---
+
+  const bgAnimations = {
+    castle_hall(ctx, t) {
+      // Flickering torches — vary brightness
+      const torchPositions = [40, 120, 200];
+      for (const tx of torchPositions) {
+        const flicker = Math.sin(t / 80 + tx) * 0.3 + Math.sin(t / 130 + tx * 2) * 0.2;
+        const bright = 0.6 + flicker * 0.4;
+        ctx.globalAlpha = bright;
+        ctx.fillStyle = '#ffcc44';
+        ctx.fillRect(tx - 1, 34, 5, 4);
+        ctx.fillStyle = '#ff8833';
+        ctx.fillRect(tx - 2, 32, 7, 6);
+        // Glow on wall
+        ctx.globalAlpha = bright * 0.15;
+        ctx.fillStyle = '#ff8833';
+        fillCircle(ctx, tx + 1, 38, 12);
+        ctx.globalAlpha = 1;
+      }
+      // Dust motes floating
+      ctx.fillStyle = '#aaaa88';
+      for (let i = 0; i < 8; i++) {
+        const speed = 0.01 + (i % 3) * 0.005;
+        const dx = ((t * speed + i * 37) % (INTERNAL_W + 20)) - 10;
+        const dy = 30 + Math.sin(t / 800 + i * 1.7) * 40 + (i * 17) % 60;
+        ctx.globalAlpha = 0.3 + Math.sin(t / 600 + i) * 0.15;
+        ctx.fillRect(Math.floor(dx), Math.floor(dy), 1, 1);
+      }
+      ctx.globalAlpha = 1;
+    },
+
+    forest(ctx, t) {
+      // Falling leaves
+      ctx.fillStyle = '#88aa33';
+      for (let i = 0; i < 6; i++) {
+        const speed = 0.015 + (i % 3) * 0.008;
+        const leafY = ((t * speed + i * 50) % (130)) + 10;
+        const leafX = 20 + (i * 43) % 220 + Math.sin(t / 500 + i * 2) * 8;
+        const c = (i % 2 === 0) ? '#88aa33' : '#cc8833';
+        ctx.fillStyle = c;
+        ctx.globalAlpha = 0.7;
+        ctx.fillRect(Math.floor(leafX), Math.floor(leafY), 2, 1);
+        ctx.fillRect(Math.floor(leafX) + 1, Math.floor(leafY) + 1, 1, 1);
+      }
+      // Bird/crow flying across
+      const birdCycle = 12000; // ms for full crossing
+      const birdX = ((t % birdCycle) / birdCycle) * (INTERNAL_W + 40) - 20;
+      const birdY = 25 + Math.sin(t / 300) * 3;
+      const wingUp = Math.sin(t / 120) > 0;
+      ctx.fillStyle = '#222222';
+      ctx.globalAlpha = 0.9;
+      // Body
+      ctx.fillRect(Math.floor(birdX), Math.floor(birdY), 3, 1);
+      // Wings
+      if (wingUp) {
+        ctx.fillRect(Math.floor(birdX) - 2, Math.floor(birdY) - 1, 2, 1);
+        ctx.fillRect(Math.floor(birdX) + 3, Math.floor(birdY) - 1, 2, 1);
+      } else {
+        ctx.fillRect(Math.floor(birdX) - 2, Math.floor(birdY) + 1, 2, 1);
+        ctx.fillRect(Math.floor(birdX) + 3, Math.floor(birdY) + 1, 2, 1);
+      }
+      ctx.globalAlpha = 1;
+    },
+
+    night_sky(ctx, t) {
+      // Twinkling stars
+      let seed = 12345;
+      for (let i = 0; i < 60; i++) {
+        seed = (seed * 16807) % 2147483647;
+        const sx = seed % INTERNAL_W;
+        seed = (seed * 16807) % 2147483647;
+        const sy = seed % (INTERNAL_H - 60);
+        const twinkle = 0.3 + Math.sin(t / 400 + i * 1.3) * 0.3 + Math.sin(t / 700 + i * 0.7) * 0.2;
+        ctx.globalAlpha = Math.max(0.05, twinkle);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(sx, sy, 1, 1);
+      }
+      // Cloud drifting across moon area
+      const cloudX = 150 + Math.sin(t / 8000) * 50;
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = '#334455';
+      fillCircle(ctx, Math.floor(cloudX), 28, 8);
+      fillCircle(ctx, Math.floor(cloudX) + 10, 25, 10);
+      fillCircle(ctx, Math.floor(cloudX) + 20, 28, 7);
+      // Second cloud, slower
+      const cloud2X = 60 + Math.sin(t / 12000 + 2) * 70;
+      ctx.globalAlpha = 0.15;
+      fillCircle(ctx, Math.floor(cloud2X), 45, 12);
+      fillCircle(ctx, Math.floor(cloud2X) + 14, 42, 9);
+      fillCircle(ctx, Math.floor(cloud2X) + 25, 46, 8);
+      // Shooting star (occasional)
+      const shootCycle = 7000;
+      const shootPhase = (t % shootCycle) / shootCycle;
+      if (shootPhase < 0.08) {
+        const sp = shootPhase / 0.08;
+        const sx = 30 + sp * 100;
+        const sy = 10 + sp * 40;
+        ctx.globalAlpha = 1 - sp;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(Math.floor(sx), Math.floor(sy), 2, 1);
+        ctx.fillRect(Math.floor(sx) - 2, Math.floor(sy) - 1, 1, 1);
+      }
+      ctx.globalAlpha = 1;
+    },
+
+    dark_tower(ctx, t) {
+      // Lightning flash (rare)
+      const flashCycle = 9000;
+      const flashPhase = (t % flashCycle) / flashCycle;
+      if (flashPhase > 0.92 && flashPhase < 0.94) {
+        ctx.globalAlpha = 0.3;
+        ctx.fillStyle = '#8866cc';
+        ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+      }
+      // Swirling embers around tower
+      ctx.fillStyle = '#884488';
+      for (let i = 0; i < 10; i++) {
+        const angle = (t / 2000 + i * 0.628) % (Math.PI * 2);
+        const radius = 30 + Math.sin(t / 1500 + i) * 10;
+        const ex = 128 + Math.cos(angle) * radius;
+        const ey = 80 + Math.sin(angle) * radius * 0.5;
+        ctx.globalAlpha = 0.4 + Math.sin(t / 300 + i * 2) * 0.3;
+        ctx.fillRect(Math.floor(ex), Math.floor(ey), 1, 1);
+      }
+      // Window flicker
+      const wFlicker = 0.7 + Math.sin(t / 200) * 0.2 + Math.sin(t / 370) * 0.1;
+      ctx.globalAlpha = wFlicker;
+      ctx.fillStyle = '#aa66aa';
+      ctx.fillRect(124, 62, 8, 12);
+      ctx.globalAlpha = 1;
+    },
+
+    village(ctx, t) {
+      // Chimney smoke from houses
+      const smokePositions = [50, 150, 220];
+      ctx.fillStyle = '#999999';
+      for (const sx of smokePositions) {
+        for (let i = 0; i < 4; i++) {
+          const age = ((t / 30 + i * 15 + sx) % 60);
+          const py = 78 - age;
+          const px = sx + Math.sin(t / 600 + i + sx * 0.1) * (3 + age * 0.1);
+          ctx.globalAlpha = Math.max(0, 0.3 - age * 0.005);
+          const size = 1 + Math.floor(age / 20);
+          ctx.fillRect(Math.floor(px), Math.floor(py), size, size);
+        }
+      }
+      // Bird sitting on roof, occasionally flaps
+      const flapPhase = (t % 5000) / 5000;
+      const bx = 68;
+      const by = 83;
+      ctx.fillStyle = '#333333';
+      ctx.globalAlpha = 0.9;
+      ctx.fillRect(bx, by, 3, 2);
+      if (flapPhase > 0.9) {
+        ctx.fillRect(bx - 2, by - 1, 2, 1);
+        ctx.fillRect(bx + 3, by - 1, 2, 1);
+      }
+      // Clouds drifting
+      const cX = ((t * 0.008) % (INTERNAL_W + 60)) - 30;
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = '#aabbcc';
+      fillCircle(ctx, Math.floor(cX), 35, 10);
+      fillCircle(ctx, Math.floor(cX) + 12, 32, 13);
+      fillCircle(ctx, Math.floor(cX) + 25, 36, 9);
+      ctx.globalAlpha = 1;
+    },
+  };
 
   // --- Character rendering ---
 
