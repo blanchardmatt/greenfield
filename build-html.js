@@ -74,6 +74,7 @@ ${css}
 <div class="toolbar-sep" style="width:1px;height:20px;background:#333;margin:0 4px;display:inline-block"></div>
 <button id="btn-prev">Prev</button>
 <button id="btn-next">Next</button>
+<button id="btn-autoplay" style="background:#335533;border-color:#557755">Auto</button>
 <div class="toolbar-sep" style="width:1px;height:20px;background:#333;margin:0 4px;display:inline-block"></div>
 <button id="btn-record" style="background:#553333;border-color:#774444">Record</button>
 <button id="btn-export-vid" style="background:#333355;border-color:#444477">Export Video</button>
@@ -138,6 +139,20 @@ ${engineJs}
   // --- Scene navigation ---
   document.getElementById('btn-prev').addEventListener('click', () => CutsceneEngine.prevScene());
   document.getElementById('btn-next').addEventListener('click', () => CutsceneEngine.nextScene());
+
+  // --- Auto-play toggle ---
+  var autoPlayBtn = document.getElementById('btn-autoplay');
+  autoPlayBtn.addEventListener('click', function() {
+    var isAuto = CutsceneEngine.getAutoAdvance();
+    CutsceneEngine.setAutoAdvance(!isAuto, 2500);
+    updateAutoPlayBtn();
+  });
+  function updateAutoPlayBtn() {
+    var isAuto = CutsceneEngine.getAutoAdvance();
+    autoPlayBtn.textContent = isAuto ? 'Manual' : 'Auto';
+    autoPlayBtn.style.background = isAuto ? '#553355' : '#335533';
+    autoPlayBtn.style.borderColor = isAuto ? '#775577' : '#557755';
+  }
 
   // --- Video Recording ---
   var mediaRecorder = null;

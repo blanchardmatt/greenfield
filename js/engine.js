@@ -720,5 +720,10 @@ const CutsceneEngine = (() => {
   }
 
   function isRunning() { return running; }
-  return { play, stop, pause, resume, step, getState, handleInput, isRunning, nextScene, prevScene, jumpToScene, getSceneCount };
+  function setAutoAdvance(on, delay) {
+    autoAdvance = !!on;
+    if (delay !== undefined) autoAdvanceDelay = delay;
+  }
+  function getAutoAdvance() { return autoAdvance; }
+  return { play, stop, pause, resume, step, getState, handleInput, isRunning, nextScene, prevScene, jumpToScene, getSceneCount, setAutoAdvance, getAutoAdvance };
 })();
