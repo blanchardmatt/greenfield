@@ -2865,11 +2865,54 @@ const Renderer = (() => {
       fillCircle(ctx, Math.floor(sc2x), 50, 10);
       fillCircle(ctx, Math.floor(sc2x) + 12, 47, 12);
 
+      // Wheelchair rider on the roof of the Biltroy
+      const roofY = 78;
+      const roofLeft = 72;
+      const roofRight = 186;
+      const roofW = roofRight - roofLeft;
+      // Ping-pong back and forth
+      const wheelCycle = 8000;
+      const wheelPhase = (t % wheelCycle) / wheelCycle;
+      const goingRight = wheelPhase < 0.5;
+      const wheelT = goingRight ? wheelPhase * 2 : (1 - wheelPhase) * 2;
+      const wx = roofLeft + wheelT * (roofW - 12);
+      const wy = roofY;
+
+      ctx.globalAlpha = 1;
+
+      // Wheelchair — wheels
+      ctx.fillStyle = '#666666';
+      ctx.fillRect(Math.floor(wx), wy + 6, 2, 2);      // back wheel
+      ctx.fillRect(Math.floor(wx) + 8, wy + 6, 2, 2);   // front wheel
+      // Wheelchair frame
+      ctx.fillStyle = '#888888';
+      ctx.fillRect(Math.floor(wx), wy + 5, 10, 1);       // seat
+      ctx.fillRect(Math.floor(wx), wy + 2, 1, 4);         // back rest
+      ctx.fillRect(Math.floor(wx) + 9, wy + 4, 1, 2);     // front
+
+      // Person in chair
+      ctx.fillStyle = '#f0b888'; // skin
+      ctx.fillRect(Math.floor(wx) + 3, wy - 1, 4, 3);     // head
+      ctx.fillStyle = '#111111';
+      if (goingRight) {
+        ctx.fillRect(Math.floor(wx) + 5, wy - 1, 1, 1);   // eye (facing right)
+      } else {
+        ctx.fillRect(Math.floor(wx) + 4, wy - 1, 1, 1);   // eye (facing left)
+      }
+      ctx.fillStyle = '#cc3333'; // shirt
+      ctx.fillRect(Math.floor(wx) + 2, wy + 2, 6, 3);     // body
+      // Arms — one raised waving
+      ctx.fillStyle = '#f0b888';
+      if (Math.sin(t / 200) > 0) {
+        ctx.fillRect(Math.floor(wx) + 7, wy, 2, 1);       // arm up
+        ctx.fillRect(Math.floor(wx) + 8, wy - 1, 1, 1);   // hand up
+      } else {
+        ctx.fillRect(Math.floor(wx) + 7, wy + 1, 2, 1);   // arm mid
+      }
+
       ctx.globalAlpha = 1;
     },
   };
-
-  // --- UFO rendering ---
 
   function drawUfo(state) {
     const ux = Math.round(state.x);
