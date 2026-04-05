@@ -191,16 +191,6 @@
           "duration": 2000
         },
         {
-          "type": "enter",
-          "character": "gimli",
-          "from": "left",
-          "to": {
-            "x": 120,
-            "y": 145
-          },
-          "duration": 600
-        },
-        {
           "type": "showProp",
           "prop": "amplifier",
           "x": 190,
@@ -242,58 +232,18 @@
         },
         {
           "type": "enter",
-          "character": "hank",
-          "from": "left",
-          "to": {
-            "x": 158,
-            "y": 148
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk3",
-          "from": "left",
-          "to": {
-            "x": 25,
-            "y": 135
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
           "character": "townsfolk2",
           "from": "left",
           "to": {
             "x": 130,
             "y": 180
           },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk4",
-          "from": "left",
-          "to": {
-            "x": 75,
-            "y": 168
-          },
-          "duration": 600
+          "duration": 1500
         },
         {
           "type": "shake",
           "intensity": 2,
           "duration": 400
-        },
-        {
-          "type": "enter",
-          "character": "hero",
-          "from": "left",
-          "to": {
-            "x": 85,
-            "y": 150
-          },
-          "duration": 600
         },
         {
           "type": "dialogue",
@@ -302,13 +252,13 @@
         },
         {
           "type": "enter",
-          "character": "swift",
+          "character": "townsfolk8",
           "from": "right",
           "to": {
-            "x": 170,
-            "y": 140
+            "x": 131,
+            "y": 174
           },
-          "duration": 600
+          "duration": 1500
         },
         {
           "type": "dialogue",
@@ -317,13 +267,13 @@
         },
         {
           "type": "enter",
-          "character": "elder",
-          "from": "left",
+          "character": "morgana",
+          "from": "right",
           "to": {
-            "x": 50,
-            "y": 138
+            "x": 89,
+            "y": 141
           },
-          "duration": 600
+          "duration": 1500
         },
         {
           "type": "dialogue",
@@ -332,13 +282,13 @@
         },
         {
           "type": "enter",
-          "character": "townsfolk1",
-          "from": "right",
+          "character": "hank",
+          "from": "left",
           "to": {
-            "x": 140,
-            "y": 162
+            "x": 158,
+            "y": 148
           },
-          "duration": 600
+          "duration": 1500
         },
         {
           "type": "shake",
@@ -354,6 +304,16 @@
           "text": "Full stalled spinning out... unkempt and overgrown."
         },
         {
+          "type": "enter",
+          "character": "elder",
+          "from": "left",
+          "to": {
+            "x": 50,
+            "y": 138
+          },
+          "duration": 1500
+        },
+        {
           "type": "emote",
           "character": "lyra",
           "emote": "anger",
@@ -363,6 +323,16 @@
           "type": "dialogue",
           "character": "lyra",
           "text": "Why so loud..."
+        },
+        {
+          "type": "enter",
+          "character": "dark_lord",
+          "from": "left",
+          "to": {
+            "x": 126,
+            "y": 154
+          },
+          "duration": 1500
         },
         {
           "type": "shake",
@@ -381,9 +351,29 @@
           "text": "Run it sideways and return."
         },
         {
+          "type": "enter",
+          "character": "duke",
+          "from": "right",
+          "to": {
+            "x": 163,
+            "y": 167
+          },
+          "duration": 1500
+        },
+        {
           "type": "dialogue",
           "character": "lyra",
           "text": "A plastic click of a pen and..."
+        },
+        {
+          "type": "enter",
+          "character": "gimli",
+          "from": "left",
+          "to": {
+            "x": 120,
+            "y": 145
+          },
+          "duration": 1500
         },
         {
           "type": "shake",
@@ -406,166 +396,6 @@
         {
           "type": "wait",
           "duration": 1000
-        },
-        {
-          "type": "enter",
-          "character": "princess",
-          "from": "left",
-          "to": {
-            "x": 10,
-            "y": 140
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "wizard",
-          "from": "right",
-          "to": {
-            "x": 47,
-            "y": 153
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "brother_sol",
-          "from": "left",
-          "to": {
-            "x": 84,
-            "y": 166
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "shade",
-          "from": "right",
-          "to": {
-            "x": 121,
-            "y": 179
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "lily",
-          "from": "left",
-          "to": {
-            "x": 158,
-            "y": 147
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "pip",
-          "from": "right",
-          "to": {
-            "x": 15,
-            "y": 160
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "ser_valen",
-          "from": "left",
-          "to": {
-            "x": 52,
-            "y": 173
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "morgana",
-          "from": "right",
-          "to": {
-            "x": 89,
-            "y": 141
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "dark_lord",
-          "from": "left",
-          "to": {
-            "x": 126,
-            "y": 154
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "duke",
-          "from": "right",
-          "to": {
-            "x": 163,
-            "y": 167
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk5",
-          "from": "left",
-          "to": {
-            "x": 20,
-            "y": 180
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk6",
-          "from": "right",
-          "to": {
-            "x": 57,
-            "y": 148
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk7",
-          "from": "left",
-          "to": {
-            "x": 94,
-            "y": 161
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk8",
-          "from": "right",
-          "to": {
-            "x": 131,
-            "y": 174
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk9",
-          "from": "left",
-          "to": {
-            "x": 168,
-            "y": 142
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk10",
-          "from": "right",
-          "to": {
-            "x": 25,
-            "y": 155
-          },
-          "duration": 600
         },
         {
           "type": "transition",
@@ -592,6 +422,16 @@
           "text": "Wind chimes howl..."
         },
         {
+          "type": "enter",
+          "character": "wizard",
+          "from": "right",
+          "to": {
+            "x": 47,
+            "y": 153
+          },
+          "duration": 1500
+        },
+        {
           "type": "joinDance",
           "character": "hero"
         },
@@ -611,13 +451,43 @@
           "text": "March in a symphony of thorns."
         },
         {
+          "type": "enter",
+          "character": "townsfolk5",
+          "from": "left",
+          "to": {
+            "x": 20,
+            "y": 180
+          },
+          "duration": 1500
+        },
+        {
           "type": "joinDance",
           "character": "gimli"
+        },
+        {
+          "type": "enter",
+          "character": "ser_valen",
+          "from": "left",
+          "to": {
+            "x": 52,
+            "y": 173
+          },
+          "duration": 1500
         },
         {
           "type": "dialogue",
           "character": "lyra",
           "text": "Sedge wren warbles... melody to paper untorn."
+        },
+        {
+          "type": "enter",
+          "character": "shade",
+          "from": "right",
+          "to": {
+            "x": 121,
+            "y": 179
+          },
+          "duration": 1500
         },
         {
           "type": "joinDance",
@@ -630,9 +500,49 @@
           "duration": 1200
         },
         {
+          "type": "enter",
+          "character": "brother_sol",
+          "from": "left",
+          "to": {
+            "x": 84,
+            "y": 166
+          },
+          "duration": 1500
+        },
+        {
           "type": "dialogue",
           "character": "lyra",
           "text": "I'm spun out..."
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk4",
+          "from": "left",
+          "to": {
+            "x": 75,
+            "y": 168
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "pip",
+          "from": "right",
+          "to": {
+            "x": 15,
+            "y": 160
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk6",
+          "from": "right",
+          "to": {
+            "x": 57,
+            "y": 148
+          },
+          "duration": 1500
         },
         {
           "type": "ufoArrive",
@@ -653,6 +563,16 @@
           "duration": 3000
         },
         {
+          "type": "enter",
+          "character": "swift",
+          "from": "right",
+          "to": {
+            "x": 170,
+            "y": 140
+          },
+          "duration": 1500
+        },
+        {
           "type": "ufoArrive",
           "character": "quee",
           "to": {
@@ -660,6 +580,26 @@
             "y": 150
           },
           "duration": 3000
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk7",
+          "from": "left",
+          "to": {
+            "x": 94,
+            "y": 161
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk3",
+          "from": "left",
+          "to": {
+            "x": 25,
+            "y": 135
+          },
+          "duration": 1500
         },
         {
           "type": "joinDance",
@@ -676,6 +616,16 @@
           "text": "All the color drains from my view."
         },
         {
+          "type": "enter",
+          "character": "lily",
+          "from": "left",
+          "to": {
+            "x": 158,
+            "y": 147
+          },
+          "duration": 1500
+        },
+        {
           "type": "joinDance",
           "character": "townsfolk2"
         },
@@ -685,13 +635,43 @@
           "duration": 800
         },
         {
+          "type": "enter",
+          "character": "hero",
+          "from": "left",
+          "to": {
+            "x": 85,
+            "y": 150
+          },
+          "duration": 1500
+        },
+        {
           "type": "dialogue",
           "character": "lyra",
           "text": "Seismic waves inbound..."
         },
         {
+          "type": "enter",
+          "character": "townsfolk9",
+          "from": "left",
+          "to": {
+            "x": 168,
+            "y": 142
+          },
+          "duration": 1500
+        },
+        {
           "type": "joinDance",
           "character": "townsfolk4"
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk10",
+          "from": "right",
+          "to": {
+            "x": 25,
+            "y": 155
+          },
+          "duration": 1500
         },
         {
           "type": "emote",
@@ -703,6 +683,26 @@
           "type": "dialogue",
           "character": "lyra",
           "text": "Slice through the layers unpeeled."
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk1",
+          "from": "right",
+          "to": {
+            "x": 140,
+            "y": 162
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "princess",
+          "from": "left",
+          "to": {
+            "x": 10,
+            "y": 140
+          },
+          "duration": 1500
         },
         {
           "type": "wait",
