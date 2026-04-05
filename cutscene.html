@@ -124,7 +124,11 @@ button:hover {
 <button id="btn-serenade">Serenade</button>
 <button id="btn-shards">Shards</button>
 <button id="btn-restart">Restart</button>
+<div class="toolbar-sep" style="width:1px;height:20px;background:#333;margin:0 4px;display:inline-block"></div>
+<button id="btn-record" style="background:#553333;border-color:#774444">Record</button>
+<button id="btn-export-vid" style="background:#333355;border-color:#444477">Export Video</button>
 </div>
+<div id="record-status" style="font-size:11px;color:#cc5555;margin-top:4px;display:none">Recording...</div>
 <div id="hint">Tap / Space to advance dialogue</div>
 <script>
 /**
@@ -1821,13 +1825,64 @@ const SHARDS_SCRIPT = {
         { "type": "dialogue", "character": "lyra", "text": "Grasping for shards of the sound." },
         { "type": "emote", "character": "wizard", "emote": "happy", "duration": 1200 },
         { "type": "wait", "duration": 2000 },
-        { "type": "exit", "character": "lyra", "to": "bottom", "duration": 1500 },
+        { "type": "transition", "effect": "fadeOut", "duration": 1500 }
+      ]
+    },
+    {
+      "id": "dance",
+      "background": "night_sky",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 1500 },
+        { "type": "enter", "character": "lyra", "from": "bottom", "to": { "x": 112, "y": 100 }, "duration": 800 },
+        { "type": "enter", "character": "hero", "from": "left", "to": { "x": 60, "y": 108 }, "duration": 600 },
+        { "type": "enter", "character": "princess", "from": "right", "to": { "x": 165, "y": 105 }, "duration": 600 },
+        { "type": "enter", "character": "elder", "from": "left", "to": { "x": 15, "y": 110 }, "duration": 700 },
+        { "type": "enter", "character": "wizard", "from": "right", "to": { "x": 200, "y": 110 }, "duration": 700 },
+        { "type": "enter", "character": "dark_lord", "from": "right", "to": { "x": 145, "y": 115 }, "duration": 800 },
         { "type": "wait", "duration": 500 },
+        { "type": "emote", "character": "hero", "emote": "happy", "duration": 800 },
+
+        { "type": "move", "character": "hero", "to": { "x": 140, "y": 95 }, "duration": 800 },
+        { "type": "move", "character": "princess", "to": { "x": 80, "y": 95 }, "duration": 800 },
+        { "type": "move", "character": "elder", "to": { "x": 60, "y": 115 }, "duration": 800 },
+        { "type": "move", "character": "wizard", "to": { "x": 160, "y": 115 }, "duration": 800 },
+        { "type": "move", "character": "dark_lord", "to": { "x": 30, "y": 100 }, "duration": 800 },
+        { "type": "emote", "character": "princess", "emote": "happy", "duration": 800 },
+        { "type": "wait", "duration": 200 },
+
+        { "type": "move", "character": "hero", "to": { "x": 170, "y": 115 }, "duration": 800 },
+        { "type": "move", "character": "princess", "to": { "x": 30, "y": 110 }, "duration": 800 },
+        { "type": "move", "character": "elder", "to": { "x": 150, "y": 100 }, "duration": 800 },
+        { "type": "move", "character": "wizard", "to": { "x": 50, "y": 100 }, "duration": 800 },
+        { "type": "move", "character": "dark_lord", "to": { "x": 190, "y": 108 }, "duration": 800 },
+        { "type": "emote", "character": "dark_lord", "emote": "happy", "duration": 800 },
+        { "type": "wait", "duration": 200 },
+
+        { "type": "move", "character": "hero", "to": { "x": 60, "y": 100 }, "duration": 800 },
+        { "type": "move", "character": "princess", "to": { "x": 165, "y": 100 }, "duration": 800 },
+        { "type": "move", "character": "elder", "to": { "x": 100, "y": 115 }, "duration": 800 },
+        { "type": "move", "character": "wizard", "to": { "x": 130, "y": 95 }, "duration": 800 },
+        { "type": "move", "character": "dark_lord", "to": { "x": 80, "y": 112 }, "duration": 800 },
+        { "type": "emote", "character": "elder", "emote": "happy", "duration": 800 },
+        { "type": "wait", "duration": 200 },
+
+        { "type": "move", "character": "hero", "to": { "x": 90, "y": 108 }, "duration": 800 },
+        { "type": "move", "character": "princess", "to": { "x": 120, "y": 98 }, "duration": 800 },
+        { "type": "move", "character": "elder", "to": { "x": 50, "y": 105 }, "duration": 800 },
+        { "type": "move", "character": "wizard", "to": { "x": 180, "y": 105 }, "duration": 800 },
+        { "type": "move", "character": "dark_lord", "to": { "x": 150, "y": 112 }, "duration": 800 },
+        { "type": "emote", "character": "wizard", "emote": "happy", "duration": 800 },
+        { "type": "wait", "duration": 500 },
+
+        { "type": "emote", "character": "lyra", "emote": "happy", "duration": 1500 },
+        { "type": "wait", "duration": 2000 },
         { "type": "exit", "character": "hero", "to": "left", "duration": 800 },
         { "type": "exit", "character": "elder", "to": "left", "duration": 800 },
         { "type": "exit", "character": "wizard", "to": "right", "duration": 800 },
         { "type": "exit", "character": "princess", "to": "right", "duration": 800 },
         { "type": "exit", "character": "dark_lord", "to": "right", "duration": 1000 },
+        { "type": "wait", "duration": 500 },
+        { "type": "exit", "character": "lyra", "to": "bottom", "duration": 1500 },
         { "type": "wait", "duration": 1500 },
         { "type": "transition", "effect": "fadeOut", "duration": 3000 }
       ]
@@ -1862,6 +1917,10 @@ const CutsceneEngine = (() => {
   // Input state
   let advancePressed = false;
   let skipPressed = false;
+  let autoAdvance = false; // auto-advance dialogue (for video export)
+  let autoAdvanceDelay = 2000; // ms to show completed dialogue before advancing
+  let autoAdvanceTimer = 0;
+  let onCompleteCallback = null;
 
   const { getInternalSize } = Renderer;
 
@@ -2018,8 +2077,8 @@ const CutsceneEngine = (() => {
   function processNextAction() {
     const scene = script.scenes[sceneIndex];
     if (!scene) {
-      // All scenes done
       running = false;
+      if (onCompleteCallback) { onCompleteCallback(); onCompleteCallback = null; }
       return;
     }
 
@@ -2075,8 +2134,18 @@ const CutsceneEngine = (() => {
         processNextAction();
       }
     } else if (currentActionState.type === 'dialogue') {
-      if (advancePressed) {
-        const twState = AnimationSystem.getTypewriterState();
+      const twState = AnimationSystem.getTypewriterState();
+      if (autoAdvance) {
+        if (twState.done) {
+          autoAdvanceTimer += dt;
+          if (autoAdvanceTimer >= autoAdvanceDelay) {
+            waitingForInput = false;
+            autoAdvanceTimer = 0;
+            actionIndex++;
+            processNextAction();
+          }
+        }
+      } else if (advancePressed) {
         if (!twState.done) {
           AnimationSystem.completeTypewriter();
         } else {
@@ -2147,7 +2216,7 @@ const CutsceneEngine = (() => {
 
   // --- Public API ---
 
-  function play(cutsceneScript) {
+  function play(cutsceneScript, options) {
     script = cutsceneScript;
     sceneIndex = 0;
     actionIndex = 0;
@@ -2159,6 +2228,10 @@ const CutsceneEngine = (() => {
     waitTimer = 0;
     activeEmote = null;
     currentActionState = null;
+    autoAdvance = (options && options.autoAdvance) || false;
+    autoAdvanceDelay = (options && options.autoAdvanceDelay) || 2000;
+    autoAdvanceTimer = 0;
+    onCompleteCallback = (options && options.onComplete) || null;
 
     // Clear characters
     for (const key of Object.keys(characters)) {
@@ -2234,7 +2307,8 @@ const CutsceneEngine = (() => {
     }
   }
 
-  return { play, stop, pause, resume, step, getState, handleInput };
+  function isRunning() { return running; }
+  return { play, stop, pause, resume, step, getState, handleInput, isRunning };
 })();
 
 
@@ -2273,6 +2347,72 @@ const CutsceneEngine = (() => {
   document.getElementById('btn-serenade').addEventListener('click', () => playScript(SERENADE_SCRIPT));
   document.getElementById('btn-shards').addEventListener('click', () => playScript(SHARDS_SCRIPT));
   document.getElementById('btn-restart').addEventListener('click', () => { if (window._lastScript) { CutsceneEngine.stop(); CutsceneEngine.play(window._lastScript); } });
+
+  // --- Video Recording ---
+  var mediaRecorder = null;
+  var recordedChunks = [];
+  var recordBtn = document.getElementById('btn-record');
+  var exportBtn = document.getElementById('btn-export-vid');
+  var statusEl = document.getElementById('record-status');
+
+  recordBtn.addEventListener('click', function() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      return;
+    }
+    startRecording();
+  });
+
+  exportBtn.addEventListener('click', function() {
+    if (!window._lastScript) { alert('Load a script first'); return; }
+    startRecording();
+    CutsceneEngine.stop();
+    CutsceneEngine.play(window._lastScript, {
+      autoAdvance: true,
+      autoAdvanceDelay: 2000,
+      onComplete: function() {
+        setTimeout(function() {
+          if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+          }
+        }, 500);
+      }
+    });
+  });
+
+  function startRecording() {
+    var canvas = document.getElementById('display-canvas');
+    var stream = canvas.captureStream(30);
+    recordedChunks = [];
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+    mediaRecorder.ondataavailable = function(e) {
+      if (e.data.size > 0) recordedChunks.push(e.data);
+    };
+    mediaRecorder.onstop = function() {
+      var blob = new Blob(recordedChunks, { type: 'video/webm' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'cutscene.webm';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      recordBtn.textContent = 'Record';
+      recordBtn.style.background = '#553333';
+      statusEl.style.display = 'none';
+    };
+    mediaRecorder.onerror = function(e) {
+      alert('Recording error: ' + e.error);
+      recordBtn.textContent = 'Record';
+      statusEl.style.display = 'none';
+    };
+    mediaRecorder.start();
+    recordBtn.textContent = 'Stop';
+    recordBtn.style.background = '#cc3333';
+    statusEl.style.display = 'block';
+  }
+
   playScript(DEMO_SCRIPT);
   function playScript(data) {
     var parsed = ScriptParser.loadFromObject(data);

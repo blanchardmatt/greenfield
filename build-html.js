@@ -53,7 +53,11 @@ ${css}
 <button id="btn-serenade">Serenade</button>
 <button id="btn-shards">Shards</button>
 <button id="btn-restart">Restart</button>
+<div class="toolbar-sep" style="width:1px;height:20px;background:#333;margin:0 4px;display:inline-block"></div>
+<button id="btn-record" style="background:#553333;border-color:#774444">Record</button>
+<button id="btn-export-vid" style="background:#333355;border-color:#444477">Export Video</button>
 </div>
+<div id="record-status" style="font-size:11px;color:#cc5555;margin-top:4px;display:none">Recording...</div>
 <div id="hint">Tap / Space to advance dialogue</div>
 <script>
 ${fontJs}
@@ -109,6 +113,72 @@ ${engineJs}
   document.getElementById('btn-serenade').addEventListener('click', () => playScript(SERENADE_SCRIPT));
   document.getElementById('btn-shards').addEventListener('click', () => playScript(SHARDS_SCRIPT));
   document.getElementById('btn-restart').addEventListener('click', () => { if (window._lastScript) { CutsceneEngine.stop(); CutsceneEngine.play(window._lastScript); } });
+
+  // --- Video Recording ---
+  var mediaRecorder = null;
+  var recordedChunks = [];
+  var recordBtn = document.getElementById('btn-record');
+  var exportBtn = document.getElementById('btn-export-vid');
+  var statusEl = document.getElementById('record-status');
+
+  recordBtn.addEventListener('click', function() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      return;
+    }
+    startRecording();
+  });
+
+  exportBtn.addEventListener('click', function() {
+    if (!window._lastScript) { alert('Load a script first'); return; }
+    startRecording();
+    CutsceneEngine.stop();
+    CutsceneEngine.play(window._lastScript, {
+      autoAdvance: true,
+      autoAdvanceDelay: 2000,
+      onComplete: function() {
+        setTimeout(function() {
+          if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+          }
+        }, 500);
+      }
+    });
+  });
+
+  function startRecording() {
+    var canvas = document.getElementById('display-canvas');
+    var stream = canvas.captureStream(30);
+    recordedChunks = [];
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+    mediaRecorder.ondataavailable = function(e) {
+      if (e.data.size > 0) recordedChunks.push(e.data);
+    };
+    mediaRecorder.onstop = function() {
+      var blob = new Blob(recordedChunks, { type: 'video/webm' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'cutscene.webm';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      recordBtn.textContent = 'Record';
+      recordBtn.style.background = '#553333';
+      statusEl.style.display = 'none';
+    };
+    mediaRecorder.onerror = function(e) {
+      alert('Recording error: ' + e.error);
+      recordBtn.textContent = 'Record';
+      statusEl.style.display = 'none';
+    };
+    mediaRecorder.start();
+    recordBtn.textContent = 'Stop';
+    recordBtn.style.background = '#cc3333';
+    statusEl.style.display = 'block';
+  }
+
   playScript(DEMO_SCRIPT);
   function playScript(data) {
     var parsed = ScriptParser.loadFromObject(data);

@@ -25,6 +25,10 @@ const CutsceneEngine = (() => {
   // Input state
   let advancePressed = false;
   let skipPressed = false;
+  let autoAdvance = false; // auto-advance dialogue (for video export)
+  let autoAdvanceDelay = 2000; // ms to show completed dialogue before advancing
+  let autoAdvanceTimer = 0;
+  let onCompleteCallback = null;
 
   const { getInternalSize } = Renderer;
 
@@ -181,8 +185,8 @@ const CutsceneEngine = (() => {
   function processNextAction() {
     const scene = script.scenes[sceneIndex];
     if (!scene) {
-      // All scenes done
       running = false;
+      if (onCompleteCallback) { onCompleteCallback(); onCompleteCallback = null; }
       return;
     }
 
@@ -238,8 +242,18 @@ const CutsceneEngine = (() => {
         processNextAction();
       }
     } else if (currentActionState.type === 'dialogue') {
-      if (advancePressed) {
-        const twState = AnimationSystem.getTypewriterState();
+      const twState = AnimationSystem.getTypewriterState();
+      if (autoAdvance) {
+        if (twState.done) {
+          autoAdvanceTimer += dt;
+          if (autoAdvanceTimer >= autoAdvanceDelay) {
+            waitingForInput = false;
+            autoAdvanceTimer = 0;
+            actionIndex++;
+            processNextAction();
+          }
+        }
+      } else if (advancePressed) {
         if (!twState.done) {
           AnimationSystem.completeTypewriter();
         } else {
@@ -310,7 +324,7 @@ const CutsceneEngine = (() => {
 
   // --- Public API ---
 
-  function play(cutsceneScript) {
+  function play(cutsceneScript, options) {
     script = cutsceneScript;
     sceneIndex = 0;
     actionIndex = 0;
@@ -322,6 +336,10 @@ const CutsceneEngine = (() => {
     waitTimer = 0;
     activeEmote = null;
     currentActionState = null;
+    autoAdvance = (options && options.autoAdvance) || false;
+    autoAdvanceDelay = (options && options.autoAdvanceDelay) || 2000;
+    autoAdvanceTimer = 0;
+    onCompleteCallback = (options && options.onComplete) || null;
 
     // Clear characters
     for (const key of Object.keys(characters)) {
@@ -397,5 +415,6 @@ const CutsceneEngine = (() => {
     }
   }
 
-  return { play, stop, pause, resume, step, getState, handleInput };
+  function isRunning() { return running; }
+  return { play, stop, pause, resume, step, getState, handleInput, isRunning };
 })();
