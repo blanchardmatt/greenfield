@@ -176,6 +176,16 @@
           "duration": 2000
         },
         {
+          "type": "enter",
+          "character": "gimli",
+          "from": "left",
+          "to": {
+            "x": 7,
+            "y": 130
+          },
+          "duration": 600
+        },
+        {
           "type": "showProp",
           "prop": "amplifier",
           "x": 190,
@@ -209,34 +219,49 @@
           "text": "White noise screaming out..."
         },
         {
+          "type": "enter",
+          "character": "hank",
+          "from": "left",
+          "to": {
+            "x": 115,
+            "y": 156
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk3",
+          "from": "left",
+          "to": {
+            "x": 105,
+            "y": 147
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk2",
+          "from": "left",
+          "to": {
+            "x": 45,
+            "y": 150
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk4",
+          "from": "left",
+          "to": {
+            "x": 140,
+            "y": 131
+          },
+          "duration": 600
+        },
+        {
           "type": "shake",
           "intensity": 2,
           "duration": 400
-        },
-        {
-          "type": "enter",
-          "character": "elder",
-          "from": "right",
-          "to": {
-            "x": 135,
-            "y": 143
-          },
-          "duration": 600
-        },
-        {
-          "type": "dialogue",
-          "character": "lyra",
-          "text": "Coach wheels on cobblestone."
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk1",
-          "from": "left",
-          "to": {
-            "x": 174,
-            "y": 159
-          },
-          "duration": 600
         },
         {
           "type": "enter",
@@ -251,37 +276,7 @@
         {
           "type": "dialogue",
           "character": "lyra",
-          "text": "Ice picks peppered in... whispers and hushed tones."
-        },
-        {
-          "type": "enter",
-          "character": "gimli",
-          "from": "left",
-          "to": {
-            "x": 7,
-            "y": 130
-          },
-          "duration": 600
-        },
-        {
-          "type": "dialogue",
-          "character": "lyra",
-          "text": "Popcorn ceiling's a frown. Nerve endings barnacled."
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk2",
-          "from": "right",
-          "to": {
-            "x": 45,
-            "y": 150
-          },
-          "duration": 600
-        },
-        {
-          "type": "shake",
-          "intensity": 3,
-          "duration": 500
+          "text": "Coach wheels on cobblestone."
         },
         {
           "type": "enter",
@@ -294,14 +289,39 @@
           "duration": 600
         },
         {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Ice picks peppered in... whispers and hushed tones."
+        },
+        {
           "type": "enter",
-          "character": "hank",
+          "character": "elder",
           "from": "left",
           "to": {
-            "x": 115,
-            "y": 156
+            "x": 135,
+            "y": 143
           },
           "duration": 600
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Popcorn ceiling's a frown. Nerve endings barnacled."
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk1",
+          "from": "right",
+          "to": {
+            "x": 174,
+            "y": 159
+          },
+          "duration": 600
+        },
+        {
+          "type": "shake",
+          "intensity": 3,
+          "duration": 500
         },
         {
           "type": "mill"
@@ -323,16 +343,6 @@
           "text": "Why so loud..."
         },
         {
-          "type": "enter",
-          "character": "townsfolk3",
-          "from": "left",
-          "to": {
-            "x": 105,
-            "y": 147
-          },
-          "duration": 600
-        },
-        {
           "type": "shake",
           "intensity": 4,
           "duration": 600
@@ -352,16 +362,6 @@
           "type": "dialogue",
           "character": "lyra",
           "text": "A plastic click of a pen and..."
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk4",
-          "from": "right",
-          "to": {
-            "x": 140,
-            "y": 131
-          },
-          "duration": 600
         },
         {
           "type": "shake",
@@ -394,63 +394,42 @@
           "duration": 1500
         },
         {
+          "type": "enter",
+          "character": "townsfolk7",
+          "from": "left",
+          "to": {
+            "x": 145,
+            "y": 164
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk6",
+          "from": "left",
+          "to": {
+            "x": 169,
+            "y": 130
+          },
+          "duration": 600
+        },
+        {
           "type": "mill"
         },
         {
-          "type": "dialogue",
-          "character": "lyra",
-          "text": "Wind chimes howl..."
-        },
-        {
-          "type": "shake",
-          "intensity": 1,
-          "duration": 400
-        },
-        {
-          "type": "shake",
-          "intensity": 1,
-          "duration": 400
-        },
-        {
-          "type": "dialogue",
-          "character": "lyra",
-          "text": "March in a symphony of thorns."
-        },
-        {
           "type": "enter",
-          "character": "princess",
+          "character": "lily",
           "from": "right",
           "to": {
-            "x": 33,
-            "y": 136
+            "x": 12,
+            "y": 176
           },
           "duration": 600
-        },
-        {
-          "type": "dialogue",
-          "character": "lyra",
-          "text": "Sedge wren warbles... melody to paper untorn."
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk5",
-          "from": "left",
-          "to": {
-            "x": 114,
-            "y": 131
-          },
-          "duration": 600
-        },
-        {
-          "type": "emote",
-          "character": "princess",
-          "emote": "happy",
-          "duration": 1200
         },
         {
           "type": "enter",
           "character": "brother_sol",
-          "from": "left",
+          "from": "right",
           "to": {
             "x": 100,
             "y": 177
@@ -470,12 +449,47 @@
         {
           "type": "dialogue",
           "character": "lyra",
-          "text": "I'm spun out..."
+          "text": "Wind chimes howl..."
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk5",
+          "from": "right",
+          "to": {
+            "x": 114,
+            "y": 131
+          },
+          "duration": 600
         },
         {
           "type": "shake",
-          "intensity": 3,
-          "duration": 500
+          "intensity": 1,
+          "duration": 400
+        },
+        {
+          "type": "enter",
+          "character": "pip",
+          "from": "right",
+          "to": {
+            "x": 180,
+            "y": 171
+          },
+          "duration": 600
+        },
+        {
+          "type": "shake",
+          "intensity": 1,
+          "duration": 400
+        },
+        {
+          "type": "enter",
+          "character": "princess",
+          "from": "left",
+          "to": {
+            "x": 33,
+            "y": 136
+          },
+          "duration": 600
         },
         {
           "type": "enter",
@@ -488,24 +502,30 @@
           "duration": 600
         },
         {
-          "type": "enter",
-          "character": "lily",
-          "from": "right",
-          "to": {
-            "x": 12,
-            "y": 176
-          },
-          "duration": 600
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "March in a symphony of thorns."
         },
         {
-          "type": "enter",
-          "character": "pip",
-          "from": "left",
-          "to": {
-            "x": 180,
-            "y": 171
-          },
-          "duration": 600
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Sedge wren warbles... melody to paper untorn."
+        },
+        {
+          "type": "emote",
+          "character": "princess",
+          "emote": "happy",
+          "duration": 1200
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "I'm spun out..."
+        },
+        {
+          "type": "shake",
+          "intensity": 3,
+          "duration": 500
         },
         {
           "type": "dialogue",
@@ -523,16 +543,6 @@
           "text": "Seismic waves inbound..."
         },
         {
-          "type": "enter",
-          "character": "townsfolk6",
-          "from": "right",
-          "to": {
-            "x": 169,
-            "y": 130
-          },
-          "duration": 600
-        },
-        {
           "type": "emote",
           "character": "wizard",
           "emote": "surprise",
@@ -546,16 +556,6 @@
         {
           "type": "wait",
           "duration": 1000
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk7",
-          "from": "left",
-          "to": {
-            "x": 145,
-            "y": 164
-          },
-          "duration": 600
         },
         {
           "type": "transition",
@@ -574,17 +574,42 @@
           "duration": 2000
         },
         {
+          "type": "enter",
+          "character": "dark_lord",
+          "from": "left",
+          "to": {
+            "x": 2,
+            "y": 160
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk10",
+          "from": "left",
+          "to": {
+            "x": 68,
+            "y": 161
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "morgana",
+          "from": "left",
+          "to": {
+            "x": 67,
+            "y": 143
+          },
+          "duration": 600
+        },
+        {
           "type": "dance"
         },
         {
           "type": "dialogue",
           "character": "lyra",
           "text": "Hollowed bell..."
-        },
-        {
-          "type": "shake",
-          "intensity": 2,
-          "duration": 600
         },
         {
           "type": "enter",
@@ -598,11 +623,36 @@
         },
         {
           "type": "enter",
-          "character": "morgana",
-          "from": "right",
+          "character": "townsfolk8",
+          "from": "left",
           "to": {
-            "x": 67,
+            "x": 65,
+            "y": 170
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "duke",
+          "from": "left",
+          "to": {
+            "x": 181,
             "y": 143
+          },
+          "duration": 600
+        },
+        {
+          "type": "shake",
+          "intensity": 2,
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk9",
+          "from": "left",
+          "to": {
+            "x": 45,
+            "y": 164
           },
           "duration": 600
         },
@@ -618,39 +668,9 @@
           "duration": 1000
         },
         {
-          "type": "enter",
-          "character": "dark_lord",
-          "from": "right",
-          "to": {
-            "x": 2,
-            "y": 160
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "duke",
-          "from": "left",
-          "to": {
-            "x": 181,
-            "y": 143
-          },
-          "duration": 600
-        },
-        {
           "type": "dialogue",
           "character": "lyra",
           "text": "Resonance..."
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk8",
-          "from": "right",
-          "to": {
-            "x": 65,
-            "y": 170
-          },
-          "duration": 600
         },
         {
           "type": "shake",
@@ -695,16 +715,6 @@
           "text": "Splinters in front of the sound."
         },
         {
-          "type": "enter",
-          "character": "townsfolk9",
-          "from": "left",
-          "to": {
-            "x": 45,
-            "y": 164
-          },
-          "duration": 600
-        },
-        {
           "type": "emote",
           "character": "princess",
           "emote": "happy",
@@ -729,16 +739,6 @@
         {
           "type": "wait",
           "duration": 1500
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk10",
-          "from": "right",
-          "to": {
-            "x": 68,
-            "y": 161
-          },
-          "duration": 600
         },
         {
           "type": "transition",
