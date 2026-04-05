@@ -1801,19 +1801,20 @@ const Renderer = (() => {
       ctx.fillRect(222, 136, 10, 4);
 
       // Bonfire pit
+      const fs = p.fireScale || 1;
       ctx.fillStyle = '#777766';
-      fillCircle(ctx, 145, 148, 8);
+      fillCircle(ctx, 145, 148, Math.round(8 * fs));
       ctx.fillStyle = p.grass;
-      fillCircle(ctx, 145, 148, 5);
+      fillCircle(ctx, 145, 148, Math.round(5 * fs));
       ctx.fillStyle = '#664422';
-      ctx.fillRect(140, 146, 12, 3);
-      ctx.fillRect(143, 144, 3, 8);
+      ctx.fillRect(145 - Math.round(6 * fs), 146, Math.round(12 * fs), 3);
+      ctx.fillRect(143, 144, 3, Math.round(8 * fs));
       ctx.fillStyle = '#cc5522';
-      ctx.fillRect(142, 140, 8, 6);
+      ctx.fillRect(145 - Math.round(4 * fs), 140 - Math.round(2 * (fs - 1)), Math.round(8 * fs), Math.round(6 * fs));
       ctx.fillStyle = '#ff8833';
-      ctx.fillRect(143, 138, 6, 5);
+      ctx.fillRect(145 - Math.round(3 * fs), 138 - Math.round(3 * (fs - 1)), Math.round(6 * fs), Math.round(5 * fs));
       ctx.fillStyle = '#ffcc44';
-      ctx.fillRect(144, 136, 4, 4);
+      ctx.fillRect(145 - Math.round(2 * fs), 136 - Math.round(4 * (fs - 1)), Math.round(4 * fs), Math.round(4 * fs));
 
       // Grass tufts
       ctx.fillStyle = p.leaf;
@@ -1833,7 +1834,7 @@ const Renderer = (() => {
         grass: '#5a9a3a', grassDark: '#4a8a2a', trunk: '#554422',
         leaf: '#448833', leafDark: '#336622', siding: '#ccbbaa',
         sidingDark: '#bbaa99', roof: '#777777', roofDark: '#666666',
-        windowColor: '#88bbdd', deck: '#aa8855', deckDark: '#997744',
+        windowColor: '#88bbdd', deck: '#aa8855', deckDark: '#997744', fireScale: 1,
       });
     },
 
@@ -1864,7 +1865,7 @@ const Renderer = (() => {
         grass: '#3a7a2a', grassDark: '#2a6a1a', trunk: '#443322',
         leaf: '#336622', leafDark: '#224411', siding: '#aa9988',
         sidingDark: '#998877', roof: '#666666', roofDark: '#555555',
-        windowColor: '#667799', deck: '#887744', deckDark: '#776633',
+        windowColor: '#667799', deck: '#887744', deckDark: '#776633', fireScale: 1,
       });
     },
 
@@ -1888,7 +1889,7 @@ const Renderer = (() => {
         grass: '#5aaa3a', grassDark: '#4a9a2a', trunk: '#664433',
         leaf: '#55aa44', leafDark: '#338833', siding: '#ddccbb',
         sidingDark: '#ccbbaa', roof: '#888888', roofDark: '#777777',
-        windowColor: '#99ccee', deck: '#bbaa66', deckDark: '#aa9955',
+        windowColor: '#99ccee', deck: '#bbaa66', deckDark: '#aa9955', fireScale: 1.2,
       });
     },
 
@@ -1920,7 +1921,7 @@ const Renderer = (() => {
         grass: '#4a7a2a', grassDark: '#3a6a1a', trunk: '#443322',
         leaf: '#447733', leafDark: '#335522', siding: '#bb9977',
         sidingDark: '#aa8866', roof: '#666655', roofDark: '#555544',
-        windowColor: '#dd9966', deck: '#997744', deckDark: '#886633',
+        windowColor: '#dd9966', deck: '#997744', deckDark: '#886633', fireScale: 1.6,
       });
       // Stage lights on the ground aimed at deck
       ctx.fillStyle = '#444444';
@@ -1963,7 +1964,7 @@ const Renderer = (() => {
         grass: '#1a3a1a', grassDark: '#0a2a0a', trunk: '#221100',
         leaf: '#1a3311', leafDark: '#112208', siding: '#555544',
         sidingDark: '#444433', roof: '#333333', roofDark: '#222222',
-        windowColor: '#ffcc44', deck: '#554422', deckDark: '#443311',
+        windowColor: '#ffcc44', deck: '#554422', deckDark: '#443311', fireScale: 2,
       });
 
       // Disco ball (above deck area)
@@ -2182,34 +2183,36 @@ const Renderer = (() => {
       ctx.globalAlpha = 1;
     },
 
-    biltroy(ctx, t) {
-      // Bonfire — animated flames
+    _drawFire(ctx, t, scale) {
+      const s = scale || 1;
       const fireX = 145;
       const fireY = 140;
-      // Flickering flames
-      for (let i = 0; i < 6; i++) {
-        const fx = fireX - 3 + Math.sin(t / 100 + i * 1.5) * 3;
-        const fy = fireY - 4 - i * 2 + Math.sin(t / 150 + i * 2) * 2;
+      const numFlames = Math.round(6 * s);
+      for (let i = 0; i < numFlames; i++) {
+        const fx = fireX - 3 * s + Math.sin(t / 100 + i * 1.5) * 3 * s;
+        const fy = fireY - 4 * s - i * 2 * s + Math.sin(t / 150 + i * 2) * 2 * s;
         const colors = ['#ff4411', '#ff6622', '#ff8833', '#ffaa44', '#ffcc55', '#ffee88'];
-        ctx.fillStyle = colors[i];
-        ctx.globalAlpha = 0.8 - i * 0.08;
-        const w = 6 - i * 0.5;
-        ctx.fillRect(Math.floor(fx), Math.floor(fy), Math.ceil(w), 3);
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.globalAlpha = 0.85 - i * 0.06;
+        const w = (7 - i * 0.4) * s;
+        ctx.fillRect(Math.floor(fx), Math.floor(fy), Math.ceil(w), Math.ceil(3 * s));
       }
-      // Sparks rising
       ctx.fillStyle = '#ffcc44';
-      for (let i = 0; i < 5; i++) {
-        const age = ((t / 20 + i * 25) % 80);
-        const sx = fireX + Math.sin(t / 300 + i * 3) * (4 + age * 0.1);
-        const sy = fireY - 8 - age;
-        ctx.globalAlpha = Math.max(0, 0.7 - age * 0.01);
+      const numSparks = Math.round(5 * s);
+      for (let i = 0; i < numSparks; i++) {
+        const age = ((t / 20 + i * 25) % (80 * s));
+        const sx = fireX + Math.sin(t / 300 + i * 3) * (4 * s + age * 0.1);
+        const sy = fireY - 8 * s - age;
+        ctx.globalAlpha = Math.max(0, 0.7 - age * 0.008);
         ctx.fillRect(Math.floor(sx), Math.floor(sy), 1, 1);
       }
-      // Fire glow on ground
-      ctx.globalAlpha = 0.1 + Math.sin(t / 200) * 0.05;
+      ctx.globalAlpha = (0.1 + Math.sin(t / 200) * 0.05) * s;
       ctx.fillStyle = '#ff6633';
-      fillCircle(ctx, fireX, fireY + 4, 14);
+      fillCircle(ctx, fireX, fireY + 4, Math.round(14 * s));
       ctx.globalAlpha = 1;
+    },
+
+    _drawBiltoyLife(ctx, t) {
 
       // Rustling leaves on oak trees
       ctx.fillStyle = '#448833';
@@ -2364,8 +2367,14 @@ const Renderer = (() => {
       ctx.globalAlpha = 1;
     },
 
+    biltroy(ctx, t) {
+      bgAnimations._drawFire(ctx, t, 1);
+      bgAnimations._drawBiltoyLife(ctx, t);
+    },
+
     biltroy_dawn(ctx, t) {
-      bgAnimations.biltroy(ctx, t);
+      bgAnimations._drawFire(ctx, t, 1);
+      bgAnimations._drawBiltoyLife(ctx, t);
       // Chickens pecking around the yard
       for (let i = 0; i < 3; i++) {
         const cx = 60 + i * 40 + Math.sin(t / 1200 + i * 3) * 15;
@@ -2398,7 +2407,8 @@ const Renderer = (() => {
     },
 
     biltroy_day(ctx, t) {
-      bgAnimations.biltroy(ctx, t);
+      bgAnimations._drawFire(ctx, t, 1.2);
+      bgAnimations._drawBiltoyLife(ctx, t);
       // Chickens (same as dawn but different positions)
       for (let i = 0; i < 4; i++) {
         const cx = 30 + i * 35 + Math.sin(t / 1000 + i * 2.5) * 18;
@@ -2424,7 +2434,8 @@ const Renderer = (() => {
     },
 
     biltroy_sunset(ctx, t) {
-      bgAnimations.biltroy(ctx, t);
+      bgAnimations._drawFire(ctx, t, 1.6);
+      bgAnimations._drawBiltoyLife(ctx, t);
       // Howling wolf silhouette on the left hill
       const wolfX = 8;
       const wolfY = 118;
@@ -2475,30 +2486,8 @@ const Renderer = (() => {
     },
 
     biltroy_night(ctx, t) {
-      // Bonfire (bigger glow at night)
-      const fireX = 145, fireY = 140;
-      for (let i = 0; i < 6; i++) {
-        const fx = fireX - 3 + Math.sin(t / 100 + i * 1.5) * 3;
-        const fy = fireY - 4 - i * 2 + Math.sin(t / 150 + i * 2) * 2;
-        const colors = ['#ff4411', '#ff6622', '#ff8833', '#ffaa44', '#ffcc55', '#ffee88'];
-        ctx.fillStyle = colors[i];
-        ctx.globalAlpha = 0.9 - i * 0.06;
-        const w = 7 - i * 0.5;
-        ctx.fillRect(Math.floor(fx), Math.floor(fy), Math.ceil(w), 3);
-      }
-      // Big sparks
-      ctx.fillStyle = '#ffcc44';
-      for (let i = 0; i < 8; i++) {
-        const age = ((t / 18 + i * 20) % 100);
-        const sx = fireX + Math.sin(t / 250 + i * 3) * (5 + age * 0.15);
-        const sy = fireY - 10 - age;
-        ctx.globalAlpha = Math.max(0, 0.8 - age * 0.008);
-        ctx.fillRect(Math.floor(sx), Math.floor(sy), 1, 1);
-      }
-      // Big fire glow
-      ctx.globalAlpha = 0.15 + Math.sin(t / 200) * 0.05;
-      ctx.fillStyle = '#ff6633';
-      fillCircle(ctx, fireX, fireY + 4, 20);
+      // Big bonfire at night
+      bgAnimations._drawFire(ctx, t, 2);
 
       // Twinkling stars
       let seed = 54321;
@@ -4669,10 +4658,10 @@ const CutsceneEngine = (() => {
         const di = dancingChars.indexOf(char);
         const totalDancers = dancingChars.length;
         const angle = (t / 2500 + (di / totalDancers) * Math.PI * 2) % (Math.PI * 2);
-        const centerX = 110;
-        const centerY = 155;
-        const radiusX = 80 + Math.sin(t / 2000) * 8;
-        const radiusY = 35 + Math.sin(t / 2500) * 5;
+        const centerX = 145;
+        const centerY = 150;
+        const radiusX = 70 + Math.sin(t / 2000) * 8;
+        const radiusY = 30 + Math.sin(t / 2500) * 5;
         char.x = centerX + Math.cos(angle) * radiusX - SpriteLibrary.W / 2;
         char.y = centerY + Math.sin(angle) * radiusY - SpriteLibrary.H / 2;
       } else if (char.milling) {
