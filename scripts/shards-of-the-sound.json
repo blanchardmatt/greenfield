@@ -305,55 +305,6 @@
           "duration": 1500
         },
         {
-          "type": "showProp",
-          "prop": "amplifier",
-          "x": 190,
-          "y": 96
-        },
-        {
-          "type": "enter",
-          "character": "lyra",
-          "from": "right",
-          "to": {
-            "x": 195,
-            "y": 58
-          },
-          "duration": 600
-        },
-        {
-          "type": "setScale",
-          "character": "lyra",
-          "scale": 1.5
-        },
-        {
-          "type": "pin",
-          "character": "lyra"
-        },
-        {
-          "type": "showNotes",
-          "character": "lyra"
-        },
-        {
-          "type": "enter",
-          "character": "elder",
-          "from": "left",
-          "to": {
-            "x": 10,
-            "y": 130
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "hero",
-          "from": "left",
-          "to": {
-            "x": 45,
-            "y": 125
-          },
-          "duration": 600
-        },
-        {
           "type": "mill"
         },
         {
@@ -365,16 +316,6 @@
           "type": "shake",
           "intensity": 1,
           "duration": 400
-        },
-        {
-          "type": "enter",
-          "character": "gimli",
-          "from": "left",
-          "to": {
-            "x": 75,
-            "y": 135
-          },
-          "duration": 600
         },
         {
           "type": "shake",
@@ -393,16 +334,6 @@
           "to": {
             "x": 165,
             "y": 125
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "swift",
-          "from": "right",
-          "to": {
-            "x": 155,
-            "y": 128
           },
           "duration": 600
         },
@@ -478,16 +409,6 @@
           "duration": 600
         },
         {
-          "type": "enter",
-          "character": "hank",
-          "from": "left",
-          "to": {
-            "x": 110,
-            "y": 133
-          },
-          "duration": 600
-        },
-        {
           "type": "dialogue",
           "character": "lyra",
           "text": "All the color drains from my view."
@@ -532,148 +453,6 @@
           "type": "transition",
           "effect": "fadeIn",
           "duration": 2000
-        },
-        {
-          "type": "showProp",
-          "prop": "amplifier",
-          "x": 190,
-          "y": 96
-        },
-        {
-          "type": "enter",
-          "character": "lyra",
-          "from": "right",
-          "to": {
-            "x": 195,
-            "y": 58
-          },
-          "duration": 600
-        },
-        {
-          "type": "setScale",
-          "character": "lyra",
-          "scale": 1.5
-        },
-        {
-          "type": "pin",
-          "character": "lyra"
-        },
-        {
-          "type": "showNotes",
-          "character": "lyra"
-        },
-        {
-          "type": "enter",
-          "character": "elder",
-          "from": "left",
-          "to": {
-            "x": 10,
-            "y": 130
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "hero",
-          "from": "left",
-          "to": {
-            "x": 45,
-            "y": 125
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "princess",
-          "from": "right",
-          "to": {
-            "x": 165,
-            "y": 125
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "wizard",
-          "from": "right",
-          "to": {
-            "x": 60,
-            "y": 128
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "gimli",
-          "from": "left",
-          "to": {
-            "x": 75,
-            "y": 135
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "swift",
-          "from": "right",
-          "to": {
-            "x": 155,
-            "y": 128
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "hank",
-          "from": "left",
-          "to": {
-            "x": 110,
-            "y": 133
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "brother_sol",
-          "from": "left",
-          "to": {
-            "x": 25,
-            "y": 133
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "shade",
-          "from": "right",
-          "to": {
-            "x": 130,
-            "y": 130
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "lily",
-          "from": "right",
-          "to": {
-            "x": 95,
-            "y": 135
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "pip",
-          "from": "left",
-          "to": {
-            "x": 140,
-            "y": 132
-          },
-          "duration": 600
-        },
-        {
-          "type": "mill"
         },
         {
           "type": "dialogue",
@@ -824,145 +603,6 @@
           "type": "transition",
           "effect": "fadeIn",
           "duration": 1500
-        },
-        {
-          "type": "showProp",
-          "prop": "amplifier",
-          "x": 190,
-          "y": 96
-        },
-        {
-          "type": "enter",
-          "character": "lyra",
-          "from": "right",
-          "to": {
-            "x": 195,
-            "y": 58
-          },
-          "duration": 800
-        },
-        {
-          "type": "setScale",
-          "character": "lyra",
-          "scale": 1.5
-        },
-        {
-          "type": "pin",
-          "character": "lyra"
-        },
-        {
-          "type": "showNotes",
-          "character": "lyra"
-        },
-        {
-          "type": "enter",
-          "character": "hero",
-          "from": "left",
-          "to": {
-            "x": 45,
-            "y": 125
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "princess",
-          "from": "right",
-          "to": {
-            "x": 165,
-            "y": 125
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "elder",
-          "from": "left",
-          "to": {
-            "x": 10,
-            "y": 130
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "wizard",
-          "from": "right",
-          "to": {
-            "x": 60,
-            "y": 128
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "dark_lord",
-          "from": "right",
-          "to": {
-            "x": 150,
-            "y": 125
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "gimli",
-          "from": "left",
-          "to": {
-            "x": 75,
-            "y": 135
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "swift",
-          "from": "right",
-          "to": {
-            "x": 155,
-            "y": 128
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "brother_sol",
-          "from": "left",
-          "to": {
-            "x": 25,
-            "y": 133
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "shade",
-          "from": "right",
-          "to": {
-            "x": 130,
-            "y": 130
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "pip",
-          "from": "left",
-          "to": {
-            "x": 140,
-            "y": 132
-          },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "lily",
-          "from": "right",
-          "to": {
-            "x": 95,
-            "y": 135
-          },
-          "duration": 600
         },
         {
           "type": "wait",
