@@ -94,6 +94,8 @@ const CutsceneEngine = (() => {
         return beginMill(action);
       case 'dance':
         return beginDance(action);
+      case 'joinDance':
+        return beginJoinDance(action);
       case 'stopDance':
         return beginStopDance(action);
       case 'showNotes':
@@ -270,8 +272,22 @@ const CutsceneEngine = (() => {
   function beginDance(action) {
     danceActive = true;
     danceElapsed = 0;
+    // If no specific characters listed, everyone joins
     for (const char of Object.values(characters)) {
-      if (char.visible && !char.pinned) char.dancing = true;
+      if (char.visible && !char.pinned) {
+        char.dancing = true;
+        char.milling = false;
+      }
+    }
+    return { done: true };
+  }
+
+  function beginJoinDance(action) {
+    danceActive = true;
+    const char = getOrCreateCharacter(action.character);
+    if (!char.pinned) {
+      char.dancing = true;
+      char.milling = false;
     }
     return { done: true };
   }

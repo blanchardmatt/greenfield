@@ -507,6 +507,10 @@
           "text": "March in a symphony of thorns."
         },
         {
+          "type": "joinDance",
+          "character": "hero"
+        },
+        {
           "type": "dialogue",
           "character": "lyra",
           "text": "Sedge wren warbles... melody to paper untorn."
@@ -521,6 +525,10 @@
           "type": "dialogue",
           "character": "lyra",
           "text": "I'm spun out..."
+        },
+        {
+          "type": "joinDance",
+          "character": "lily"
         },
         {
           "type": "shake",
@@ -541,6 +549,10 @@
           "type": "dialogue",
           "character": "lyra",
           "text": "Seismic waves inbound..."
+        },
+        {
+          "type": "joinDance",
+          "character": "pip"
         },
         {
           "type": "emote",
@@ -604,12 +616,13 @@
           "duration": 600
         },
         {
-          "type": "dance"
-        },
-        {
           "type": "dialogue",
           "character": "lyra",
           "text": "Hollowed bell..."
+        },
+        {
+          "type": "joinDance",
+          "character": "princess"
         },
         {
           "type": "enter",
@@ -662,6 +675,10 @@
           "text": "Wrings us out."
         },
         {
+          "type": "joinDance",
+          "character": "gimli"
+        },
+        {
           "type": "emote",
           "character": "elder",
           "emote": "happy",
@@ -673,6 +690,10 @@
           "text": "Resonance..."
         },
         {
+          "type": "joinDance",
+          "character": "swift"
+        },
+        {
           "type": "shake",
           "intensity": 3,
           "duration": 500
@@ -681,6 +702,10 @@
           "type": "dialogue",
           "character": "lyra",
           "text": "Underground."
+        },
+        {
+          "type": "joinDance",
+          "character": "townsfolk2"
         },
         {
           "type": "emote",
@@ -699,6 +724,10 @@
           "text": "Outer shell..."
         },
         {
+          "type": "joinDance",
+          "character": "brother_sol"
+        },
+        {
           "type": "emote",
           "character": "dark_lord",
           "emote": "surprise",
@@ -715,6 +744,10 @@
           "text": "Splinters in front of the sound."
         },
         {
+          "type": "joinDance",
+          "character": "shade"
+        },
+        {
           "type": "emote",
           "character": "princess",
           "emote": "happy",
@@ -729,6 +762,10 @@
           "type": "dialogue",
           "character": "lyra",
           "text": "Grasping for shards of the sound."
+        },
+        {
+          "type": "joinDance",
+          "character": "townsfolk4"
         },
         {
           "type": "emote",
@@ -757,6 +794,9 @@
           "duration": 1500
         },
         {
+          "type": "dance"
+        },
+        {
           "type": "wait",
           "duration": 500
         },
@@ -765,9 +805,6 @@
           "character": "hero",
           "emote": "happy",
           "duration": 800
-        },
-        {
-          "type": "dance"
         },
         {
           "type": "emote",

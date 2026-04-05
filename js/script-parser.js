@@ -5,7 +5,7 @@ const ScriptParser = (() => {
   const VALID_ACTIONS = [
     'transition', 'enter', 'exit', 'dialogue', 'wait',
     'shake', 'emote', 'move', 'setBackground', 'title', 'credits',
-    'mill', 'dance', 'stopDance', 'showNotes', 'hideNotes', 'setScale',
+    'mill', 'dance', 'joinDance', 'stopDance', 'showNotes', 'hideNotes', 'setScale',
     'showProp', 'hideProp', 'pin', 'unpin', 'ufoArrive', 'ufoDepart',
   ];
 
