@@ -2874,15 +2874,49 @@ const Renderer = (() => {
   function drawUfo(state) {
     const ux = Math.round(state.x);
     const uy = Math.round(state.y);
+    const ufoW = 48;
+    const ufoH = 20;
 
-    // Draw the UFO sprite
-    SpriteLibrary.drawProp(ctx, 'ufo', ux, uy);
+    // Draw UFO procedurally (larger than sprite for legible text)
+    // Dome (top half)
+    ctx.fillStyle = '#cccccc';
+    fillCircle(ctx, ux + 24, uy + 6, 12);
+    ctx.fillStyle = '#aaaaaa';
+    fillCircle(ctx, ux + 24, uy + 6, 9);
+    ctx.fillStyle = '#888888';
+    fillCircle(ctx, ux + 24, uy + 8, 7);
+
+    // "UBER" text on the dome
+    ctx.fillStyle = '#111111';
+    PixelFont.drawText(ctx, 'UBER', ux + 9, uy + 3, '#111111', 1);
+
+    // Body (disc)
+    ctx.fillStyle = '#dddddd';
+    for (let dy = 0; dy < 6; dy++) {
+      const w = ufoW - dy * 4;
+      const xOff = (ufoW - w) / 2;
+      ctx.fillRect(ux + Math.floor(xOff), uy + 10 + dy, Math.ceil(w), 1);
+    }
+    // Body outline
+    ctx.fillStyle = '#888888';
+    ctx.fillRect(ux + 2, uy + 10, 44, 1);
+    ctx.fillRect(ux + 10, uy + 15, 28, 1);
+
+    // Colored running lights on body
+    const lightColors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'];
+    for (let i = 0; i < 5; i++) {
+      const on = Math.sin(Date.now() / 150 + i * 1.2) > 0.2;
+      if (on) {
+        ctx.fillStyle = lightColors[i];
+        ctx.fillRect(ux + 8 + i * 7, uy + 11, 3, 2);
+      }
+    }
 
     // Tractor beam
     if (state.beamOn) {
-      const beamX = ux + 8;
-      const beamTopW = 16;
-      const beamBottomW = 30;
+      const beamX = ux + 10;
+      const beamTopW = 28;
+      const beamBottomW = 40;
       const beamH = INTERNAL_H - uy - 15;
 
       // Beam: widening trapezoid of light
@@ -2911,17 +2945,6 @@ const Renderer = (() => {
       ctx.globalAlpha = 1;
     }
 
-    // UFO lights blinking
-    const lightPhase = Date.now() / 200;
-    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00'];
-    for (let i = 0; i < 4; i++) {
-      const on = Math.sin(lightPhase + i * 1.5) > 0.3;
-      if (on) {
-        ctx.fillStyle = colors[i];
-        ctx.globalAlpha = 0.8;
-        ctx.fillRect(ux + 6 + i * 5, uy + 12, 2, 1);
-      }
-    }
     ctx.globalAlpha = 1;
   }
 
