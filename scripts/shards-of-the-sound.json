@@ -137,6 +137,21 @@
       "sprite": "dwarf",
       "name": "Stout",
       "nameColor": "#cc8844"
+    },
+    "zorp": {
+      "sprite": "alien_green",
+      "name": "Zorp",
+      "nameColor": "#33dd66"
+    },
+    "blix": {
+      "sprite": "alien_blue",
+      "name": "Blixnarg",
+      "nameColor": "#5588ff"
+    },
+    "quee": {
+      "sprite": "alien_pink",
+      "name": "Quee",
+      "nameColor": "#ff66aa"
     }
   },
   "scenes": [
@@ -613,6 +628,33 @@
           "text": "I'm spun out..."
         },
         {
+          "type": "ufoArrive",
+          "character": "zorp",
+          "to": {
+            "x": 50,
+            "y": 145
+          },
+          "duration": 3000
+        },
+        {
+          "type": "ufoArrive",
+          "character": "blix",
+          "to": {
+            "x": 140,
+            "y": 160
+          },
+          "duration": 3000
+        },
+        {
+          "type": "ufoArrive",
+          "character": "quee",
+          "to": {
+            "x": 170,
+            "y": 150
+          },
+          "duration": 3000
+        },
+        {
           "type": "joinDance",
           "character": "princess"
         },
@@ -1037,6 +1079,12 @@
             "Ser Bryn . . . . . .  Knight",
             "Whisper . . . . . . .  Thief",
             "Stout . . . . . . . .  Dwarf",
+            "",
+            "#Special Guests",
+            "",
+            "Zorp . . . . . . Green Alien",
+            "Blixnarg . . . . Blue Alien",
+            "Quee . . . . . . Pink Alien",
             "",
             "",
             "#Created with",
