@@ -877,6 +877,18 @@
           "character": "townsfolk7"
         },
         {
+          "type": "joinDance",
+          "character": "zorp"
+        },
+        {
+          "type": "joinDance",
+          "character": "blix"
+        },
+        {
+          "type": "joinDance",
+          "character": "quee"
+        },
+        {
           "type": "emote",
           "character": "wizard",
           "emote": "happy",
@@ -901,6 +913,9 @@
           "type": "transition",
           "effect": "fadeIn",
           "duration": 1500
+        },
+        {
+          "type": "dance"
         },
         {
           "type": "wait",
@@ -936,7 +951,161 @@
         },
         {
           "type": "wait",
-          "duration": 500
+          "duration": 1000
+        },
+        {
+          "type": "exit",
+          "character": "elder",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "hero",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "gimli",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "swift",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "hank",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "princess",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "wizard",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "brother_sol",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "shade",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "lily",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "pip",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "ser_valen",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "morgana",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "dark_lord",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "duke",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk1",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk2",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk3",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk4",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk5",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk6",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk7",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk8",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk9",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk10",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "wait",
+          "duration": 1500
         },
         {
           "type": "ufoDepart",
@@ -945,91 +1114,56 @@
         },
         {
           "type": "wait",
-          "duration": 500
+          "duration": 1000
+        },
+        {
+          "type": "emote",
+          "character": "zorp",
+          "emote": "happy",
+          "duration": 1500
+        },
+        {
+          "type": "emote",
+          "character": "blix",
+          "emote": "happy",
+          "duration": 1500
+        },
+        {
+          "type": "emote",
+          "character": "quee",
+          "emote": "happy",
+          "duration": 1500
         },
         {
           "type": "wait",
-          "duration": 1000
+          "duration": 2000
         },
         {
-          "type": "exit",
-          "character": "hero",
-          "to": "left",
-          "duration": 800
-        },
-        {
-          "type": "exit",
-          "character": "elder",
-          "to": "left",
-          "duration": 800
-        },
-        {
-          "type": "exit",
-          "character": "gimli",
-          "to": "left",
-          "duration": 700
-        },
-        {
-          "type": "exit",
-          "character": "brother_sol",
-          "to": "left",
-          "duration": 700
-        },
-        {
-          "type": "exit",
-          "character": "pip",
-          "to": "left",
-          "duration": 700
-        },
-        {
-          "type": "exit",
-          "character": "wizard",
-          "to": "right",
-          "duration": 800
-        },
-        {
-          "type": "exit",
-          "character": "princess",
-          "to": "right",
-          "duration": 800
-        },
-        {
-          "type": "exit",
-          "character": "dark_lord",
-          "to": "right",
-          "duration": 1000
-        },
-        {
-          "type": "exit",
-          "character": "swift",
-          "to": "right",
-          "duration": 700
-        },
-        {
-          "type": "exit",
-          "character": "shade",
-          "to": "right",
-          "duration": 700
-        },
-        {
-          "type": "exit",
-          "character": "lily",
-          "to": "right",
-          "duration": 600
+          "type": "ufoDepart",
+          "character": "zorp",
+          "duration": 4000
         },
         {
           "type": "wait",
           "duration": 500
         },
         {
-          "type": "exit",
-          "character": "lyra",
-          "to": "bottom",
-          "duration": 1500
+          "type": "ufoDepart",
+          "character": "blix",
+          "duration": 4000
         },
         {
           "type": "wait",
-          "duration": 1500
+          "duration": 500
+        },
+        {
+          "type": "ufoDepart",
+          "character": "quee",
+          "duration": 4000
+        },
+        {
+          "type": "wait",
+          "duration": 2000
         },
         {
           "type": "transition",

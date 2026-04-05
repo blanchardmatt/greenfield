@@ -363,11 +363,15 @@ const SpriteLibrary = (() => {
   const PN = '#cc66aa'; // pink/magenta
   const HB = '#886644'; // hide brown (leather)
   const AM = '#cc8844'; // amber
-  // Diverse skin tones
-  const S2 = '#8b5e3c'; // dark brown skin
+  // Diverse skin tones (gradient from pale to deep)
+  const S2 = '#8b5e3c'; // medium brown skin
   const S3 = '#d4a06a'; // olive/tan skin
   const S4 = '#3c2415'; // very dark skin
-  const S5 = '#fdd9b5'; // pale skin
+  const S5 = '#fdd9b5'; // pale/light skin
+  const S6 = '#c68642'; // warm brown skin
+  const S7 = '#503020'; // deep brown skin
+  const S8 = '#e8b98a'; // light tan skin
+  const S9 = '#a0724a'; // medium-dark brown skin
   // Eye colors
   const EG = '#22aa44'; // green eyes
   const EB = '#2266cc'; // blue eyes
@@ -392,6 +396,7 @@ const SpriteLibrary = (() => {
     'T': TN, 't': TD, 'L': LB, 'R': RH, 'F': PK,
     'c': CY, 'C': CD, 'O': OG, 'V': DB, 'h': LG, 'M': PN, 'H': HB, 'A': AM,
     '1': S2, '2': S3, '3': S4, '4': S5, '5': EG, '6': EB, '7': EA,
+    'i': S6, 'j': S7, 'e': S8, 'f': S9,
     '8': HK, '9': HR, '0': HG, 'N': HN,
     'X': XG, 'Z': XB, 'Q': XP, 'J': XO,
   };
@@ -868,29 +873,29 @@ const SpriteLibrary = (() => {
 
   // ===== ARCHER — green hood, bow =====
   const archer_f1 = decode([
-    '..............1551..............',
+    '..............i55i..............',
     '.............KggggK.............',
     '............KggggggK............',
     '...........KgggggggK............',
-    '...........Kg111111gK...........',
-    '...........K11111111K...........',
-    '...........K11155111K...........',
-    '...........K11111111K...........',
-    '............K11331K.............',
-    '.............1551KK.............',
-    '.........15Kgggggg51K...........',
+    '...........KgiiiiiigK...........',
+    '...........KiiiiiiiiK...........',
+    '...........Kiii55iiiK...........',
+    '...........KiiiiiiiiK...........',
+    '............Kii33iK.............',
+    '.............i55iKK.............',
+    '.........i5Kgggggg5iK...........',
     '........KgggggggggggggK.........',
     '........KGggggggggggGgK.........',
-    '.......K115ggggggg511K..........',
-    '.......K11KgggggggK11K..........',
-    '........15Kggggggg51K...........',
+    '.......Kii5ggggggg5iiK..........',
+    '.......KiiKgggggggKiiK..........',
+    '........i5Kggggggg5iK...........',
     '.........KgggggggggK............',
     '.........KbbbbbbbbbbK...........',
     '.........KbbbbKKbbbbK...........',
     '..........KbbK..KbbK............',
     '..........KbbK..KbbK............',
     '.........KbbbK..KbbbK...........',
-    '.........1551....KKKK...........',
+    '.........i55i....KKKK...........',
     '................................',
     '................................',
     '................................',
@@ -905,29 +910,29 @@ const SpriteLibrary = (() => {
 
   // ===== MONK — bald, orange robes =====
   const monk_f1 = decode([
-    '..............1771..............',
-    '.............K1313K.............',
-    '............K131313K............',
-    '............K111111K............',
-    '............K111111K............',
-    '............K117711K............',
-    '............K111111K............',
-    '.............K133K..............',
-    '..............1771..............',
-    '.........17Koooooo71K...........',
+    '..............j77j..............',
+    '.............Kj3j3K.............',
+    '............Kj3j3j3K............',
+    '............KjjjjjjK............',
+    '............KjjjjjjK............',
+    '............Kjj77jjK............',
+    '............KjjjjjjK............',
+    '.............Kj33K..............',
+    '..............j77j..............',
+    '.........j7Koooooo7jK...........',
     '........KooooooooooooK..........',
     '.......KooooooooooooooK.........',
     '.......KooooooooooooooK.........',
-    '......K117oooooooo711K..........',
-    '......K11KooooooooK11K..........',
-    '.......17Koooooooo71K...........',
+    '......Kjj7oooooooo7jjK..........',
+    '......KjjKooooooooKjjK..........',
+    '.......j7Koooooooo7jK...........',
     '........KooooooooooK............',
     '........KooooooooooK............',
-    '........Kooo1771oooK............',
+    '........Koooj77joooK............',
     '.........KooK..KooK.............',
     '.........KooK..KooK.............',
     '.........KbbK..KbbK.............',
-    '.........1771..KKKK.............',
+    '.........j77j..KKKK.............',
     '................................',
     '................................',
     '................................',
@@ -979,28 +984,28 @@ const SpriteLibrary = (() => {
 
   // ===== KNIGHT — full plate, helmet =====
   const knight_f1 = decode([
-    '..............2662..............',
+    '..............e66e..............',
     '.............KyyyyK.............',
     '............KyyyyyyK............',
     '...........KyyyyyyyyK...........',
-    '...........Ky22222y2K...........',
-    '...........K22266222K...........',
-    '...........K22222222K...........',
-    '...........Ky22dd2yK............',
-    '............2662KKKK............',
-    '.........26Kyyyyyyyy62K.........',
+    '...........KyeeeeeyeK...........',
+    '...........Keee66eeeK...........',
+    '...........KeeeeeeeeK...........',
+    '...........KyeeddeyK............',
+    '............e66eKKKK............',
+    '.........e6Kyyyyyyyy6eK.........',
     '........KyyyyyyyyyyyyyyyyK......',
     '.......KyyyyyyyyyyyyyyyyyK......',
     '.......KkyyyyYYYyyyyykyK........',
-    '......K226yyyyyyyy622K..........',
-    '......K22KyyyyyyyyK22K..........',
-    '.......26Kyyyyyyyy62K...........',
+    '......Kee6yyyyyyyy6eeK..........',
+    '......KeeKyyyyyyyyKeeK..........',
+    '.......e6Kyyyyyyyy6eK...........',
     '........KyyyyyyyyyyyyK..........',
-    '........Kyyyy2662yyyyK..........',
+    '........Kyyyye66eyyyyK..........',
     '.........KyyK....KyyK...........',
     '.........KyyK....KyyK...........',
     '........KyyyK....KyyyK..........',
-    '........2662K....KKKKK..........',
+    '........e66eK....KKKKK..........',
     '................................',
     '................................',
     '................................',
@@ -1090,29 +1095,29 @@ const SpriteLibrary = (() => {
 
   // ===== FARMER — straw hat, overalls =====
   const farmer_f1 = decode([
-    '..........2772KKKKKK............',
+    '..........f77fKKKKKK............',
     '.........KYYYYYYYYYYk...........',
     '........KYYYYYYYYYYYYK..........',
     '........KYYYYYYYYYYYYk..........',
-    '........2772KKKKKKKKKKK.........',
-    '..........K22222222K............',
-    '..........K22277222K............',
-    '..........K22222222K............',
-    '...........K22dd2K..............',
-    '............2772KK..............',
-    '.........27lllllll72K...........',
+    '........f77fKKKKKKKKKKK.........',
+    '..........KffffffffK............',
+    '..........Kfff77fffK............',
+    '..........KffffffffK............',
+    '...........KffddfK..............',
+    '............f77fKK..............',
+    '.........f7lllllll7fK...........',
     '........KlllllllllllllK.........',
     '.......KllllllllllllllK.........',
     '.......KulllllllllllluK.........',
-    '......K227llllllll722K..........',
-    '......K22KllllllllK22K..........',
-    '.......27Kllllllll72K...........',
+    '......Kff7llllllll7ffK..........',
+    '......KffKllllllllKffK..........',
+    '.......f7Kllllllll7fK...........',
     '........KllllllllllK............',
     '........KbbbbKKbbbbK............',
     '.........KbbK..KbbK.............',
     '.........KbbK..KbbK.............',
     '........KbbbK..KbbbK............',
-    '........2772....KKKK............',
+    '........f77f....KKKK............',
     '................................',
     '................................',
     '................................',
@@ -1337,10 +1342,10 @@ const SpriteLibrary = (() => {
     ufo: decode([
       '..........KKKKKKKKKKKK..........',
       '.........KyyyyyyyyyyyyK.........',
-      '........KyyyyyyyyyyyyyyK........',
-      '.......KyyyyyyyyyyyyyyyyK.......',
-      '......KyyyyyyyyyyyyyyyyyyK......',
-      '....KKyyyyyyyyyyyyyyyyyyyKK.....',
+      '........KyyKyKyyKyKyyyK.........',
+      '.......KyyyKyKyyKyKyyyyK........',
+      '......KyyyyKyKyyKyKyyyyyK.......',
+      '....KKyyyyKKKyyKKKyyyyyyyyKK....',
       '..KKyyyyyyyyyyyyyyyyyyyyyyKKK...',
       '.KyyyyyyyyyyyyyyyyyyyyyyyyyykK..',
       'KyyyykKKKKKKKKKKKKKKKkyyyyykK...',
@@ -4412,6 +4417,18 @@ const SHARDS_SCRIPT = {
           "character": "townsfolk7"
         },
         {
+          "type": "joinDance",
+          "character": "zorp"
+        },
+        {
+          "type": "joinDance",
+          "character": "blix"
+        },
+        {
+          "type": "joinDance",
+          "character": "quee"
+        },
+        {
           "type": "emote",
           "character": "wizard",
           "emote": "happy",
@@ -4436,6 +4453,9 @@ const SHARDS_SCRIPT = {
           "type": "transition",
           "effect": "fadeIn",
           "duration": 1500
+        },
+        {
+          "type": "dance"
         },
         {
           "type": "wait",
@@ -4471,7 +4491,161 @@ const SHARDS_SCRIPT = {
         },
         {
           "type": "wait",
-          "duration": 500
+          "duration": 1000
+        },
+        {
+          "type": "exit",
+          "character": "elder",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "hero",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "gimli",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "swift",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "hank",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "princess",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "wizard",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "brother_sol",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "shade",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "lily",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "pip",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "ser_valen",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "morgana",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "dark_lord",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "duke",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk1",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk2",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk3",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk4",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk5",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk6",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk7",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk8",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk9",
+          "to": "right",
+          "duration": 1200
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk10",
+          "to": "left",
+          "duration": 1200
+        },
+        {
+          "type": "wait",
+          "duration": 1500
         },
         {
           "type": "ufoDepart",
@@ -4480,91 +4654,56 @@ const SHARDS_SCRIPT = {
         },
         {
           "type": "wait",
-          "duration": 500
+          "duration": 1000
+        },
+        {
+          "type": "emote",
+          "character": "zorp",
+          "emote": "happy",
+          "duration": 1500
+        },
+        {
+          "type": "emote",
+          "character": "blix",
+          "emote": "happy",
+          "duration": 1500
+        },
+        {
+          "type": "emote",
+          "character": "quee",
+          "emote": "happy",
+          "duration": 1500
         },
         {
           "type": "wait",
-          "duration": 1000
+          "duration": 2000
         },
         {
-          "type": "exit",
-          "character": "hero",
-          "to": "left",
-          "duration": 800
-        },
-        {
-          "type": "exit",
-          "character": "elder",
-          "to": "left",
-          "duration": 800
-        },
-        {
-          "type": "exit",
-          "character": "gimli",
-          "to": "left",
-          "duration": 700
-        },
-        {
-          "type": "exit",
-          "character": "brother_sol",
-          "to": "left",
-          "duration": 700
-        },
-        {
-          "type": "exit",
-          "character": "pip",
-          "to": "left",
-          "duration": 700
-        },
-        {
-          "type": "exit",
-          "character": "wizard",
-          "to": "right",
-          "duration": 800
-        },
-        {
-          "type": "exit",
-          "character": "princess",
-          "to": "right",
-          "duration": 800
-        },
-        {
-          "type": "exit",
-          "character": "dark_lord",
-          "to": "right",
-          "duration": 1000
-        },
-        {
-          "type": "exit",
-          "character": "swift",
-          "to": "right",
-          "duration": 700
-        },
-        {
-          "type": "exit",
-          "character": "shade",
-          "to": "right",
-          "duration": 700
-        },
-        {
-          "type": "exit",
-          "character": "lily",
-          "to": "right",
-          "duration": 600
+          "type": "ufoDepart",
+          "character": "zorp",
+          "duration": 4000
         },
         {
           "type": "wait",
           "duration": 500
         },
         {
-          "type": "exit",
-          "character": "lyra",
-          "to": "bottom",
-          "duration": 1500
+          "type": "ufoDepart",
+          "character": "blix",
+          "duration": 4000
         },
         {
           "type": "wait",
-          "duration": 1500
+          "duration": 500
+        },
+        {
+          "type": "ufoDepart",
+          "character": "quee",
+          "duration": 4000
+        },
+        {
+          "type": "wait",
+          "duration": 2000
         },
         {
           "type": "transition",
