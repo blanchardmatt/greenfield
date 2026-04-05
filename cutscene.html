@@ -5697,6 +5697,47 @@ const CutsceneEngine = (() => {
     ufoState = null;
     activeProps.length = 0;
     currentActionState = null;
+
+    // Replay state-building actions from all previous scenes
+    // so characters, props, scale, pins, etc are reconstructed
+    const stateActions = ['enter', 'showProp', 'setScale', 'pin', 'showNotes',
+                          'mill', 'joinDance', 'dance', 'ufoArrive'];
+    for (let si = 0; si < index; si++) {
+      const prevScene = script.scenes[si];
+      if (prevScene.background) currentBackground = prevScene.background;
+      for (const action of prevScene.actions) {
+        if (stateActions.includes(action.type)) {
+          // Execute instantly without animation
+          if (action.type === 'enter' || action.type === 'ufoArrive') {
+            const char = getOrCreateCharacter(action.character);
+            const to = action.to || { x: 128, y: 120 };
+            char.x = to.x; char.y = to.y;
+            char.baseX = to.x; char.baseY = to.y;
+            char.visible = true;
+          } else if (action.type === 'showProp') {
+            activeProps.push({ name: action.prop || 'amplifier', x: action.x || 0, y: action.y || 0, scale: action.scale || 1 });
+          } else if (action.type === 'setScale') {
+            const char = getOrCreateCharacter(action.character);
+            char.renderScale = action.scale || 1;
+          } else if (action.type === 'pin') {
+            const char = getOrCreateCharacter(action.character);
+            char.pinned = true;
+          } else if (action.type === 'showNotes') {
+            notesActive = true; notesCharId = action.character || null;
+          } else if (action.type === 'mill') {
+            for (const c of Object.values(characters)) { if (c.visible && !c.pinned) c.milling = true; }
+          } else if (action.type === 'joinDance') {
+            danceActive = true;
+            const char = getOrCreateCharacter(action.character);
+            if (!char.pinned) { char.dancing = true; char.milling = false; }
+          } else if (action.type === 'dance') {
+            danceActive = true;
+            for (const c of Object.values(characters)) { if (c.visible && !c.pinned) { c.dancing = true; c.milling = false; } }
+          }
+        }
+      }
+    }
+
     sceneIndex = index;
     actionIndex = 0;
     const scene = script.scenes[sceneIndex];
