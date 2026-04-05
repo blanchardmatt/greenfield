@@ -3604,6 +3604,9 @@ const SHARDS_SCRIPT = {
           "duration": 2000
         },
         {
+          "type": "dance"
+        },
+        {
           "type": "dialogue",
           "character": "lyra",
           "text": "Hollowed bell..."
@@ -3764,8 +3767,7 @@ const SHARDS_SCRIPT = {
           "duration": 800
         },
         {
-          "type": "dance",
-          "duration": 12000
+          "type": "dance"
         },
         {
           "type": "emote",
@@ -4214,11 +4216,7 @@ const CutsceneEngine = (() => {
     for (const char of Object.values(characters)) {
       if (char.visible && !char.pinned) char.dancing = true;
     }
-    const duration = action.duration || 8000;
-    waitTimer = duration;
-    return { done: false, type: 'timed', onDone: () => {
-      // Dance keeps going until stopDance
-    }};
+    return { done: true };
   }
 
   function beginStopDance(action) {

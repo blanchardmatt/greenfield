@@ -455,6 +455,9 @@
           "duration": 2000
         },
         {
+          "type": "dance"
+        },
+        {
           "type": "dialogue",
           "character": "lyra",
           "text": "Hollowed bell..."
@@ -615,8 +618,7 @@
           "duration": 800
         },
         {
-          "type": "dance",
-          "duration": 12000
+          "type": "dance"
         },
         {
           "type": "emote",

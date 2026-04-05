@@ -269,11 +269,7 @@ const CutsceneEngine = (() => {
     for (const char of Object.values(characters)) {
       if (char.visible && !char.pinned) char.dancing = true;
     }
-    const duration = action.duration || 8000;
-    waitTimer = duration;
-    return { done: false, type: 'timed', onDone: () => {
-      // Dance keeps going until stopDance
-    }};
+    return { done: true };
   }
 
   function beginStopDance(action) {
