@@ -1369,58 +1369,58 @@ const Renderer = (() => {
         const rungW = 12 - Math.floor(t2 * 2);
         ctx.fillRect(Math.floor(rx), Math.floor(ry), rungW, 2);
       }
-      // Guy position: standing on a rung about 40% up
+      // Guy: feet on a rung ~35% from top of ladder
       const guyT = 0.35;
-      const ladX = Math.floor(ladTopX + guyT * ladDx);
-      const ladY = Math.floor(ladTopY + guyT * ladDy);
-      // Guy standing on ladder, dancing wildly
-      const guyY = ladY + 14;
+      const fX = Math.floor(ladTopX + guyT * (ladBotX - ladTopX));
+      const fY = Math.floor(ladTopY + guyT * (ladBotY - ladTopY));
+      // All positions relative to feet (fX, fY)
       const bounce = Math.abs(Math.sin(t / 200)) * 3;
-      const leanX = Math.sin(t / 300) * 3;
+      const lean = Math.sin(t / 300) * 3;
       const armL = Math.sin(t / 180);
       const armR = Math.sin(t / 220);
+      const bx = fX + lean; // body center x
+      const by = fY - bounce; // feet y with bounce
 
-      // Legs (pale skin, on rung)
-      ctx.fillStyle = '#fdd9b5';
-      ctx.fillRect(Math.floor(ladX + 3 + leanX), guyY + 16 - bounce, 3, 6);
-      ctx.fillRect(Math.floor(ladX + 8 + leanX), guyY + 16 - bounce, 3, 6);
-      // Shoes
+      // Shoes on rung
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(Math.floor(ladX + 3 + leanX), guyY + 22 - bounce, 3, 2);
-      ctx.fillRect(Math.floor(ladX + 8 + leanX), guyY + 22 - bounce, 3, 2);
-      // Shorts (khaki)
+      ctx.fillRect(Math.floor(bx - 1), Math.floor(by - 2), 3, 2);
+      ctx.fillRect(Math.floor(bx + 5), Math.floor(by - 2), 3, 2);
+      // Legs
+      ctx.fillStyle = '#fdd9b5';
+      ctx.fillRect(Math.floor(bx), Math.floor(by - 8), 3, 6);
+      ctx.fillRect(Math.floor(bx + 5), Math.floor(by - 8), 3, 6);
+      // Shorts
       ctx.fillStyle = '#ccbb88';
-      ctx.fillRect(Math.floor(ladX + 2 + leanX), guyY + 12 - bounce, 10, 5);
-      // Tank top (bright white)
+      ctx.fillRect(Math.floor(bx - 1), Math.floor(by - 13), 10, 5);
+      // Tank top
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(Math.floor(ladX + 3 + leanX), guyY + 4 - bounce, 8, 9);
-      // Shoulder straps
+      ctx.fillRect(Math.floor(bx), Math.floor(by - 22), 8, 10);
+      // Skin showing (straps)
       ctx.fillStyle = '#fdd9b5';
-      ctx.fillRect(Math.floor(ladX + 3 + leanX), guyY + 5 - bounce, 2, 6);
-      ctx.fillRect(Math.floor(ladX + 9 + leanX), guyY + 5 - bounce, 2, 6);
+      ctx.fillRect(Math.floor(bx), Math.floor(by - 20), 2, 7);
+      ctx.fillRect(Math.floor(bx + 6), Math.floor(by - 20), 2, 7);
       // Head
       ctx.fillStyle = '#fdd9b5';
-      ctx.fillRect(Math.floor(ladX + 4 + leanX), guyY - 1 - bounce, 6, 5);
-      // Hair (short brown)
+      ctx.fillRect(Math.floor(bx + 1), Math.floor(by - 27), 6, 5);
+      // Hair
       ctx.fillStyle = '#885522';
-      ctx.fillRect(Math.floor(ladX + 4 + leanX), guyY - 2 - bounce, 6, 2);
+      ctx.fillRect(Math.floor(bx + 1), Math.floor(by - 28), 6, 2);
       // Eyes
       ctx.fillStyle = '#111111';
-      ctx.fillRect(Math.floor(ladX + 5 + leanX), guyY + 1 - bounce, 1, 1);
-      ctx.fillRect(Math.floor(ladX + 8 + leanX), guyY + 1 - bounce, 1, 1);
-      // Mouth (open, yelling/singing along)
+      ctx.fillRect(Math.floor(bx + 2), Math.floor(by - 25), 1, 1);
+      ctx.fillRect(Math.floor(bx + 5), Math.floor(by - 25), 1, 1);
+      // Mouth (yelling)
       ctx.fillStyle = '#cc4444';
-      ctx.fillRect(Math.floor(ladX + 6 + leanX), guyY + 3 - bounce, 2, 1);
-      // Arms — flailing wildly
-      ctx.fillStyle = '#fdd9b5';
+      ctx.fillRect(Math.floor(bx + 3), Math.floor(by - 23), 2, 1);
       // Left arm
-      const laY = armL > 0 ? guyY + 2 - bounce : guyY + 8 - bounce;
-      ctx.fillRect(Math.floor(ladX + leanX), laY, 3, 2);
-      if (armL > 0.5) ctx.fillRect(Math.floor(ladX - 2 + leanX), laY - 3, 2, 3);
+      ctx.fillStyle = '#fdd9b5';
+      const laY = armL > 0 ? by - 24 : by - 16;
+      ctx.fillRect(Math.floor(bx - 3), Math.floor(laY), 3, 2);
+      if (armL > 0.5) ctx.fillRect(Math.floor(bx - 5), Math.floor(laY - 3), 2, 3);
       // Right arm
-      const raY = armR > 0 ? guyY + 1 - bounce : guyY + 9 - bounce;
-      ctx.fillRect(Math.floor(ladX + 11 + leanX), raY, 3, 2);
-      if (armR > 0.5) ctx.fillRect(Math.floor(ladX + 14 + leanX), raY - 3, 2, 3);
+      const raY = armR > 0 ? by - 25 : by - 17;
+      ctx.fillRect(Math.floor(bx + 8), Math.floor(raY), 3, 2);
+      if (armR > 0.5) ctx.fillRect(Math.floor(bx + 11), Math.floor(raY - 3), 2, 3);
 
       // Wheelchair rider on the roof of the Biltroy
       const roofY = layout.wheelchairY;
