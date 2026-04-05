@@ -360,16 +360,10 @@ const CutsceneEngine = (() => {
         char.x = centerX + Math.cos(angle) * radiusX - SpriteLibrary.W / 2;
         char.y = centerY + Math.sin(angle) * radiusY - SpriteLibrary.H / 2;
       } else if (char.milling) {
-        // Wandering near base position
-        const wx = Math.sin(t / 2000 + seed) * 12 + Math.sin(t / 3000 + seed * 2) * 6;
-        const wy = Math.sin(t / 2500 + seed * 1.5) * 5;
-        let nx = char.baseX + wx;
-        // Avoid the bonfire zone (x=125-165)
-        const charRight = nx + SpriteLibrary.W;
-        if (nx < 165 && charRight > 125 && char.baseY > 120) {
-          nx = char.baseX < 145 ? Math.min(nx, 125 - SpriteLibrary.W) : Math.max(nx, 165);
-        }
-        char.x = nx;
+        // Wandering near base position — orbit loosely around fire
+        const wx = Math.sin(t / 2500 + seed) * 10 + Math.sin(t / 4000 + seed * 2) * 5;
+        const wy = Math.sin(t / 3000 + seed * 1.5) * 4;
+        char.x = char.baseX + wx;
         char.y = char.baseY + wy;
       } else {
         // Subtle idle bob — slight vertical bounce
@@ -504,19 +498,26 @@ const CutsceneEngine = (() => {
 
     // Characters — sorted by Y (back to front) with idle bob
     const t = Date.now();
-    // Sort by Y position for depth — characters further down are in front
-    const sortedChars = Object.values(characters).filter(c => c.visible).sort((a, b) => a.y - b.y);
-    for (const char of sortedChars) {
-      const idleBob = (!char.dancing && !char.milling) ? Math.sin(t / 600 + char.idleSeed * 10) * 1.5 : 0;
-
-      // Perspective scale based on Y depth (unless manually scaled)
+    // Compute perspective scale for all visible characters first
+    const visibleChars = Object.values(characters).filter(c => c.visible);
+    for (const char of visibleChars) {
       if (!char.pinned) {
         const minY = 120, maxY = 190;
         const minScale = 0.6, maxScale = 1.15;
         const depthT = Math.max(0, Math.min(1, (char.y - minY) / (maxY - minY)));
         char.renderScale = minScale + depthT * (maxScale - minScale);
       }
+    }
 
+    // Sort by feet (bottom of sprite) — characters with lower feet drawn in front
+    const sortedChars = visibleChars.sort((a, b) => {
+      const aFeet = a.y + SpriteLibrary.H * (a.renderScale || 1);
+      const bFeet = b.y + SpriteLibrary.H * (b.renderScale || 1);
+      return aFeet - bFeet;
+    });
+
+    for (const char of sortedChars) {
+      const idleBob = (!char.dancing && !char.milling) ? Math.sin(t / 600 + char.idleSeed * 10) * 1.5 : 0;
       Renderer.drawCharacterWithOffset(char, animFrame, 0, idleBob);
 
       // Smoke if touching the bonfire (fire center ~145, 148)
