@@ -4,7 +4,7 @@
 const ScriptParser = (() => {
   const VALID_ACTIONS = [
     'transition', 'enter', 'exit', 'dialogue', 'wait',
-    'shake', 'emote', 'move', 'setBackground',
+    'shake', 'emote', 'move', 'setBackground', 'title', 'credits',
   ];
 
   const VALID_DIRECTIONS = ['left', 'right', 'top', 'bottom'];
