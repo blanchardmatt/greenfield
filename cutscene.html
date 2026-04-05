@@ -1741,15 +1741,27 @@ const Renderer = (() => {
     },
 
     night_sky(ctx) {
-      // Dark sky — fill ENTIRE canvas first
-      ctx.fillStyle = '#0a0a22';
-      ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+      // Sky gradient — dark blue to deep purple at horizon
+      for (let y = 0; y < INTERNAL_H; y++) {
+        const t = y / INTERNAL_H;
+        const r = Math.floor(10 + t * 15);
+        const g = Math.floor(10 + t * 10);
+        const b = Math.floor(34 + t * 30);
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fillRect(0, y, INTERNAL_W, 1);
+      }
 
-      // Ground — visible darker band
-      ctx.fillStyle = '#151530';
-      ctx.fillRect(0, 160, INTERNAL_W, INTERNAL_H - 160);
-      ctx.fillStyle = '#1a1a38';
-      ctx.fillRect(0, 180, INTERNAL_W, INTERNAL_H - 180);
+      // Ground — visible rolling hills
+      ctx.fillStyle = '#1a2a1a';
+      ctx.fillRect(0, 170, INTERNAL_W, INTERNAL_H - 170);
+      ctx.fillStyle = '#152015';
+      ctx.fillRect(0, 190, INTERNAL_W, INTERNAL_H - 190);
+      // Hill silhouettes
+      ctx.fillStyle = '#1a2a1a';
+      for (let x = 0; x < INTERNAL_W; x++) {
+        const hillY = 168 + Math.sin(x * 0.025) * 6 + Math.sin(x * 0.06) * 3;
+        ctx.fillRect(x, Math.floor(hillY), 1, INTERNAL_H - Math.floor(hillY));
+      }
 
       // Stars (seeded pseudo-random for consistency)
       ctx.fillStyle = '#ffffff';
