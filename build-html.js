@@ -147,6 +147,10 @@ ${engineJs}
   var statusEl = document.getElementById('record-status');
 
   recordBtn.addEventListener('click', function() {
+    if (webCodecsRecording) {
+      stopWebCodecsRecording();
+      return;
+    }
     if (mediaRecorder && mediaRecorder.state === 'recording') {
       mediaRecorder.stop();
       return;
@@ -163,7 +167,9 @@ ${engineJs}
       autoAdvanceDelay: 2000,
       onComplete: function() {
         setTimeout(function() {
-          if (mediaRecorder && mediaRecorder.state === 'recording') {
+          if (webCodecsRecording) {
+            stopWebCodecsRecording();
+          } else if (mediaRecorder && mediaRecorder.state === 'recording') {
             mediaRecorder.stop();
           }
         }, 500);
@@ -171,9 +177,11 @@ ${engineJs}
     });
   });
 
-  // Detect best video format
+  // Detect best video format — try MP4 first (Chrome 123+, Safari)
   function getVideoFormat() {
     var formats = [
+      { mimeType: 'video/mp4;codecs="avc1.42E01E"', ext: 'mp4', type: 'video/mp4' },
+      { mimeType: 'video/mp4;codecs=avc1.42E01E', ext: 'mp4', type: 'video/mp4' },
       { mimeType: 'video/mp4;codecs=avc1', ext: 'mp4', type: 'video/mp4' },
       { mimeType: 'video/mp4', ext: 'mp4', type: 'video/mp4' },
       { mimeType: 'video/webm;codecs=vp9', ext: 'webm', type: 'video/webm' },
@@ -181,20 +189,57 @@ ${engineJs}
       { mimeType: 'video/webm', ext: 'webm', type: 'video/webm' },
     ];
     for (var i = 0; i < formats.length; i++) {
-      if (MediaRecorder.isTypeSupported(formats[i].mimeType)) {
-        return formats[i];
-      }
+      try {
+        if (MediaRecorder.isTypeSupported(formats[i].mimeType)) {
+          return formats[i];
+        }
+      } catch(e) {}
     }
-    return formats[0]; // fallback
+    return { mimeType: '', ext: 'webm', type: 'video/webm' };
+  }
+
+  // Check if WebCodecs MP4 export is available (Chrome with no MP4 MediaRecorder)
+  var canUseWebCodecs = (typeof VideoEncoder !== 'undefined');
+  var mp4MuxerLoaded = false;
+  var mp4MuxerModule = null;
+
+  function loadMp4Muxer(callback) {
+    if (mp4MuxerLoaded) { callback(); return; }
+    var script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.min.js';
+    script.onload = function() {
+      mp4MuxerLoaded = true;
+      mp4MuxerModule = window.Mp4Muxer;
+      callback();
+    };
+    script.onerror = function() {
+      alert('Could not load MP4 encoder. Falling back to WebM.');
+      startMediaRecorderRecording();
+    };
+    document.head.appendChild(script);
   }
 
   function startRecording() {
+    var fmt = getVideoFormat();
+    if (fmt.ext === 'mp4') {
+      // Native MP4 MediaRecorder (Safari, Chrome 123+)
+      startMediaRecorderRecording();
+    } else if (canUseWebCodecs) {
+      // Chrome without MP4 MediaRecorder — use WebCodecs + mp4-muxer
+      loadMp4Muxer(function() { startWebCodecsRecording(); });
+    } else {
+      // Fallback to WebM
+      startMediaRecorderRecording();
+    }
+  }
+
+  function startMediaRecorderRecording() {
     var canvas = document.getElementById('display-canvas');
     var stream = canvas.captureStream(30);
     var fmt = getVideoFormat();
     recordedChunks = [];
     var options = {};
-    if (MediaRecorder.isTypeSupported(fmt.mimeType)) {
+    if (fmt.mimeType && MediaRecorder.isTypeSupported(fmt.mimeType)) {
       options.mimeType = fmt.mimeType;
     }
     mediaRecorder = new MediaRecorder(stream, options);
@@ -203,14 +248,7 @@ ${engineJs}
     };
     mediaRecorder.onstop = function() {
       var blob = new Blob(recordedChunks, { type: fmt.type });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = 'cutscene.' + fmt.ext;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      downloadBlob(blob, 'cutscene.' + fmt.ext);
       recordBtn.textContent = 'Record';
       recordBtn.style.background = '#553333';
       statusEl.style.display = 'none';
@@ -220,11 +258,107 @@ ${engineJs}
       recordBtn.textContent = 'Record';
       statusEl.style.display = 'none';
     };
-    mediaRecorder.start(1000); // collect data every second
+    mediaRecorder.start(1000);
     recordBtn.textContent = 'Stop';
     recordBtn.style.background = '#cc3333';
     statusEl.style.display = 'block';
     statusEl.textContent = 'Recording (' + fmt.ext.toUpperCase() + ')...';
+  }
+
+  // WebCodecs-based MP4 recording (Chrome)
+  var webCodecsRecording = false;
+  var webCodecsEncoder = null;
+  var webCodecsMuxer = null;
+
+  function startWebCodecsRecording() {
+    var canvas = document.getElementById('display-canvas');
+    var w = canvas.width;
+    var h = canvas.height;
+    // Ensure dimensions are even (H.264 requirement)
+    w = w % 2 === 0 ? w : w - 1;
+    h = h % 2 === 0 ? h : h - 1;
+    var fps = 30;
+
+    var target = new Mp4Muxer.ArrayBufferTarget();
+    webCodecsMuxer = new Mp4Muxer.Muxer({
+      target: target,
+      video: { codec: 'avc', width: w, height: h },
+      fastStart: 'in-memory',
+    });
+
+    webCodecsEncoder = new VideoEncoder({
+      output: function(chunk, meta) {
+        webCodecsMuxer.addVideoChunk(chunk, meta);
+      },
+      error: function(e) {
+        alert('Encoder error: ' + e.message);
+        stopWebCodecsRecording();
+      }
+    });
+
+    webCodecsEncoder.configure({
+      codec: 'avc1.42E01E',
+      width: w,
+      height: h,
+      bitrate: 4000000,
+      framerate: fps,
+    });
+
+    webCodecsRecording = true;
+    var frameCount = 0;
+    var interval = 1000 / fps;
+
+    function captureFrame() {
+      if (!webCodecsRecording) return;
+      try {
+        var frame = new VideoFrame(canvas, {
+          timestamp: frameCount * interval * 1000,
+        });
+        var keyFrame = frameCount % 60 === 0;
+        webCodecsEncoder.encode(frame, { keyFrame: keyFrame });
+        frame.close();
+        frameCount++;
+      } catch(e) {}
+      setTimeout(captureFrame, interval);
+    }
+
+    captureFrame();
+    recordBtn.textContent = 'Stop';
+    recordBtn.style.background = '#cc3333';
+    statusEl.style.display = 'block';
+    statusEl.textContent = 'Recording (MP4)...';
+
+    // Store target reference for download
+    webCodecsMuxer._target = target;
+  }
+
+  function stopWebCodecsRecording() {
+    webCodecsRecording = false;
+    if (webCodecsEncoder) {
+      webCodecsEncoder.flush().then(function() {
+        webCodecsMuxer.finalize();
+        var buf = webCodecsMuxer._target.buffer;
+        var blob = new Blob([buf], { type: 'video/mp4' });
+        downloadBlob(blob, 'cutscene.mp4');
+        webCodecsEncoder.close();
+        webCodecsEncoder = null;
+        webCodecsMuxer = null;
+        recordBtn.textContent = 'Record';
+        recordBtn.style.background = '#553333';
+        statusEl.style.display = 'none';
+      });
+    }
+  }
+
+  function downloadBlob(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   playScript(DEMO_SCRIPT);
