@@ -333,13 +333,13 @@ const CutsceneEngine = (() => {
       const seed = char.idleSeed;
 
       if (char.dancing) {
-        // Coordinated dance: characters orbit in a circle pattern
+        // Coordinated dance: characters orbit around the bonfire
         const totalChars = visibleChars.length;
         const angle = (t / 3000 + (i / totalChars) * Math.PI * 2) % (Math.PI * 2);
-        const centerX = 112;
-        const centerY = 100;
-        const radiusX = 60 + Math.sin(t / 2000) * 15;
-        const radiusY = 25 + Math.sin(t / 2500) * 8;
+        const centerX = 145;
+        const centerY = 135;
+        const radiusX = 50 + Math.sin(t / 2000) * 10;
+        const radiusY = 20 + Math.sin(t / 2500) * 5;
         char.x = centerX + Math.cos(angle) * radiusX;
         char.y = centerY + Math.sin(angle) * radiusY;
       } else if (char.milling) {

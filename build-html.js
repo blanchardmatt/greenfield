@@ -39,6 +39,24 @@ ${css}
   max-width: 100%;
   width: 768px;
 }
+#controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  padding: 8px 4px;
+  max-width: 768px;
+}
+#controls button, #controls .toolbar-sep {
+  font-family: monospace;
+  font-size: 12px;
+  background: #2a2a4e;
+  color: #aaa;
+  border: 1px solid #444;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+#controls button:hover { background: #3a3a5e; color: #ccc; }
 </style>
 </head>
 <body>
