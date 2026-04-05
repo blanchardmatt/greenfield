@@ -58,6 +58,7 @@ const CutsceneEngine = (() => {
         idleSeed: Math.random() * 1000, // unique per character for varied idle
         milling: false, // wandering around
         dancing: false, // active dancing
+        pinned: false, // stays at position, ignores mill/dance
       };
     }
     return characters[charId];
@@ -253,7 +254,7 @@ const CutsceneEngine = (() => {
   // Mill: characters wander near their base position
   function beginMill(action) {
     for (const char of Object.values(characters)) {
-      if (char.visible) char.milling = true;
+      if (char.visible && !char.pinned) char.milling = true;
     }
     return { done: true };
   }
@@ -266,7 +267,7 @@ const CutsceneEngine = (() => {
     danceActive = true;
     danceElapsed = 0;
     for (const char of Object.values(characters)) {
-      if (char.visible) char.dancing = true;
+      if (char.visible && !char.pinned) char.dancing = true;
     }
     const duration = action.duration || 8000;
     waitTimer = duration;

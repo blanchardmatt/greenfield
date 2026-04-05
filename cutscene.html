@@ -1904,6 +1904,14 @@ const Renderer = (() => {
         sidingDark: '#aa8866', roof: '#666655', roofDark: '#555544',
         windowColor: '#dd9966', deck: '#997744', deckDark: '#886633',
       });
+      // Stage lights on the ground aimed at deck
+      ctx.fillStyle = '#444444';
+      ctx.fillRect(175, 132, 4, 3);
+      ctx.fillRect(238, 132, 4, 3);
+      ctx.fillStyle = '#ffdd44';
+      ctx.fillRect(176, 131, 2, 1);
+      ctx.fillStyle = '#ff4444';
+      ctx.fillRect(239, 131, 2, 1);
     },
 
     biltroy_night(ctx) {
@@ -1951,6 +1959,17 @@ const Renderer = (() => {
       // String to roof
       ctx.fillStyle = '#888888';
       ctx.fillRect(210, 72, 1, 6);
+      // Stage lights on ground
+      ctx.fillStyle = '#333333';
+      ctx.fillRect(170, 132, 5, 4);
+      ctx.fillRect(240, 132, 5, 4);
+      ctx.fillRect(155, 134, 4, 3);
+      ctx.fillStyle = '#ff4444';
+      ctx.fillRect(171, 131, 3, 1);
+      ctx.fillStyle = '#4444ff';
+      ctx.fillRect(241, 131, 3, 1);
+      ctx.fillStyle = '#44ff44';
+      ctx.fillRect(156, 133, 2, 1);
     },
   };
 
@@ -2310,6 +2329,23 @@ const Renderer = (() => {
         ctx.globalAlpha = 0.3 + Math.sin(t / 300 + i * 2) * 0.2;
         ctx.fillRect(Math.floor(hx), Math.floor(hy), 2, 1);
       }
+      // Stage light beams (sunset)
+      ctx.globalAlpha = 0.08 + Math.sin(t / 500) * 0.04;
+      ctx.fillStyle = '#ffdd44';
+      ctx.beginPath();
+      ctx.moveTo(177, 131);
+      ctx.lineTo(195, 95);
+      ctx.lineTo(210, 95);
+      ctx.lineTo(177, 131);
+      ctx.fill();
+      ctx.globalAlpha = 0.06 + Math.sin(t / 600 + 1) * 0.03;
+      ctx.fillStyle = '#ff4444';
+      ctx.beginPath();
+      ctx.moveTo(240, 131);
+      ctx.lineTo(220, 95);
+      ctx.lineTo(205, 95);
+      ctx.lineTo(240, 131);
+      ctx.fill();
       ctx.globalAlpha = 1;
     },
 
@@ -2383,6 +2419,25 @@ const Renderer = (() => {
         ctx.fillStyle = beamColors[i % beamColors.length];
         ctx.globalAlpha = 0.08 + Math.sin(t / 400 + i) * 0.04;
         fillCircle(ctx, Math.floor(px), Math.floor(py), 8);
+      }
+
+      // Stage light beams (night - colorful, animated)
+      const stageLights = [
+        { x: 172, color: '#ff4444' },
+        { x: 242, color: '#4444ff' },
+        { x: 157, color: '#44ff44' },
+      ];
+      for (let i = 0; i < stageLights.length; i++) {
+        const sl = stageLights[i];
+        const sway = Math.sin(t / 800 + i * 2) * 8;
+        ctx.fillStyle = sl.color;
+        ctx.globalAlpha = 0.1 + Math.sin(t / 400 + i) * 0.05;
+        ctx.beginPath();
+        ctx.moveTo(sl.x, 131);
+        ctx.lineTo(200 + sway, 85);
+        ctx.lineTo(210 + sway, 85);
+        ctx.lineTo(sl.x + 4, 131);
+        ctx.fill();
       }
 
       // Bats flying across
@@ -4231,6 +4286,7 @@ const CutsceneEngine = (() => {
         idleSeed: Math.random() * 1000, // unique per character for varied idle
         milling: false, // wandering around
         dancing: false, // active dancing
+        pinned: false, // stays at position, ignores mill/dance
       };
     }
     return characters[charId];
@@ -4426,7 +4482,7 @@ const CutsceneEngine = (() => {
   // Mill: characters wander near their base position
   function beginMill(action) {
     for (const char of Object.values(characters)) {
-      if (char.visible) char.milling = true;
+      if (char.visible && !char.pinned) char.milling = true;
     }
     return { done: true };
   }
@@ -4439,7 +4495,7 @@ const CutsceneEngine = (() => {
     danceActive = true;
     danceElapsed = 0;
     for (const char of Object.values(characters)) {
-      if (char.visible) char.dancing = true;
+      if (char.visible && !char.pinned) char.dancing = true;
     }
     const duration = action.duration || 8000;
     waitTimer = duration;
