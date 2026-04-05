@@ -4434,11 +4434,11 @@ const CutsceneEngine = (() => {
     char.baseY = to.y;
     char.visible = true;
 
-    const tweenX = AnimationSystem.addTween(char, 'x', char.x, to.x, duration, 'easeOut');
-    const tweenY = AnimationSystem.addTween(char, 'y', char.y, to.y, duration, 'easeOut');
+    AnimationSystem.addTween(char, 'x', char.x, to.x, duration, 'easeOut');
+    AnimationSystem.addTween(char, 'y', char.y, to.y, duration, 'easeOut');
 
-    waitTimer = duration;
-    return { done: false, type: 'timed' };
+    // Non-blocking: tween runs in background, engine continues immediately
+    return { done: true };
   }
 
   function beginExit(action) {
