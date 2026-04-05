@@ -2,22 +2,27 @@
  * Renderer — Canvas rendering for backgrounds, sprites, dialogue, and effects.
  */
 const Renderer = (() => {
-  const INTERNAL_W = 256;
-  const INTERNAL_H = 224;
-  const SCALE = 3; // 256*3 = 768, 224*3 = 672
+  let INTERNAL_W = 256;
+  let INTERNAL_H = 224;
+  let SCALE = 3;
+  let verticalMode = false;
 
   let displayCanvas, displayCtx;
   let offscreen, ctx;
 
-  // Dialogue box dimensions (in internal resolution)
+  // Dialogue box dimensions (recalculated on mode change)
   const DIALOG_MARGIN = 4;
   const DIALOG_HEIGHT = 32;
-  const DIALOG_Y = INTERNAL_H - DIALOG_HEIGHT - DIALOG_MARGIN;
+  let DIALOG_Y = INTERNAL_H - DIALOG_HEIGHT - DIALOG_MARGIN;
   const TEXT_PADDING = 3;
   const TEXT_SCALE = 1;
 
   function init(canvasElement) {
     displayCanvas = canvasElement;
+    applyDimensions();
+  }
+
+  function applyDimensions() {
     displayCanvas.width = INTERNAL_W * SCALE;
     displayCanvas.height = INTERNAL_H * SCALE;
     displayCtx = displayCanvas.getContext('2d');
@@ -27,6 +32,27 @@ const Renderer = (() => {
     offscreen.width = INTERNAL_W;
     offscreen.height = INTERNAL_H;
     ctx = offscreen.getContext('2d');
+
+    DIALOG_Y = INTERNAL_H - DIALOG_HEIGHT - DIALOG_MARGIN;
+  }
+
+  function setVerticalMode(on) {
+    verticalMode = !!on;
+    if (verticalMode) {
+      INTERNAL_W = 144;
+      INTERNAL_H = 256;
+      SCALE = 3;
+    } else {
+      INTERNAL_W = 256;
+      INTERNAL_H = 224;
+      SCALE = 3;
+    }
+    applyDimensions();
+    return verticalMode;
+  }
+
+  function isVertical() {
+    return verticalMode;
   }
 
   // --- Background drawing ---
@@ -1662,7 +1688,7 @@ const Renderer = (() => {
     drawBackground, drawProp, drawBonfire, drawUfo, drawCharacter, drawCharacterWithOffset, drawEmoteBubble, drawMusicNotes, drawSmoke,
     drawDialogueBox, drawDialogueText, drawFadeOverlay,
     drawTitleOverlay, drawCreditsOverlay,
-    getTextMaxWidth, getTextScale, getInternalSize,
+    getTextMaxWidth, getTextScale, getInternalSize, setVerticalMode, isVertical,
     getBackgroundNames, renderBackgroundToCanvas,
   };
 })();

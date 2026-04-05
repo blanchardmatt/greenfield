@@ -75,6 +75,7 @@ ${css}
 <button id="btn-prev">Prev</button>
 <button id="btn-next">Next</button>
 <button id="btn-autoplay" style="background:#335533;border-color:#557755">Auto</button>
+<button id="btn-vertical" style="background:#334455;border-color:#556677">9:16</button>
 <div class="toolbar-sep" style="width:1px;height:20px;background:#333;margin:0 4px;display:inline-block"></div>
 <button id="btn-record" style="background:#553333;border-color:#774444">Record</button>
 <button id="btn-export-vid" style="background:#333355;border-color:#444477">Export Video</button>
@@ -152,6 +153,25 @@ ${engineJs}
     autoPlayBtn.textContent = isAuto ? 'Manual' : 'Auto';
     autoPlayBtn.style.background = isAuto ? '#553355' : '#335533';
     autoPlayBtn.style.borderColor = isAuto ? '#775577' : '#557755';
+  }
+
+  // --- Vertical mode toggle ---
+  var vertBtn = document.getElementById('btn-vertical');
+  vertBtn.addEventListener('click', function() {
+    var isVert = Renderer.isVertical();
+    Renderer.setVerticalMode(!isVert);
+    updateVertBtn();
+    // Replay current script with new dimensions
+    if (window._lastScript) {
+      CutsceneEngine.stop();
+      CutsceneEngine.play(window._lastScript);
+    }
+  });
+  function updateVertBtn() {
+    var isVert = Renderer.isVertical();
+    vertBtn.textContent = isVert ? '16:9' : '9:16';
+    vertBtn.style.background = isVert ? '#554433' : '#334455';
+    vertBtn.style.borderColor = isVert ? '#776655' : '#556677';
   }
 
   // --- Video Recording ---

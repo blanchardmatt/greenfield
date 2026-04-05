@@ -146,6 +146,7 @@ button:hover {
 <button id="btn-prev">Prev</button>
 <button id="btn-next">Next</button>
 <button id="btn-autoplay" style="background:#335533;border-color:#557755">Auto</button>
+<button id="btn-vertical" style="background:#334455;border-color:#556677">9:16</button>
 <div class="toolbar-sep" style="width:1px;height:20px;background:#333;margin:0 4px;display:inline-block"></div>
 <button id="btn-record" style="background:#553333;border-color:#774444">Record</button>
 <button id="btn-export-vid" style="background:#333355;border-color:#444477">Export Video</button>
@@ -1651,22 +1652,27 @@ const AnimationSystem = (() => {
  * Renderer — Canvas rendering for backgrounds, sprites, dialogue, and effects.
  */
 const Renderer = (() => {
-  const INTERNAL_W = 256;
-  const INTERNAL_H = 224;
-  const SCALE = 3; // 256*3 = 768, 224*3 = 672
+  let INTERNAL_W = 256;
+  let INTERNAL_H = 224;
+  let SCALE = 3;
+  let verticalMode = false;
 
   let displayCanvas, displayCtx;
   let offscreen, ctx;
 
-  // Dialogue box dimensions (in internal resolution)
+  // Dialogue box dimensions (recalculated on mode change)
   const DIALOG_MARGIN = 4;
   const DIALOG_HEIGHT = 32;
-  const DIALOG_Y = INTERNAL_H - DIALOG_HEIGHT - DIALOG_MARGIN;
+  let DIALOG_Y = INTERNAL_H - DIALOG_HEIGHT - DIALOG_MARGIN;
   const TEXT_PADDING = 3;
   const TEXT_SCALE = 1;
 
   function init(canvasElement) {
     displayCanvas = canvasElement;
+    applyDimensions();
+  }
+
+  function applyDimensions() {
     displayCanvas.width = INTERNAL_W * SCALE;
     displayCanvas.height = INTERNAL_H * SCALE;
     displayCtx = displayCanvas.getContext('2d');
@@ -1676,6 +1682,27 @@ const Renderer = (() => {
     offscreen.width = INTERNAL_W;
     offscreen.height = INTERNAL_H;
     ctx = offscreen.getContext('2d');
+
+    DIALOG_Y = INTERNAL_H - DIALOG_HEIGHT - DIALOG_MARGIN;
+  }
+
+  function setVerticalMode(on) {
+    verticalMode = !!on;
+    if (verticalMode) {
+      INTERNAL_W = 144;
+      INTERNAL_H = 256;
+      SCALE = 3;
+    } else {
+      INTERNAL_W = 256;
+      INTERNAL_H = 224;
+      SCALE = 3;
+    }
+    applyDimensions();
+    return verticalMode;
+  }
+
+  function isVertical() {
+    return verticalMode;
   }
 
   // --- Background drawing ---
@@ -3311,7 +3338,7 @@ const Renderer = (() => {
     drawBackground, drawProp, drawBonfire, drawUfo, drawCharacter, drawCharacterWithOffset, drawEmoteBubble, drawMusicNotes, drawSmoke,
     drawDialogueBox, drawDialogueText, drawFadeOverlay,
     drawTitleOverlay, drawCreditsOverlay,
-    getTextMaxWidth, getTextScale, getInternalSize,
+    getTextMaxWidth, getTextScale, getInternalSize, setVerticalMode, isVertical,
     getBackgroundNames, renderBackgroundToCanvas,
   };
 })();
@@ -6111,6 +6138,25 @@ const CutsceneEngine = (() => {
     autoPlayBtn.textContent = isAuto ? 'Manual' : 'Auto';
     autoPlayBtn.style.background = isAuto ? '#553355' : '#335533';
     autoPlayBtn.style.borderColor = isAuto ? '#775577' : '#557755';
+  }
+
+  // --- Vertical mode toggle ---
+  var vertBtn = document.getElementById('btn-vertical');
+  vertBtn.addEventListener('click', function() {
+    var isVert = Renderer.isVertical();
+    Renderer.setVerticalMode(!isVert);
+    updateVertBtn();
+    // Replay current script with new dimensions
+    if (window._lastScript) {
+      CutsceneEngine.stop();
+      CutsceneEngine.play(window._lastScript);
+    }
+  });
+  function updateVertBtn() {
+    var isVert = Renderer.isVertical();
+    vertBtn.textContent = isVert ? '16:9' : '9:16';
+    vertBtn.style.background = isVert ? '#554433' : '#334455';
+    vertBtn.style.borderColor = isVert ? '#776655' : '#556677';
   }
 
   // --- Video Recording ---
