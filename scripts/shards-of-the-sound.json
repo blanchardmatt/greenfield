@@ -139,7 +139,7 @@
             "x": 195,
             "y": 58
           },
-          "duration": 1200
+          "duration": 800
         },
         {
           "type": "setScale",
@@ -155,10 +155,6 @@
           "character": "lyra"
         },
         {
-          "type": "wait",
-          "duration": 800
-        },
-        {
           "type": "dialogue",
           "character": "lyra",
           "text": "White noise screaming out..."
@@ -169,23 +165,29 @@
           "duration": 400
         },
         {
+          "type": "enter",
+          "character": "elder",
+          "from": "right",
+          "to": {
+            "x": 160,
+            "y": 108
+          },
+          "duration": 50
+        },
+        {
           "type": "dialogue",
           "character": "lyra",
           "text": "Coach wheels on cobblestone."
         },
         {
           "type": "enter",
-          "character": "elder",
-          "from": "right",
+          "character": "hero",
+          "from": "left",
           "to": {
-            "x": 200,
-            "y": 108
+            "x": 20,
+            "y": 110
           },
-          "duration": 1000
-        },
-        {
-          "type": "wait",
-          "duration": 300
+          "duration": 50
         },
         {
           "type": "dialogue",
@@ -193,8 +195,14 @@
           "text": "Ice picks peppered in... whispers and hushed tones."
         },
         {
-          "type": "wait",
-          "duration": 500
+          "type": "enter",
+          "character": "gimli",
+          "from": "left",
+          "to": {
+            "x": 5,
+            "y": 112
+          },
+          "duration": 50
         },
         {
           "type": "dialogue",
@@ -208,42 +216,31 @@
         },
         {
           "type": "enter",
-          "character": "hero",
+          "character": "swift",
+          "from": "right",
+          "to": {
+            "x": 140,
+            "y": 106
+          },
+          "duration": 50
+        },
+        {
+          "type": "enter",
+          "character": "hank",
           "from": "left",
           "to": {
-            "x": 20,
-            "y": 110
+            "x": 38,
+            "y": 112
           },
-          "duration": 800
+          "duration": 50
+        },
+        {
+          "type": "mill"
         },
         {
           "type": "dialogue",
           "character": "lyra",
           "text": "Full stalled spinning out... unkempt and overgrown."
-        },
-        {
-          "type": "enter",
-          "character": "gimli",
-          "from": "left",
-          "to": {
-            "x": 5,
-            "y": 112
-          },
-          "duration": 700
-        },
-        {
-          "type": "wait",
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "swift",
-          "from": "right",
-          "to": {
-            "x": 220,
-            "y": 106
-          },
-          "duration": 700
         },
         {
           "type": "emote",
@@ -268,23 +265,6 @@
           "duration": 1000
         },
         {
-          "type": "enter",
-          "character": "hank",
-          "from": "left",
-          "to": {
-            "x": 38,
-            "y": 112
-          },
-          "duration": 800
-        },
-        {
-          "type": "mill"
-        },
-        {
-          "type": "wait",
-          "duration": 400
-        },
-        {
           "type": "dialogue",
           "character": "lyra",
           "text": "Run it sideways and return."
@@ -293,10 +273,6 @@
           "type": "dialogue",
           "character": "lyra",
           "text": "A plastic click of a pen and..."
-        },
-        {
-          "type": "wait",
-          "duration": 500
         },
         {
           "type": "shake",
@@ -326,7 +302,7 @@
         {
           "type": "transition",
           "effect": "fadeIn",
-          "duration": 2000
+          "duration": 1500
         },
         {
           "type": "showProp",
@@ -342,7 +318,7 @@
             "x": 195,
             "y": 58
           },
-          "duration": 1000
+          "duration": 600
         },
         {
           "type": "setScale",
@@ -360,29 +336,25 @@
         {
           "type": "enter",
           "character": "elder",
-          "from": "right",
+          "from": "left",
           "to": {
-            "x": 160,
-            "y": 103
+            "x": 10,
+            "y": 108
           },
-          "duration": 800
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "hero",
           "from": "left",
           "to": {
-            "x": 15,
+            "x": 40,
             "y": 105
           },
-          "duration": 800
+          "duration": 50
         },
         {
           "type": "mill"
-        },
-        {
-          "type": "wait",
-          "duration": 600
         },
         {
           "type": "dialogue",
@@ -395,8 +367,14 @@
           "duration": 400
         },
         {
-          "type": "wait",
-          "duration": 300
+          "type": "enter",
+          "character": "gimli",
+          "from": "left",
+          "to": {
+            "x": 25,
+            "y": 112
+          },
+          "duration": 50
         },
         {
           "type": "shake",
@@ -413,14 +391,20 @@
           "character": "princess",
           "from": "right",
           "to": {
-            "x": 215,
+            "x": 150,
             "y": 100
           },
-          "duration": 900
+          "duration": 50
         },
         {
-          "type": "wait",
-          "duration": 400
+          "type": "enter",
+          "character": "swift",
+          "from": "right",
+          "to": {
+            "x": 130,
+            "y": 106
+          },
+          "duration": 50
         },
         {
           "type": "dialogue",
@@ -441,21 +425,17 @@
             "x": 5,
             "y": 108
           },
-          "duration": 700
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "shade",
           "from": "right",
           "to": {
-            "x": 225,
+            "x": 165,
             "y": 108
           },
-          "duration": 600
-        },
-        {
-          "type": "wait",
-          "duration": 500
+          "duration": 50
         },
         {
           "type": "dialogue",
@@ -472,39 +452,45 @@
           "character": "wizard",
           "from": "left",
           "to": {
-            "x": 40,
+            "x": 55,
             "y": 108
           },
-          "duration": 1000
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "lily",
           "from": "right",
           "to": {
-            "x": 180,
+            "x": 120,
             "y": 112
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "pip",
           "from": "left",
           "to": {
-            "x": 25,
+            "x": 70,
             "y": 105
           },
-          "duration": 700
+          "duration": 50
+        },
+        {
+          "type": "enter",
+          "character": "hank",
+          "from": "left",
+          "to": {
+            "x": 85,
+            "y": 110
+          },
+          "duration": 50
         },
         {
           "type": "dialogue",
           "character": "lyra",
           "text": "All the color drains from my view."
-        },
-        {
-          "type": "wait",
-          "duration": 600
         },
         {
           "type": "shake",
@@ -521,10 +507,6 @@
           "character": "wizard",
           "emote": "surprise",
           "duration": 1000
-        },
-        {
-          "type": "wait",
-          "duration": 400
         },
         {
           "type": "dialogue",
@@ -549,7 +531,7 @@
         {
           "type": "transition",
           "effect": "fadeIn",
-          "duration": 2500
+          "duration": 2000
         },
         {
           "type": "showProp",
@@ -565,7 +547,7 @@
             "x": 195,
             "y": 58
           },
-          "duration": 1200
+          "duration": 600
         },
         {
           "type": "setScale",
@@ -588,57 +570,57 @@
             "x": 5,
             "y": 108
           },
-          "duration": 800
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "hero",
           "from": "left",
           "to": {
-            "x": 40,
+            "x": 35,
             "y": 105
           },
-          "duration": 900
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "princess",
           "from": "right",
           "to": {
-            "x": 195,
+            "x": 160,
             "y": 100
           },
-          "duration": 800
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "wizard",
           "from": "right",
           "to": {
-            "x": 175,
+            "x": 140,
             "y": 108
           },
-          "duration": 900
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "gimli",
           "from": "left",
           "to": {
-            "x": 55,
+            "x": 50,
             "y": 112
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "swift",
           "from": "right",
           "to": {
-            "x": 145,
+            "x": 120,
             "y": 106
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
@@ -648,91 +630,47 @@
             "x": 20,
             "y": 112
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "brother_sol",
           "from": "left",
           "to": {
-            "x": 70,
+            "x": 65,
             "y": 110
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "shade",
           "from": "right",
           "to": {
-            "x": 160,
+            "x": 105,
             "y": 110
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "lily",
           "from": "right",
           "to": {
-            "x": 130,
+            "x": 80,
             "y": 115
           },
-          "duration": 500
+          "duration": 50
         },
         {
           "type": "enter",
           "character": "pip",
           "from": "left",
           "to": {
-            "x": 85,
+            "x": 90,
             "y": 108
           },
-          "duration": 600
-        },
-        {
-          "type": "enter",
-          "character": "ser_valen",
-          "from": "left",
-          "to": {
-            "x": 5,
-            "y": 110
-          },
-          "duration": 700
-        },
-        {
-          "type": "enter",
-          "character": "morgana",
-          "from": "right",
-          "to": {
-            "x": 210,
-            "y": 108
-          },
-          "duration": 700
-        },
-        {
-          "type": "wait",
-          "duration": 800
-        },
-        {
-          "type": "enter",
-          "character": "dark_lord",
-          "from": "right",
-          "to": {
-            "x": 225,
-            "y": 105
-          },
-          "duration": 1200
-        },
-        {
-          "type": "enter",
-          "character": "duke",
-          "from": "left",
-          "to": {
-            "x": 35,
-            "y": 107
-          },
-          "duration": 800
+          "duration": 50
         },
         {
           "type": "mill"
@@ -748,8 +686,24 @@
           "duration": 600
         },
         {
-          "type": "wait",
-          "duration": 500
+          "type": "enter",
+          "character": "ser_valen",
+          "from": "left",
+          "to": {
+            "x": 10,
+            "y": 110
+          },
+          "duration": 50
+        },
+        {
+          "type": "enter",
+          "character": "morgana",
+          "from": "right",
+          "to": {
+            "x": 155,
+            "y": 108
+          },
+          "duration": 50
         },
         {
           "type": "dialogue",
@@ -763,8 +717,24 @@
           "duration": 1000
         },
         {
-          "type": "wait",
-          "duration": 600
+          "type": "enter",
+          "character": "dark_lord",
+          "from": "right",
+          "to": {
+            "x": 170,
+            "y": 105
+          },
+          "duration": 50
+        },
+        {
+          "type": "enter",
+          "character": "duke",
+          "from": "left",
+          "to": {
+            "x": 45,
+            "y": 107
+          },
+          "duration": 50
         },
         {
           "type": "dialogue",
@@ -777,10 +747,6 @@
           "duration": 500
         },
         {
-          "type": "wait",
-          "duration": 400
-        },
-        {
           "type": "dialogue",
           "character": "lyra",
           "text": "Underground."
@@ -790,10 +756,6 @@
           "character": "hero",
           "emote": "happy",
           "duration": 1000
-        },
-        {
-          "type": "wait",
-          "duration": 800
         },
         {
           "type": "shake",
@@ -812,10 +774,6 @@
           "duration": 1200
         },
         {
-          "type": "wait",
-          "duration": 400
-        },
-        {
           "type": "shake",
           "intensity": 7,
           "duration": 900
@@ -830,10 +788,6 @@
           "character": "princess",
           "emote": "happy",
           "duration": 1500
-        },
-        {
-          "type": "wait",
-          "duration": 800
         },
         {
           "type": "shake",
@@ -853,7 +807,7 @@
         },
         {
           "type": "wait",
-          "duration": 2000
+          "duration": 1500
         },
         {
           "type": "transition",
@@ -908,7 +862,7 @@
             "x": 60,
             "y": 108
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
@@ -918,7 +872,7 @@
             "x": 165,
             "y": 105
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
@@ -928,7 +882,7 @@
             "x": 15,
             "y": 110
           },
-          "duration": 700
+          "duration": 50
         },
         {
           "type": "enter",
@@ -938,7 +892,7 @@
             "x": 200,
             "y": 110
           },
-          "duration": 700
+          "duration": 50
         },
         {
           "type": "enter",
@@ -948,7 +902,7 @@
             "x": 145,
             "y": 115
           },
-          "duration": 800
+          "duration": 50
         },
         {
           "type": "enter",
@@ -958,7 +912,7 @@
             "x": 30,
             "y": 112
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
@@ -968,7 +922,7 @@
             "x": 180,
             "y": 108
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
@@ -978,7 +932,7 @@
             "x": 75,
             "y": 110
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
@@ -988,7 +942,7 @@
             "x": 130,
             "y": 112
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
@@ -998,7 +952,7 @@
             "x": 45,
             "y": 106
           },
-          "duration": 600
+          "duration": 50
         },
         {
           "type": "enter",
@@ -1008,7 +962,7 @@
             "x": 210,
             "y": 113
           },
-          "duration": 500
+          "duration": 50
         },
         {
           "type": "wait",

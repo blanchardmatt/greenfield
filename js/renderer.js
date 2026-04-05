@@ -10,10 +10,10 @@ const Renderer = (() => {
   let offscreen, ctx;
 
   // Dialogue box dimensions (in internal resolution)
-  const DIALOG_MARGIN = 8;
-  const DIALOG_HEIGHT = 56;
+  const DIALOG_MARGIN = 6;
+  const DIALOG_HEIGHT = 30;
   const DIALOG_Y = INTERNAL_H - DIALOG_HEIGHT - DIALOG_MARGIN;
-  const TEXT_PADDING = 8;
+  const TEXT_PADDING = 4;
   const TEXT_SCALE = 1;
 
   function init(canvasElement) {
