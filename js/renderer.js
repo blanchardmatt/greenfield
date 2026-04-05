@@ -731,16 +731,96 @@ const Renderer = (() => {
     },
 
     biltroy_dawn(ctx, t) {
-      // Reuse biltroy fire + nature animations
       bgAnimations.biltroy(ctx, t);
+      // Chickens pecking around the yard
+      for (let i = 0; i < 3; i++) {
+        const cx = 60 + i * 40 + Math.sin(t / 1200 + i * 3) * 15;
+        const cy = 142 + i * 4 + Math.sin(t / 800 + i * 2) * 2;
+        const peck = Math.sin(t / 300 + i * 5) > 0.7;
+        ctx.fillStyle = '#eeeeaa';
+        ctx.globalAlpha = 0.9;
+        // Body
+        ctx.fillRect(Math.floor(cx), Math.floor(cy), 4, 3);
+        // Head (up or pecking down)
+        if (peck) {
+          ctx.fillRect(Math.floor(cx) + 4, Math.floor(cy) + 2, 2, 1);
+          ctx.fillStyle = '#dd6633';
+          ctx.fillRect(Math.floor(cx) + 6, Math.floor(cy) + 2, 1, 1);
+        } else {
+          ctx.fillRect(Math.floor(cx) + 3, Math.floor(cy) - 1, 2, 2);
+          ctx.fillStyle = '#dd6633';
+          ctx.fillRect(Math.floor(cx) + 5, Math.floor(cy) - 1, 1, 1);
+          // Comb
+          ctx.fillStyle = '#cc3333';
+          ctx.fillRect(Math.floor(cx) + 3, Math.floor(cy) - 2, 2, 1);
+        }
+        ctx.fillStyle = '#eeeeaa';
+        // Legs
+        ctx.fillStyle = '#dd9944';
+        ctx.fillRect(Math.floor(cx) + 1, Math.floor(cy) + 3, 1, 2);
+        ctx.fillRect(Math.floor(cx) + 3, Math.floor(cy) + 3, 1, 2);
+      }
+      ctx.globalAlpha = 1;
     },
 
     biltroy_day(ctx, t) {
       bgAnimations.biltroy(ctx, t);
+      // Chickens (same as dawn but different positions)
+      for (let i = 0; i < 4; i++) {
+        const cx = 30 + i * 35 + Math.sin(t / 1000 + i * 2.5) * 18;
+        const cy = 140 + (i % 3) * 5 + Math.sin(t / 700 + i * 1.8) * 2;
+        const peck = Math.sin(t / 250 + i * 4) > 0.6;
+        ctx.fillStyle = i < 2 ? '#eeeeaa' : '#cc8844';
+        ctx.globalAlpha = 0.9;
+        ctx.fillRect(Math.floor(cx), Math.floor(cy), 4, 3);
+        if (peck) {
+          ctx.fillRect(Math.floor(cx) + 4, Math.floor(cy) + 2, 2, 1);
+          ctx.fillStyle = '#dd6633';
+          ctx.fillRect(Math.floor(cx) + 6, Math.floor(cy) + 2, 1, 1);
+        } else {
+          ctx.fillRect(Math.floor(cx) + 3, Math.floor(cy) - 1, 2, 2);
+          ctx.fillStyle = '#cc3333';
+          ctx.fillRect(Math.floor(cx) + 3, Math.floor(cy) - 2, 2, 1);
+        }
+        ctx.fillStyle = '#dd9944';
+        ctx.fillRect(Math.floor(cx) + 1, Math.floor(cy) + 3, 1, 2);
+        ctx.fillRect(Math.floor(cx) + 3, Math.floor(cy) + 3, 1, 2);
+      }
+      ctx.globalAlpha = 1;
     },
 
     biltroy_sunset(ctx, t) {
       bgAnimations.biltroy(ctx, t);
+      // Howling wolf silhouette on the left hill
+      const wolfX = 8;
+      const wolfY = 118;
+      ctx.fillStyle = '#221100';
+      ctx.globalAlpha = 0.9;
+      // Body
+      ctx.fillRect(wolfX, wolfY, 8, 4);
+      // Head tilted up (howling)
+      ctx.fillRect(wolfX + 7, wolfY - 3, 3, 4);
+      // Snout up
+      ctx.fillRect(wolfX + 9, wolfY - 5, 2, 3);
+      // Ear
+      ctx.fillRect(wolfX + 7, wolfY - 5, 1, 2);
+      // Tail
+      ctx.fillRect(wolfX - 2, wolfY - 1, 3, 1);
+      ctx.fillRect(wolfX - 3, wolfY - 2, 2, 1);
+      // Legs
+      ctx.fillRect(wolfX + 1, wolfY + 4, 1, 3);
+      ctx.fillRect(wolfX + 3, wolfY + 4, 1, 3);
+      ctx.fillRect(wolfX + 5, wolfY + 4, 1, 3);
+      ctx.fillRect(wolfX + 7, wolfY + 4, 1, 3);
+      // Howl lines (animated)
+      ctx.fillStyle = '#ffddaa';
+      for (let i = 0; i < 3; i++) {
+        const hx = wolfX + 12 + i * 3 + Math.sin(t / 400 + i) * 2;
+        const hy = wolfY - 6 - i * 2;
+        ctx.globalAlpha = 0.3 + Math.sin(t / 300 + i * 2) * 0.2;
+        ctx.fillRect(Math.floor(hx), Math.floor(hy), 2, 1);
+      }
+      ctx.globalAlpha = 1;
     },
 
     biltroy_night(ctx, t) {
@@ -814,6 +894,38 @@ const Renderer = (() => {
         ctx.globalAlpha = 0.08 + Math.sin(t / 400 + i) * 0.04;
         fillCircle(ctx, Math.floor(px), Math.floor(py), 8);
       }
+
+      // Bats flying across
+      ctx.fillStyle = '#222233';
+      for (let i = 0; i < 4; i++) {
+        const batCycle = 8000 + i * 2000;
+        const bx = ((t % batCycle) / batCycle) * (INTERNAL_W + 60) - 30;
+        const by = 15 + i * 12 + Math.sin(t / 200 + i * 3) * 5;
+        const wingUp = Math.sin(t / 80 + i * 4) > 0;
+        ctx.globalAlpha = 0.8;
+        ctx.fillRect(Math.floor(bx), Math.floor(by), 2, 1);
+        if (wingUp) {
+          ctx.fillRect(Math.floor(bx) - 3, Math.floor(by) - 1, 3, 1);
+          ctx.fillRect(Math.floor(bx) + 2, Math.floor(by) - 1, 3, 1);
+          ctx.fillRect(Math.floor(bx) - 4, Math.floor(by) - 2, 2, 1);
+          ctx.fillRect(Math.floor(bx) + 4, Math.floor(by) - 2, 2, 1);
+        } else {
+          ctx.fillRect(Math.floor(bx) - 3, Math.floor(by) + 1, 3, 1);
+          ctx.fillRect(Math.floor(bx) + 2, Math.floor(by) + 1, 3, 1);
+        }
+      }
+
+      // Spooky clouds drifting past moon
+      ctx.fillStyle = '#1a1a33';
+      ctx.globalAlpha = 0.4;
+      const sc1x = 160 + Math.sin(t / 10000) * 60;
+      fillCircle(ctx, Math.floor(sc1x), 28, 12);
+      fillCircle(ctx, Math.floor(sc1x) + 14, 24, 14);
+      fillCircle(ctx, Math.floor(sc1x) + 28, 30, 10);
+      ctx.globalAlpha = 0.25;
+      const sc2x = 100 + Math.sin(t / 14000 + 3) * 80;
+      fillCircle(ctx, Math.floor(sc2x), 50, 10);
+      fillCircle(ctx, Math.floor(sc2x) + 12, 47, 12);
 
       ctx.globalAlpha = 1;
     },

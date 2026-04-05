@@ -2221,16 +2221,96 @@ const Renderer = (() => {
     },
 
     biltroy_dawn(ctx, t) {
-      // Reuse biltroy fire + nature animations
       bgAnimations.biltroy(ctx, t);
+      // Chickens pecking around the yard
+      for (let i = 0; i < 3; i++) {
+        const cx = 60 + i * 40 + Math.sin(t / 1200 + i * 3) * 15;
+        const cy = 142 + i * 4 + Math.sin(t / 800 + i * 2) * 2;
+        const peck = Math.sin(t / 300 + i * 5) > 0.7;
+        ctx.fillStyle = '#eeeeaa';
+        ctx.globalAlpha = 0.9;
+        // Body
+        ctx.fillRect(Math.floor(cx), Math.floor(cy), 4, 3);
+        // Head (up or pecking down)
+        if (peck) {
+          ctx.fillRect(Math.floor(cx) + 4, Math.floor(cy) + 2, 2, 1);
+          ctx.fillStyle = '#dd6633';
+          ctx.fillRect(Math.floor(cx) + 6, Math.floor(cy) + 2, 1, 1);
+        } else {
+          ctx.fillRect(Math.floor(cx) + 3, Math.floor(cy) - 1, 2, 2);
+          ctx.fillStyle = '#dd6633';
+          ctx.fillRect(Math.floor(cx) + 5, Math.floor(cy) - 1, 1, 1);
+          // Comb
+          ctx.fillStyle = '#cc3333';
+          ctx.fillRect(Math.floor(cx) + 3, Math.floor(cy) - 2, 2, 1);
+        }
+        ctx.fillStyle = '#eeeeaa';
+        // Legs
+        ctx.fillStyle = '#dd9944';
+        ctx.fillRect(Math.floor(cx) + 1, Math.floor(cy) + 3, 1, 2);
+        ctx.fillRect(Math.floor(cx) + 3, Math.floor(cy) + 3, 1, 2);
+      }
+      ctx.globalAlpha = 1;
     },
 
     biltroy_day(ctx, t) {
       bgAnimations.biltroy(ctx, t);
+      // Chickens (same as dawn but different positions)
+      for (let i = 0; i < 4; i++) {
+        const cx = 30 + i * 35 + Math.sin(t / 1000 + i * 2.5) * 18;
+        const cy = 140 + (i % 3) * 5 + Math.sin(t / 700 + i * 1.8) * 2;
+        const peck = Math.sin(t / 250 + i * 4) > 0.6;
+        ctx.fillStyle = i < 2 ? '#eeeeaa' : '#cc8844';
+        ctx.globalAlpha = 0.9;
+        ctx.fillRect(Math.floor(cx), Math.floor(cy), 4, 3);
+        if (peck) {
+          ctx.fillRect(Math.floor(cx) + 4, Math.floor(cy) + 2, 2, 1);
+          ctx.fillStyle = '#dd6633';
+          ctx.fillRect(Math.floor(cx) + 6, Math.floor(cy) + 2, 1, 1);
+        } else {
+          ctx.fillRect(Math.floor(cx) + 3, Math.floor(cy) - 1, 2, 2);
+          ctx.fillStyle = '#cc3333';
+          ctx.fillRect(Math.floor(cx) + 3, Math.floor(cy) - 2, 2, 1);
+        }
+        ctx.fillStyle = '#dd9944';
+        ctx.fillRect(Math.floor(cx) + 1, Math.floor(cy) + 3, 1, 2);
+        ctx.fillRect(Math.floor(cx) + 3, Math.floor(cy) + 3, 1, 2);
+      }
+      ctx.globalAlpha = 1;
     },
 
     biltroy_sunset(ctx, t) {
       bgAnimations.biltroy(ctx, t);
+      // Howling wolf silhouette on the left hill
+      const wolfX = 8;
+      const wolfY = 118;
+      ctx.fillStyle = '#221100';
+      ctx.globalAlpha = 0.9;
+      // Body
+      ctx.fillRect(wolfX, wolfY, 8, 4);
+      // Head tilted up (howling)
+      ctx.fillRect(wolfX + 7, wolfY - 3, 3, 4);
+      // Snout up
+      ctx.fillRect(wolfX + 9, wolfY - 5, 2, 3);
+      // Ear
+      ctx.fillRect(wolfX + 7, wolfY - 5, 1, 2);
+      // Tail
+      ctx.fillRect(wolfX - 2, wolfY - 1, 3, 1);
+      ctx.fillRect(wolfX - 3, wolfY - 2, 2, 1);
+      // Legs
+      ctx.fillRect(wolfX + 1, wolfY + 4, 1, 3);
+      ctx.fillRect(wolfX + 3, wolfY + 4, 1, 3);
+      ctx.fillRect(wolfX + 5, wolfY + 4, 1, 3);
+      ctx.fillRect(wolfX + 7, wolfY + 4, 1, 3);
+      // Howl lines (animated)
+      ctx.fillStyle = '#ffddaa';
+      for (let i = 0; i < 3; i++) {
+        const hx = wolfX + 12 + i * 3 + Math.sin(t / 400 + i) * 2;
+        const hy = wolfY - 6 - i * 2;
+        ctx.globalAlpha = 0.3 + Math.sin(t / 300 + i * 2) * 0.2;
+        ctx.fillRect(Math.floor(hx), Math.floor(hy), 2, 1);
+      }
+      ctx.globalAlpha = 1;
     },
 
     biltroy_night(ctx, t) {
@@ -2304,6 +2384,38 @@ const Renderer = (() => {
         ctx.globalAlpha = 0.08 + Math.sin(t / 400 + i) * 0.04;
         fillCircle(ctx, Math.floor(px), Math.floor(py), 8);
       }
+
+      // Bats flying across
+      ctx.fillStyle = '#222233';
+      for (let i = 0; i < 4; i++) {
+        const batCycle = 8000 + i * 2000;
+        const bx = ((t % batCycle) / batCycle) * (INTERNAL_W + 60) - 30;
+        const by = 15 + i * 12 + Math.sin(t / 200 + i * 3) * 5;
+        const wingUp = Math.sin(t / 80 + i * 4) > 0;
+        ctx.globalAlpha = 0.8;
+        ctx.fillRect(Math.floor(bx), Math.floor(by), 2, 1);
+        if (wingUp) {
+          ctx.fillRect(Math.floor(bx) - 3, Math.floor(by) - 1, 3, 1);
+          ctx.fillRect(Math.floor(bx) + 2, Math.floor(by) - 1, 3, 1);
+          ctx.fillRect(Math.floor(bx) - 4, Math.floor(by) - 2, 2, 1);
+          ctx.fillRect(Math.floor(bx) + 4, Math.floor(by) - 2, 2, 1);
+        } else {
+          ctx.fillRect(Math.floor(bx) - 3, Math.floor(by) + 1, 3, 1);
+          ctx.fillRect(Math.floor(bx) + 2, Math.floor(by) + 1, 3, 1);
+        }
+      }
+
+      // Spooky clouds drifting past moon
+      ctx.fillStyle = '#1a1a33';
+      ctx.globalAlpha = 0.4;
+      const sc1x = 160 + Math.sin(t / 10000) * 60;
+      fillCircle(ctx, Math.floor(sc1x), 28, 12);
+      fillCircle(ctx, Math.floor(sc1x) + 14, 24, 14);
+      fillCircle(ctx, Math.floor(sc1x) + 28, 30, 10);
+      ctx.globalAlpha = 0.25;
+      const sc2x = 100 + Math.sin(t / 14000 + 3) * 80;
+      fillCircle(ctx, Math.floor(sc2x), 50, 10);
+      fillCircle(ctx, Math.floor(sc2x) + 12, 47, 12);
 
       ctx.globalAlpha = 1;
     },
@@ -2578,7 +2690,7 @@ const ScriptParser = (() => {
     'transition', 'enter', 'exit', 'dialogue', 'wait',
     'shake', 'emote', 'move', 'setBackground', 'title', 'credits',
     'mill', 'dance', 'stopDance', 'showNotes', 'hideNotes', 'setScale',
-    'showProp', 'hideProp',
+    'showProp', 'hideProp', 'pin', 'unpin',
   ];
 
   const VALID_DIRECTIONS = ['left', 'right', 'top', 'bottom'];
@@ -2860,7 +2972,10 @@ const SERENADE_SCRIPT = {
 const SHARDS_SCRIPT = {
   "title": "Misophonia",
   "settings": {
-    "resolution": [256, 224],
+    "resolution": [
+      256,
+      224
+    ],
     "textSpeed": 40
   },
   "characters": {
@@ -2950,238 +3065,1107 @@ const SHARDS_SCRIPT = {
       "id": "title_screen",
       "background": "night_sky",
       "actions": [
-        { "type": "transition", "effect": "fadeIn", "duration": 1500 },
-        { "type": "title", "text": "MISOPHONIA", "subtitle": "Performed by Lyra the Dark Elf", "color": "#ffffff", "subtitleColor": "#aa66dd", "duration": 5000, "fadeIn": 1500, "fadeOut": 1500 },
-        { "type": "transition", "effect": "fadeOut", "duration": 1000 }
+        {
+          "type": "transition",
+          "effect": "fadeIn",
+          "duration": 1500
+        },
+        {
+          "type": "title",
+          "text": "MISOPHONIA",
+          "subtitle": "Performed by Lyra the Dark Elf",
+          "color": "#ffffff",
+          "subtitleColor": "#aa66dd",
+          "duration": 5000,
+          "fadeIn": 1500,
+          "fadeOut": 1500
+        },
+        {
+          "type": "transition",
+          "effect": "fadeOut",
+          "duration": 1000
+        }
       ]
     },
     {
       "id": "verse1_noise",
       "background": "biltroy_dawn",
       "actions": [
-        { "type": "transition", "effect": "fadeIn", "duration": 2000 },
-        { "type": "showProp", "prop": "amplifier", "x": 190, "y": 96 },
-        { "type": "enter", "character": "lyra", "from": "right", "to": { "x": 200, "y": 60 }, "duration": 1200 },
-        { "type": "setScale", "character": "lyra", "scale": 1.5 },
-        { "type": "showNotes", "character": "lyra" },
-        { "type": "wait", "duration": 800 },
-        { "type": "dialogue", "character": "lyra", "text": "White noise screaming out..." },
-        { "type": "shake", "intensity": 2, "duration": 400 },
-        { "type": "dialogue", "character": "lyra", "text": "Coach wheels on cobblestone." },
-        { "type": "enter", "character": "elder", "from": "right", "to": { "x": 200, "y": 108 }, "duration": 1000 },
-        { "type": "wait", "duration": 300 },
-        { "type": "dialogue", "character": "lyra", "text": "Ice picks peppered in... whispers and hushed tones." },
-        { "type": "wait", "duration": 500 },
-        { "type": "dialogue", "character": "lyra", "text": "Popcorn ceiling's a frown. Nerve endings barnacled." },
-        { "type": "shake", "intensity": 3, "duration": 500 },
-        { "type": "enter", "character": "hero", "from": "left", "to": { "x": 20, "y": 110 }, "duration": 800 },
-        { "type": "dialogue", "character": "lyra", "text": "Full stalled spinning out... unkempt and overgrown." },
-        { "type": "enter", "character": "gimli", "from": "left", "to": { "x": 5, "y": 112 }, "duration": 700 },
-        { "type": "wait", "duration": 600 },
-        { "type": "enter", "character": "swift", "from": "right", "to": { "x": 220, "y": 106 }, "duration": 700 },
-        { "type": "emote", "character": "lyra", "emote": "anger", "duration": 1200 },
-        { "type": "dialogue", "character": "lyra", "text": "Why so loud..." },
-        { "type": "shake", "intensity": 4, "duration": 600 },
-        { "type": "emote", "character": "hero", "emote": "surprise", "duration": 1000 },
-        { "type": "enter", "character": "hank", "from": "left", "to": { "x": 38, "y": 112 }, "duration": 800 },
-        { "type": "mill" },
-        { "type": "wait", "duration": 400 },
-        { "type": "dialogue", "character": "lyra", "text": "Run it sideways and return." },
-        { "type": "dialogue", "character": "lyra", "text": "A plastic click of a pen and..." },
-        { "type": "wait", "duration": 500 },
-        { "type": "shake", "intensity": 5, "duration": 800 },
-        { "type": "dialogue", "character": "lyra", "text": "My spiral can't unwind." },
-        { "type": "wait", "duration": 1000 },
-        { "type": "transition", "effect": "fadeOut", "duration": 1500 }
+        {
+          "type": "transition",
+          "effect": "fadeIn",
+          "duration": 2000
+        },
+        {
+          "type": "showProp",
+          "prop": "amplifier",
+          "x": 190,
+          "y": 96
+        },
+        {
+          "type": "enter",
+          "character": "lyra",
+          "from": "right",
+          "to": {
+            "x": 195,
+            "y": 58
+          },
+          "duration": 1200
+        },
+        {
+          "type": "setScale",
+          "character": "lyra",
+          "scale": 1.5
+        },
+        {
+          "type": "pin",
+          "character": "lyra"
+        },
+        {
+          "type": "showNotes",
+          "character": "lyra"
+        },
+        {
+          "type": "wait",
+          "duration": 800
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "White noise screaming out..."
+        },
+        {
+          "type": "shake",
+          "intensity": 2,
+          "duration": 400
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Coach wheels on cobblestone."
+        },
+        {
+          "type": "enter",
+          "character": "elder",
+          "from": "right",
+          "to": {
+            "x": 200,
+            "y": 108
+          },
+          "duration": 1000
+        },
+        {
+          "type": "wait",
+          "duration": 300
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Ice picks peppered in... whispers and hushed tones."
+        },
+        {
+          "type": "wait",
+          "duration": 500
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Popcorn ceiling's a frown. Nerve endings barnacled."
+        },
+        {
+          "type": "shake",
+          "intensity": 3,
+          "duration": 500
+        },
+        {
+          "type": "enter",
+          "character": "hero",
+          "from": "left",
+          "to": {
+            "x": 20,
+            "y": 110
+          },
+          "duration": 800
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Full stalled spinning out... unkempt and overgrown."
+        },
+        {
+          "type": "enter",
+          "character": "gimli",
+          "from": "left",
+          "to": {
+            "x": 5,
+            "y": 112
+          },
+          "duration": 700
+        },
+        {
+          "type": "wait",
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "swift",
+          "from": "right",
+          "to": {
+            "x": 220,
+            "y": 106
+          },
+          "duration": 700
+        },
+        {
+          "type": "emote",
+          "character": "lyra",
+          "emote": "anger",
+          "duration": 1200
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Why so loud..."
+        },
+        {
+          "type": "shake",
+          "intensity": 4,
+          "duration": 600
+        },
+        {
+          "type": "emote",
+          "character": "hero",
+          "emote": "surprise",
+          "duration": 1000
+        },
+        {
+          "type": "enter",
+          "character": "hank",
+          "from": "left",
+          "to": {
+            "x": 38,
+            "y": 112
+          },
+          "duration": 800
+        },
+        {
+          "type": "mill"
+        },
+        {
+          "type": "wait",
+          "duration": 400
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Run it sideways and return."
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "A plastic click of a pen and..."
+        },
+        {
+          "type": "wait",
+          "duration": 500
+        },
+        {
+          "type": "shake",
+          "intensity": 5,
+          "duration": 800
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "My spiral can't unwind."
+        },
+        {
+          "type": "wait",
+          "duration": 1000
+        },
+        {
+          "type": "transition",
+          "effect": "fadeOut",
+          "duration": 1500
+        }
       ]
     },
     {
       "id": "verse2_nature",
       "background": "biltroy_day",
       "actions": [
-        { "type": "transition", "effect": "fadeIn", "duration": 2000 },
-        { "type": "showProp", "prop": "amplifier", "x": 70, "y": 115 },
-        { "type": "enter", "character": "lyra", "from": "bottom", "to": { "x": 100, "y": 75 }, "duration": 1000 },
-        { "type": "setScale", "character": "lyra", "scale": 1.5 },
-        { "type": "showNotes", "character": "lyra" },
-        { "type": "enter", "character": "elder", "from": "right", "to": { "x": 195, "y": 103 }, "duration": 800 },
-        { "type": "enter", "character": "hero", "from": "left", "to": { "x": 15, "y": 105 }, "duration": 800 },
-        { "type": "mill" },
-        { "type": "wait", "duration": 600 },
-        { "type": "dialogue", "character": "lyra", "text": "Wind chimes howl..." },
-        { "type": "shake", "intensity": 1, "duration": 400 },
-        { "type": "wait", "duration": 300 },
-        { "type": "shake", "intensity": 1, "duration": 400 },
-        { "type": "dialogue", "character": "lyra", "text": "March in a symphony of thorns." },
-        { "type": "enter", "character": "princess", "from": "right", "to": { "x": 215, "y": 100 }, "duration": 900 },
-        { "type": "wait", "duration": 400 },
-        { "type": "dialogue", "character": "lyra", "text": "Sedge wren warbles... melody to paper untorn." },
-        { "type": "emote", "character": "princess", "emote": "happy", "duration": 1200 },
-        { "type": "enter", "character": "brother_sol", "from": "left", "to": { "x": 5, "y": 108 }, "duration": 700 },
-        { "type": "enter", "character": "shade", "from": "right", "to": { "x": 225, "y": 108 }, "duration": 600 },
-        { "type": "wait", "duration": 500 },
-        { "type": "dialogue", "character": "lyra", "text": "I'm spun out..." },
-        { "type": "shake", "intensity": 3, "duration": 500 },
-        { "type": "enter", "character": "wizard", "from": "left", "to": { "x": 40, "y": 108 }, "duration": 1000 },
-        { "type": "enter", "character": "lily", "from": "right", "to": { "x": 180, "y": 112 }, "duration": 600 },
-        { "type": "enter", "character": "pip", "from": "left", "to": { "x": 25, "y": 105 }, "duration": 700 },
-        { "type": "dialogue", "character": "lyra", "text": "All the color drains from my view." },
-        { "type": "wait", "duration": 600 },
-        { "type": "shake", "intensity": 6, "duration": 800 },
-        { "type": "dialogue", "character": "lyra", "text": "Seismic waves inbound..." },
-        { "type": "emote", "character": "wizard", "emote": "surprise", "duration": 1000 },
-        { "type": "wait", "duration": 400 },
-        { "type": "dialogue", "character": "lyra", "text": "Slice through the layers unpeeled." },
-        { "type": "wait", "duration": 1000 },
-        { "type": "transition", "effect": "fadeOut", "duration": 1500 }
+        {
+          "type": "transition",
+          "effect": "fadeIn",
+          "duration": 2000
+        },
+        {
+          "type": "showProp",
+          "prop": "amplifier",
+          "x": 190,
+          "y": 96
+        },
+        {
+          "type": "enter",
+          "character": "lyra",
+          "from": "right",
+          "to": {
+            "x": 195,
+            "y": 58
+          },
+          "duration": 1000
+        },
+        {
+          "type": "setScale",
+          "character": "lyra",
+          "scale": 1.5
+        },
+        {
+          "type": "pin",
+          "character": "lyra"
+        },
+        {
+          "type": "showNotes",
+          "character": "lyra"
+        },
+        {
+          "type": "enter",
+          "character": "elder",
+          "from": "right",
+          "to": {
+            "x": 160,
+            "y": 103
+          },
+          "duration": 800
+        },
+        {
+          "type": "enter",
+          "character": "hero",
+          "from": "left",
+          "to": {
+            "x": 15,
+            "y": 105
+          },
+          "duration": 800
+        },
+        {
+          "type": "mill"
+        },
+        {
+          "type": "wait",
+          "duration": 600
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Wind chimes howl..."
+        },
+        {
+          "type": "shake",
+          "intensity": 1,
+          "duration": 400
+        },
+        {
+          "type": "wait",
+          "duration": 300
+        },
+        {
+          "type": "shake",
+          "intensity": 1,
+          "duration": 400
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "March in a symphony of thorns."
+        },
+        {
+          "type": "enter",
+          "character": "princess",
+          "from": "right",
+          "to": {
+            "x": 215,
+            "y": 100
+          },
+          "duration": 900
+        },
+        {
+          "type": "wait",
+          "duration": 400
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Sedge wren warbles... melody to paper untorn."
+        },
+        {
+          "type": "emote",
+          "character": "princess",
+          "emote": "happy",
+          "duration": 1200
+        },
+        {
+          "type": "enter",
+          "character": "brother_sol",
+          "from": "left",
+          "to": {
+            "x": 5,
+            "y": 108
+          },
+          "duration": 700
+        },
+        {
+          "type": "enter",
+          "character": "shade",
+          "from": "right",
+          "to": {
+            "x": 225,
+            "y": 108
+          },
+          "duration": 600
+        },
+        {
+          "type": "wait",
+          "duration": 500
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "I'm spun out..."
+        },
+        {
+          "type": "shake",
+          "intensity": 3,
+          "duration": 500
+        },
+        {
+          "type": "enter",
+          "character": "wizard",
+          "from": "left",
+          "to": {
+            "x": 40,
+            "y": 108
+          },
+          "duration": 1000
+        },
+        {
+          "type": "enter",
+          "character": "lily",
+          "from": "right",
+          "to": {
+            "x": 180,
+            "y": 112
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "pip",
+          "from": "left",
+          "to": {
+            "x": 25,
+            "y": 105
+          },
+          "duration": 700
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "All the color drains from my view."
+        },
+        {
+          "type": "wait",
+          "duration": 600
+        },
+        {
+          "type": "shake",
+          "intensity": 6,
+          "duration": 800
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Seismic waves inbound..."
+        },
+        {
+          "type": "emote",
+          "character": "wizard",
+          "emote": "surprise",
+          "duration": 1000
+        },
+        {
+          "type": "wait",
+          "duration": 400
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Slice through the layers unpeeled."
+        },
+        {
+          "type": "wait",
+          "duration": 1000
+        },
+        {
+          "type": "transition",
+          "effect": "fadeOut",
+          "duration": 1500
+        }
       ]
     },
     {
       "id": "verse3_shards",
       "background": "biltroy_sunset",
       "actions": [
-        { "type": "transition", "effect": "fadeIn", "duration": 2500 },
-        { "type": "showProp", "prop": "amplifier", "x": 68, "y": 112 },
-        { "type": "enter", "character": "lyra", "from": "bottom", "to": { "x": 100, "y": 70 }, "duration": 1200 },
-        { "type": "setScale", "character": "lyra", "scale": 1.5 },
-        { "type": "showNotes", "character": "lyra" },
-        { "type": "enter", "character": "elder", "from": "left", "to": { "x": 5, "y": 108 }, "duration": 800 },
-        { "type": "enter", "character": "hero", "from": "left", "to": { "x": 40, "y": 105 }, "duration": 900 },
-        { "type": "enter", "character": "princess", "from": "right", "to": { "x": 195, "y": 100 }, "duration": 800 },
-        { "type": "enter", "character": "wizard", "from": "right", "to": { "x": 175, "y": 108 }, "duration": 900 },
-        { "type": "enter", "character": "gimli", "from": "left", "to": { "x": 55, "y": 112 }, "duration": 600 },
-        { "type": "enter", "character": "swift", "from": "right", "to": { "x": 145, "y": 106 }, "duration": 600 },
-        { "type": "enter", "character": "hank", "from": "left", "to": { "x": 20, "y": 112 }, "duration": 600 },
-        { "type": "enter", "character": "brother_sol", "from": "left", "to": { "x": 70, "y": 110 }, "duration": 600 },
-        { "type": "enter", "character": "shade", "from": "right", "to": { "x": 160, "y": 110 }, "duration": 600 },
-        { "type": "enter", "character": "lily", "from": "right", "to": { "x": 130, "y": 115 }, "duration": 500 },
-        { "type": "enter", "character": "pip", "from": "left", "to": { "x": 85, "y": 108 }, "duration": 600 },
-        { "type": "enter", "character": "ser_valen", "from": "left", "to": { "x": 5, "y": 110 }, "duration": 700 },
-        { "type": "enter", "character": "morgana", "from": "right", "to": { "x": 210, "y": 108 }, "duration": 700 },
-        { "type": "wait", "duration": 800 },
-        { "type": "enter", "character": "dark_lord", "from": "right", "to": { "x": 225, "y": 105 }, "duration": 1200 },
-        { "type": "enter", "character": "duke", "from": "left", "to": { "x": 35, "y": 107 }, "duration": 800 },
-        { "type": "mill" },
-        { "type": "dialogue", "character": "lyra", "text": "Hollowed bell..." },
-        { "type": "shake", "intensity": 2, "duration": 600 },
-        { "type": "wait", "duration": 500 },
-        { "type": "dialogue", "character": "lyra", "text": "Wrings us out." },
-        { "type": "emote", "character": "elder", "emote": "happy", "duration": 1000 },
-        { "type": "wait", "duration": 600 },
-        { "type": "dialogue", "character": "lyra", "text": "Resonance..." },
-        { "type": "shake", "intensity": 3, "duration": 500 },
-        { "type": "wait", "duration": 400 },
-        { "type": "dialogue", "character": "lyra", "text": "Underground." },
-        { "type": "emote", "character": "hero", "emote": "happy", "duration": 1000 },
-        { "type": "wait", "duration": 800 },
-        { "type": "shake", "intensity": 5, "duration": 700 },
-        { "type": "dialogue", "character": "lyra", "text": "Outer shell..." },
-        { "type": "emote", "character": "dark_lord", "emote": "surprise", "duration": 1200 },
-        { "type": "wait", "duration": 400 },
-        { "type": "shake", "intensity": 7, "duration": 900 },
-        { "type": "dialogue", "character": "lyra", "text": "Splinters in front of the sound." },
-        { "type": "emote", "character": "princess", "emote": "happy", "duration": 1500 },
-        { "type": "wait", "duration": 800 },
-        { "type": "shake", "intensity": 8, "duration": 1000 },
-        { "type": "dialogue", "character": "lyra", "text": "Grasping for shards of the sound." },
-        { "type": "emote", "character": "wizard", "emote": "happy", "duration": 1200 },
-        { "type": "wait", "duration": 2000 },
-        { "type": "transition", "effect": "fadeOut", "duration": 1500 }
+        {
+          "type": "transition",
+          "effect": "fadeIn",
+          "duration": 2500
+        },
+        {
+          "type": "showProp",
+          "prop": "amplifier",
+          "x": 190,
+          "y": 96
+        },
+        {
+          "type": "enter",
+          "character": "lyra",
+          "from": "right",
+          "to": {
+            "x": 195,
+            "y": 58
+          },
+          "duration": 1200
+        },
+        {
+          "type": "setScale",
+          "character": "lyra",
+          "scale": 1.5
+        },
+        {
+          "type": "pin",
+          "character": "lyra"
+        },
+        {
+          "type": "showNotes",
+          "character": "lyra"
+        },
+        {
+          "type": "enter",
+          "character": "elder",
+          "from": "left",
+          "to": {
+            "x": 5,
+            "y": 108
+          },
+          "duration": 800
+        },
+        {
+          "type": "enter",
+          "character": "hero",
+          "from": "left",
+          "to": {
+            "x": 40,
+            "y": 105
+          },
+          "duration": 900
+        },
+        {
+          "type": "enter",
+          "character": "princess",
+          "from": "right",
+          "to": {
+            "x": 195,
+            "y": 100
+          },
+          "duration": 800
+        },
+        {
+          "type": "enter",
+          "character": "wizard",
+          "from": "right",
+          "to": {
+            "x": 175,
+            "y": 108
+          },
+          "duration": 900
+        },
+        {
+          "type": "enter",
+          "character": "gimli",
+          "from": "left",
+          "to": {
+            "x": 55,
+            "y": 112
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "swift",
+          "from": "right",
+          "to": {
+            "x": 145,
+            "y": 106
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "hank",
+          "from": "left",
+          "to": {
+            "x": 20,
+            "y": 112
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "brother_sol",
+          "from": "left",
+          "to": {
+            "x": 70,
+            "y": 110
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "shade",
+          "from": "right",
+          "to": {
+            "x": 160,
+            "y": 110
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "lily",
+          "from": "right",
+          "to": {
+            "x": 130,
+            "y": 115
+          },
+          "duration": 500
+        },
+        {
+          "type": "enter",
+          "character": "pip",
+          "from": "left",
+          "to": {
+            "x": 85,
+            "y": 108
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "ser_valen",
+          "from": "left",
+          "to": {
+            "x": 5,
+            "y": 110
+          },
+          "duration": 700
+        },
+        {
+          "type": "enter",
+          "character": "morgana",
+          "from": "right",
+          "to": {
+            "x": 210,
+            "y": 108
+          },
+          "duration": 700
+        },
+        {
+          "type": "wait",
+          "duration": 800
+        },
+        {
+          "type": "enter",
+          "character": "dark_lord",
+          "from": "right",
+          "to": {
+            "x": 225,
+            "y": 105
+          },
+          "duration": 1200
+        },
+        {
+          "type": "enter",
+          "character": "duke",
+          "from": "left",
+          "to": {
+            "x": 35,
+            "y": 107
+          },
+          "duration": 800
+        },
+        {
+          "type": "mill"
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Hollowed bell..."
+        },
+        {
+          "type": "shake",
+          "intensity": 2,
+          "duration": 600
+        },
+        {
+          "type": "wait",
+          "duration": 500
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Wrings us out."
+        },
+        {
+          "type": "emote",
+          "character": "elder",
+          "emote": "happy",
+          "duration": 1000
+        },
+        {
+          "type": "wait",
+          "duration": 600
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Resonance..."
+        },
+        {
+          "type": "shake",
+          "intensity": 3,
+          "duration": 500
+        },
+        {
+          "type": "wait",
+          "duration": 400
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Underground."
+        },
+        {
+          "type": "emote",
+          "character": "hero",
+          "emote": "happy",
+          "duration": 1000
+        },
+        {
+          "type": "wait",
+          "duration": 800
+        },
+        {
+          "type": "shake",
+          "intensity": 5,
+          "duration": 700
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Outer shell..."
+        },
+        {
+          "type": "emote",
+          "character": "dark_lord",
+          "emote": "surprise",
+          "duration": 1200
+        },
+        {
+          "type": "wait",
+          "duration": 400
+        },
+        {
+          "type": "shake",
+          "intensity": 7,
+          "duration": 900
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Splinters in front of the sound."
+        },
+        {
+          "type": "emote",
+          "character": "princess",
+          "emote": "happy",
+          "duration": 1500
+        },
+        {
+          "type": "wait",
+          "duration": 800
+        },
+        {
+          "type": "shake",
+          "intensity": 8,
+          "duration": 1000
+        },
+        {
+          "type": "dialogue",
+          "character": "lyra",
+          "text": "Grasping for shards of the sound."
+        },
+        {
+          "type": "emote",
+          "character": "wizard",
+          "emote": "happy",
+          "duration": 1200
+        },
+        {
+          "type": "wait",
+          "duration": 2000
+        },
+        {
+          "type": "transition",
+          "effect": "fadeOut",
+          "duration": 1500
+        }
       ]
     },
     {
       "id": "dance",
       "background": "biltroy_night",
       "actions": [
-        { "type": "transition", "effect": "fadeIn", "duration": 1500 },
-        { "type": "showProp", "prop": "amplifier", "x": 78, "y": 118 },
-        { "type": "enter", "character": "lyra", "from": "bottom", "to": { "x": 112, "y": 85 }, "duration": 800 },
-        { "type": "setScale", "character": "lyra", "scale": 1.5 },
-        { "type": "showNotes", "character": "lyra" },
-        { "type": "enter", "character": "hero", "from": "left", "to": { "x": 60, "y": 108 }, "duration": 600 },
-        { "type": "enter", "character": "princess", "from": "right", "to": { "x": 165, "y": 105 }, "duration": 600 },
-        { "type": "enter", "character": "elder", "from": "left", "to": { "x": 15, "y": 110 }, "duration": 700 },
-        { "type": "enter", "character": "wizard", "from": "right", "to": { "x": 200, "y": 110 }, "duration": 700 },
-        { "type": "enter", "character": "dark_lord", "from": "right", "to": { "x": 145, "y": 115 }, "duration": 800 },
-        { "type": "enter", "character": "gimli", "from": "left", "to": { "x": 30, "y": 112 }, "duration": 600 },
-        { "type": "enter", "character": "swift", "from": "right", "to": { "x": 180, "y": 108 }, "duration": 600 },
-        { "type": "enter", "character": "brother_sol", "from": "left", "to": { "x": 75, "y": 110 }, "duration": 600 },
-        { "type": "enter", "character": "shade", "from": "right", "to": { "x": 130, "y": 112 }, "duration": 600 },
-        { "type": "enter", "character": "pip", "from": "left", "to": { "x": 45, "y": 106 }, "duration": 600 },
-        { "type": "enter", "character": "lily", "from": "right", "to": { "x": 210, "y": 113 }, "duration": 500 },
-        { "type": "wait", "duration": 500 },
-        { "type": "emote", "character": "hero", "emote": "happy", "duration": 800 },
-        { "type": "dance", "duration": 12000 },
-        { "type": "emote", "character": "princess", "emote": "happy", "duration": 1000 },
-        { "type": "emote", "character": "lyra", "emote": "happy", "duration": 1500 },
-        { "type": "stopDance" },
-        { "type": "hideNotes" },
-        { "type": "wait", "duration": 1000 },
-        { "type": "exit", "character": "hero", "to": "left", "duration": 800 },
-        { "type": "exit", "character": "elder", "to": "left", "duration": 800 },
-        { "type": "exit", "character": "gimli", "to": "left", "duration": 700 },
-        { "type": "exit", "character": "brother_sol", "to": "left", "duration": 700 },
-        { "type": "exit", "character": "pip", "to": "left", "duration": 700 },
-        { "type": "exit", "character": "wizard", "to": "right", "duration": 800 },
-        { "type": "exit", "character": "princess", "to": "right", "duration": 800 },
-        { "type": "exit", "character": "dark_lord", "to": "right", "duration": 1000 },
-        { "type": "exit", "character": "swift", "to": "right", "duration": 700 },
-        { "type": "exit", "character": "shade", "to": "right", "duration": 700 },
-        { "type": "exit", "character": "lily", "to": "right", "duration": 600 },
-        { "type": "wait", "duration": 500 },
-        { "type": "exit", "character": "lyra", "to": "bottom", "duration": 1500 },
-        { "type": "wait", "duration": 1500 },
-        { "type": "transition", "effect": "fadeOut", "duration": 3000 }
+        {
+          "type": "transition",
+          "effect": "fadeIn",
+          "duration": 1500
+        },
+        {
+          "type": "showProp",
+          "prop": "amplifier",
+          "x": 190,
+          "y": 96
+        },
+        {
+          "type": "enter",
+          "character": "lyra",
+          "from": "right",
+          "to": {
+            "x": 195,
+            "y": 58
+          },
+          "duration": 800
+        },
+        {
+          "type": "setScale",
+          "character": "lyra",
+          "scale": 1.5
+        },
+        {
+          "type": "pin",
+          "character": "lyra"
+        },
+        {
+          "type": "showNotes",
+          "character": "lyra"
+        },
+        {
+          "type": "enter",
+          "character": "hero",
+          "from": "left",
+          "to": {
+            "x": 60,
+            "y": 108
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "princess",
+          "from": "right",
+          "to": {
+            "x": 165,
+            "y": 105
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "elder",
+          "from": "left",
+          "to": {
+            "x": 15,
+            "y": 110
+          },
+          "duration": 700
+        },
+        {
+          "type": "enter",
+          "character": "wizard",
+          "from": "right",
+          "to": {
+            "x": 200,
+            "y": 110
+          },
+          "duration": 700
+        },
+        {
+          "type": "enter",
+          "character": "dark_lord",
+          "from": "right",
+          "to": {
+            "x": 145,
+            "y": 115
+          },
+          "duration": 800
+        },
+        {
+          "type": "enter",
+          "character": "gimli",
+          "from": "left",
+          "to": {
+            "x": 30,
+            "y": 112
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "swift",
+          "from": "right",
+          "to": {
+            "x": 180,
+            "y": 108
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "brother_sol",
+          "from": "left",
+          "to": {
+            "x": 75,
+            "y": 110
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "shade",
+          "from": "right",
+          "to": {
+            "x": 130,
+            "y": 112
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "pip",
+          "from": "left",
+          "to": {
+            "x": 45,
+            "y": 106
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
+          "character": "lily",
+          "from": "right",
+          "to": {
+            "x": 210,
+            "y": 113
+          },
+          "duration": 500
+        },
+        {
+          "type": "wait",
+          "duration": 500
+        },
+        {
+          "type": "emote",
+          "character": "hero",
+          "emote": "happy",
+          "duration": 800
+        },
+        {
+          "type": "dance",
+          "duration": 12000
+        },
+        {
+          "type": "emote",
+          "character": "princess",
+          "emote": "happy",
+          "duration": 1000
+        },
+        {
+          "type": "emote",
+          "character": "lyra",
+          "emote": "happy",
+          "duration": 1500
+        },
+        {
+          "type": "stopDance"
+        },
+        {
+          "type": "hideNotes"
+        },
+        {
+          "type": "wait",
+          "duration": 1000
+        },
+        {
+          "type": "exit",
+          "character": "hero",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "elder",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "gimli",
+          "to": "left",
+          "duration": 700
+        },
+        {
+          "type": "exit",
+          "character": "brother_sol",
+          "to": "left",
+          "duration": 700
+        },
+        {
+          "type": "exit",
+          "character": "pip",
+          "to": "left",
+          "duration": 700
+        },
+        {
+          "type": "exit",
+          "character": "wizard",
+          "to": "right",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "princess",
+          "to": "right",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "dark_lord",
+          "to": "right",
+          "duration": 1000
+        },
+        {
+          "type": "exit",
+          "character": "swift",
+          "to": "right",
+          "duration": 700
+        },
+        {
+          "type": "exit",
+          "character": "shade",
+          "to": "right",
+          "duration": 700
+        },
+        {
+          "type": "exit",
+          "character": "lily",
+          "to": "right",
+          "duration": 600
+        },
+        {
+          "type": "wait",
+          "duration": 500
+        },
+        {
+          "type": "exit",
+          "character": "lyra",
+          "to": "bottom",
+          "duration": 1500
+        },
+        {
+          "type": "wait",
+          "duration": 1500
+        },
+        {
+          "type": "transition",
+          "effect": "fadeOut",
+          "duration": 3000
+        }
       ]
     },
     {
       "id": "credits",
       "background": "night_sky",
       "actions": [
-        { "type": "transition", "effect": "fadeIn", "duration": 1000 },
-        { "type": "credits", "lines": [
-          "",
-          "",
-          "#MISOPHONIA",
-          "",
-          "#Performed by",
-          "Lyra the Dark Elf Ranger",
-          "",
-          "",
-          "#Cast",
-          "",
-          "Lyra . . . . . Dark Elf Ranger",
-          "Aldric . . . . . . . . Warrior",
-          "Elder Morin . . . . . . . Sage",
-          "Princess Elara . . . . Royalty",
-          "Thalos . . . . . . . . . Mage",
-          "Lord Malachar . . . . Villain",
-          "Page . . . . . . . . . Dwarf",
-          "Zach . . . . . . . .  Archer",
-          "Eliza . . . . . . . . . Monk",
-          "Joe . . . . . . . . .  Thief",
-          "Ser Valen . . . . . . Knight",
-          "Daphne . . . . . . . .  Bard",
-          "Morgana . . . . . . . . Witch",
-          "Nathan . . . . . . .  Farmer",
-          "Leo . . . . . . . . .  Child",
-          "Duke Ashford . . . .  Noble",
-          "",
-          "",
-          "#Created with",
-          "Pixel Cutscene Renderer",
-          "",
-          "",
-          "#Music and Lyrics",
-          "Misophonia",
-          "",
-          "",
-          "",
-          "#Thank you for watching",
-          "",
-          ""
-        ], "speed": 20, "color": "#aaaaaa", "highlightColor": "#ffffff" },
-        { "type": "transition", "effect": "fadeOut", "duration": 2000 }
+        {
+          "type": "transition",
+          "effect": "fadeIn",
+          "duration": 1000
+        },
+        {
+          "type": "credits",
+          "lines": [
+            "",
+            "",
+            "#MISOPHONIA",
+            "",
+            "#Performed by",
+            "Lyra the Dark Elf Ranger",
+            "",
+            "",
+            "#Cast",
+            "",
+            "Lyra . . . . . Dark Elf Ranger",
+            "Aldric . . . . . . . . Warrior",
+            "Elder Morin . . . . . . . Sage",
+            "Princess Elara . . . . Royalty",
+            "Thalos . . . . . . . . . Mage",
+            "Lord Malachar . . . . Villain",
+            "Page . . . . . . . . . Dwarf",
+            "Zach . . . . . . . .  Archer",
+            "Eliza . . . . . . . . . Monk",
+            "Joe . . . . . . . . .  Thief",
+            "Ser Valen . . . . . . Knight",
+            "Daphne . . . . . . . .  Bard",
+            "Morgana . . . . . . . . Witch",
+            "Nathan . . . . . . .  Farmer",
+            "Leo . . . . . . . . .  Child",
+            "Duke Ashford . . . .  Noble",
+            "",
+            "",
+            "#Created with",
+            "Pixel Cutscene Renderer",
+            "",
+            "",
+            "#Music and Lyrics",
+            "Misophonia",
+            "",
+            "",
+            "",
+            "#Thank you for watching",
+            "",
+            ""
+          ],
+          "speed": 20,
+          "color": "#aaaaaa",
+          "highlightColor": "#ffffff"
+        },
+        {
+          "type": "transition",
+          "effect": "fadeOut",
+          "duration": 2000
+        }
       ]
     }
   ]
@@ -3290,6 +4274,10 @@ const CutsceneEngine = (() => {
         return beginHideNotes(action);
       case 'setScale':
         return beginSetScale(action);
+      case 'pin':
+        return beginPin(action);
+      case 'unpin':
+        return beginUnpin(action);
       case 'showProp':
         return beginShowProp(action);
       case 'hideProp':
@@ -3495,6 +4483,18 @@ const CutsceneEngine = (() => {
   // Props on screen
   const activeProps = [];
 
+  function beginPin(action) {
+    const char = getOrCreateCharacter(action.character);
+    char.pinned = true;
+    return { done: true };
+  }
+
+  function beginUnpin(action) {
+    const char = getOrCreateCharacter(action.character);
+    char.pinned = false;
+    return { done: true };
+  }
+
   function beginShowProp(action) {
     activeProps.push({
       name: action.prop || 'amplifier',
@@ -3521,7 +4521,9 @@ const CutsceneEngine = (() => {
       const char = visibleChars[i];
       const seed = char.idleSeed;
 
-      if (char.dancing) {
+      if (char.pinned) {
+        // Pinned characters stay put — just subtle bob from idle
+      } else if (char.dancing) {
         // Coordinated dance: characters orbit around the bonfire
         const totalChars = visibleChars.length;
         const angle = (t / 3000 + (i / totalChars) * Math.PI * 2) % (Math.PI * 2);

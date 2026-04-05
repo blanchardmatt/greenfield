@@ -101,6 +101,10 @@ const CutsceneEngine = (() => {
         return beginHideNotes(action);
       case 'setScale':
         return beginSetScale(action);
+      case 'pin':
+        return beginPin(action);
+      case 'unpin':
+        return beginUnpin(action);
       case 'showProp':
         return beginShowProp(action);
       case 'hideProp':
@@ -306,6 +310,18 @@ const CutsceneEngine = (() => {
   // Props on screen
   const activeProps = [];
 
+  function beginPin(action) {
+    const char = getOrCreateCharacter(action.character);
+    char.pinned = true;
+    return { done: true };
+  }
+
+  function beginUnpin(action) {
+    const char = getOrCreateCharacter(action.character);
+    char.pinned = false;
+    return { done: true };
+  }
+
   function beginShowProp(action) {
     activeProps.push({
       name: action.prop || 'amplifier',
@@ -332,7 +348,9 @@ const CutsceneEngine = (() => {
       const char = visibleChars[i];
       const seed = char.idleSeed;
 
-      if (char.dancing) {
+      if (char.pinned) {
+        // Pinned characters stay put — just subtle bob from idle
+      } else if (char.dancing) {
         // Coordinated dance: characters orbit around the bonfire
         const totalChars = visibleChars.length;
         const angle = (t / 3000 + (i / totalChars) * Math.PI * 2) % (Math.PI * 2);
