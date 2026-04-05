@@ -37,22 +37,22 @@
     },
     "gimli": {
       "sprite": "dwarf",
-      "name": "Gimli",
+      "name": "Page",
       "nameColor": "#cc6633"
     },
     "swift": {
       "sprite": "archer",
-      "name": "Swift",
+      "name": "Zach",
       "nameColor": "#66cc66"
     },
     "brother_sol": {
       "sprite": "monk",
-      "name": "Brother Sol",
+      "name": "Eliza",
       "nameColor": "#ddaa44"
     },
     "shade": {
       "sprite": "thief",
-      "name": "Shade",
+      "name": "Joe",
       "nameColor": "#888899"
     },
     "ser_valen": {
@@ -62,7 +62,7 @@
     },
     "pip": {
       "sprite": "bard",
-      "name": "Pip",
+      "name": "Daphne",
       "nameColor": "#44cccc"
     },
     "morgana": {
@@ -72,12 +72,12 @@
     },
     "hank": {
       "sprite": "farmer",
-      "name": "Hank",
+      "name": "Nathan",
       "nameColor": "#88aa44"
     },
     "lily": {
       "sprite": "child",
-      "name": "Lily",
+      "name": "Leo",
       "nameColor": "#ff8888"
     },
     "duke": {
@@ -299,15 +299,15 @@
           "Princess Elara . . . . Royalty",
           "Thalos . . . . . . . . . Mage",
           "Lord Malachar . . . . Villain",
-          "Gimli . . . . . . . . . Dwarf",
-          "Swift . . . . . . . .  Archer",
-          "Brother Sol . . . . . .  Monk",
-          "Shade . . . . . . . . . Thief",
+          "Page . . . . . . . . . Dwarf",
+          "Zach . . . . . . . .  Archer",
+          "Eliza . . . . . . . . . Monk",
+          "Joe . . . . . . . . .  Thief",
           "Ser Valen . . . . . . Knight",
-          "Pip . . . . . . . . . .  Bard",
+          "Daphne . . . . . . . .  Bard",
           "Morgana . . . . . . . . Witch",
-          "Hank . . . . . . . .  Farmer",
-          "Lily . . . . . . . . . Child",
+          "Nathan . . . . . . .  Farmer",
+          "Leo . . . . . . . . .  Child",
           "Duke Ashford . . . .  Noble",
           "",
           "",
