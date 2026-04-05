@@ -1243,63 +1243,65 @@ const Renderer = (() => {
       fillCircle(ctx, Math.floor(sc2x) + 12, 47, 12);
 
       // Pale man dancing on a ladder against left tree
-      const ladX = 42;
-      const ladY = 70; // ladder leans against tree
-      // Ladder (two rails + rungs)
-      ctx.fillStyle = '#aa8855';
-      ctx.fillRect(ladX, ladY, 2, 55);       // left rail
-      ctx.fillRect(ladX + 8, ladY, 2, 55);    // right rail
-      for (let r = 0; r < 6; r++) {
-        ctx.fillRect(ladX, ladY + 5 + r * 9, 10, 1); // rungs
+      const ladX = 44;
+      const ladY = 60;
+      ctx.globalAlpha = 1;
+      // Ladder (two rails + rungs) — bright yellow
+      ctx.fillStyle = '#ccaa44';
+      ctx.fillRect(ladX, ladY, 2, 65);        // left rail
+      ctx.fillRect(ladX + 12, ladY, 2, 65);   // right rail
+      ctx.fillStyle = '#bbaa44';
+      for (let r = 0; r < 7; r++) {
+        ctx.fillRect(ladX, ladY + 4 + r * 9, 14, 2); // rungs
       }
-      // Guy standing on ladder mid-height, dancing
-      const guyY = ladY + 18;
-      const dancePhase = Math.sin(t / 250);
-      const armPhase = Math.sin(t / 200);
-      const leanX = Math.sin(t / 400) * 2;
+      // Guy standing on ladder, dancing wildly
+      const guyY = ladY + 14;
+      const bounce = Math.abs(Math.sin(t / 200)) * 3;
+      const leanX = Math.sin(t / 300) * 3;
+      const armL = Math.sin(t / 180);
+      const armR = Math.sin(t / 220);
 
-      // Legs on rung
-      ctx.fillStyle = '#ddcc99'; // pale skin
-      ctx.fillRect(Math.floor(ladX + 2 + leanX), guyY + 12, 2, 4); // left leg
-      ctx.fillRect(Math.floor(ladX + 6 + leanX), guyY + 12, 2, 4); // right leg
-      // Shorts
-      ctx.fillStyle = '#6688aa'; // blue shorts
-      ctx.fillRect(Math.floor(ladX + 1 + leanX), guyY + 9, 8, 4);
-      // Tank top (white)
-      ctx.fillStyle = '#eeeeee';
-      ctx.fillRect(Math.floor(ladX + 2 + leanX), guyY + 3, 6, 6);
-      // Skin showing on sides (tank top straps)
-      ctx.fillStyle = '#ddcc99';
-      ctx.fillRect(Math.floor(ladX + 2 + leanX), guyY + 4, 1, 4);
-      ctx.fillRect(Math.floor(ladX + 7 + leanX), guyY + 4, 1, 4);
+      // Legs (pale skin, on rung)
+      ctx.fillStyle = '#fdd9b5';
+      ctx.fillRect(Math.floor(ladX + 3 + leanX), guyY + 16 - bounce, 3, 6);
+      ctx.fillRect(Math.floor(ladX + 8 + leanX), guyY + 16 - bounce, 3, 6);
+      // Shoes
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(Math.floor(ladX + 3 + leanX), guyY + 22 - bounce, 3, 2);
+      ctx.fillRect(Math.floor(ladX + 8 + leanX), guyY + 22 - bounce, 3, 2);
+      // Shorts (khaki)
+      ctx.fillStyle = '#ccbb88';
+      ctx.fillRect(Math.floor(ladX + 2 + leanX), guyY + 12 - bounce, 10, 5);
+      // Tank top (bright white)
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(Math.floor(ladX + 3 + leanX), guyY + 4 - bounce, 8, 9);
+      // Shoulder straps
+      ctx.fillStyle = '#fdd9b5';
+      ctx.fillRect(Math.floor(ladX + 3 + leanX), guyY + 5 - bounce, 2, 6);
+      ctx.fillRect(Math.floor(ladX + 9 + leanX), guyY + 5 - bounce, 2, 6);
       // Head
-      ctx.fillStyle = '#ddcc99';
-      ctx.fillRect(Math.floor(ladX + 3 + leanX), guyY - 1, 4, 4);
+      ctx.fillStyle = '#fdd9b5';
+      ctx.fillRect(Math.floor(ladX + 4 + leanX), guyY - 1 - bounce, 6, 5);
       // Hair (short brown)
       ctx.fillStyle = '#885522';
-      ctx.fillRect(Math.floor(ladX + 3 + leanX), guyY - 2, 4, 2);
+      ctx.fillRect(Math.floor(ladX + 4 + leanX), guyY - 2 - bounce, 6, 2);
       // Eyes
       ctx.fillStyle = '#111111';
-      ctx.fillRect(Math.floor(ladX + 4 + leanX), guyY, 1, 1);
-      ctx.fillRect(Math.floor(ladX + 6 + leanX), guyY, 1, 1);
-      // Mouth (grinning)
-      ctx.fillRect(Math.floor(ladX + 4 + leanX), guyY + 2, 2, 1);
-      // Arms — flailing while dancing
-      ctx.fillStyle = '#ddcc99';
+      ctx.fillRect(Math.floor(ladX + 5 + leanX), guyY + 1 - bounce, 1, 1);
+      ctx.fillRect(Math.floor(ladX + 8 + leanX), guyY + 1 - bounce, 1, 1);
+      // Mouth (open, yelling/singing along)
+      ctx.fillStyle = '#cc4444';
+      ctx.fillRect(Math.floor(ladX + 6 + leanX), guyY + 3 - bounce, 2, 1);
+      // Arms — flailing wildly
+      ctx.fillStyle = '#fdd9b5';
       // Left arm
-      if (armPhase > 0) {
-        ctx.fillRect(Math.floor(ladX + leanX), guyY + 2, 2, 1);
-        ctx.fillRect(Math.floor(ladX - 1 + leanX), guyY, 1, 2);  // arm up
-      } else {
-        ctx.fillRect(Math.floor(ladX + leanX), guyY + 5, 2, 1);   // arm down
-      }
+      const laY = armL > 0 ? guyY + 2 - bounce : guyY + 8 - bounce;
+      ctx.fillRect(Math.floor(ladX + leanX), laY, 3, 2);
+      if (armL > 0.5) ctx.fillRect(Math.floor(ladX - 2 + leanX), laY - 3, 2, 3);
       // Right arm
-      if (dancePhase > 0) {
-        ctx.fillRect(Math.floor(ladX + 8 + leanX), guyY + 1, 2, 1);
-        ctx.fillRect(Math.floor(ladX + 10 + leanX), guyY - 1, 1, 2); // arm up
-      } else {
-        ctx.fillRect(Math.floor(ladX + 8 + leanX), guyY + 6, 2, 1);  // arm down
-      }
+      const raY = armR > 0 ? guyY + 1 - bounce : guyY + 9 - bounce;
+      ctx.fillRect(Math.floor(ladX + 11 + leanX), raY, 3, 2);
+      if (armR > 0.5) ctx.fillRect(Math.floor(ladX + 14 + leanX), raY - 3, 2, 3);
 
       // Wheelchair rider on the roof of the Biltroy
       const roofY = 78;
