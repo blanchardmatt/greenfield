@@ -31,9 +31,9 @@ const CutsceneEngine = (() => {
   function getOffscreenPos(direction) {
     const size = getInternalSize();
     switch (direction) {
-      case 'left': return { x: -20, y: null };
+      case 'left': return { x: -36, y: null };
       case 'right': return { x: size.width + 4, y: null };
-      case 'top': return { x: null, y: -28 };
+      case 'top': return { x: null, y: -52 };
       case 'bottom': return { x: null, y: size.height + 4 };
       default: return { x: -20, y: null };
     }

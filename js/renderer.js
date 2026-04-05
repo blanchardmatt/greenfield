@@ -229,8 +229,8 @@ const Renderer = (() => {
   // --- Emote rendering ---
 
   function drawEmoteBubble(char, emoteName, bobOffset) {
-    const ex = Math.round(char.x) + SpriteLibrary.W / 2 - 4;
-    const ey = Math.round(char.y) - 12 + bobOffset;
+    const ex = Math.round(char.x) + SpriteLibrary.W / 2 - 6;
+    const ey = Math.round(char.y) - 16 + bobOffset;
     SpriteLibrary.drawEmote(ctx, emoteName, ex, ey);
   }
 
