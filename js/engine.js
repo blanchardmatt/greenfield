@@ -102,6 +102,10 @@ const CutsceneEngine = (() => {
         return beginHideNotes(action);
       case 'setScale':
         return beginSetScale(action);
+      case 'ufoArrive':
+        return beginUfoArrive(action);
+      case 'ufoDepart':
+        return beginUfoDepart(action);
       case 'pin':
         return beginPin(action);
       case 'unpin':
@@ -307,6 +311,117 @@ const CutsceneEngine = (() => {
   // Props on screen
   const activeProps = [];
 
+  // UFO state
+  let ufoState = null; // { x, y, phase, elapsed, duration, targetX, targetY, character, beamOn }
+
+  function beginUfoArrive(action) {
+    const char = getOrCreateCharacter(action.character);
+    const targetX = action.to ? action.to.x : 195;
+    const targetY = action.to ? action.to.y : 58;
+    const duration = action.duration || 5000;
+    char.visible = false;
+    ufoState = {
+      x: -40, y: 20,
+      targetX: targetX, targetY: targetY,
+      phase: 'flyIn', elapsed: 0, duration: duration,
+      character: action.character, beamOn: false,
+    };
+    waitTimer = duration;
+    return { done: false, type: 'timed', onDone: () => {
+      char.x = targetX;
+      char.y = targetY;
+      char.baseX = targetX;
+      char.baseY = targetY;
+      char.visible = true;
+      ufoState = null;
+    }};
+  }
+
+  function beginUfoDepart(action) {
+    const char = action.character ? characters[action.character] : null;
+    const duration = action.duration || 5000;
+    const charX = char ? char.x : 195;
+    const charY = char ? char.y : 58;
+    ufoState = {
+      x: 256, y: 15,
+      targetX: charX, targetY: charY,
+      phase: 'flyIn', elapsed: 0, duration: duration,
+      character: action.character, beamOn: false,
+      departing: true,
+    };
+    waitTimer = duration;
+    return { done: false, type: 'timed', onDone: () => {
+      if (char) char.visible = false;
+      ufoState = null;
+    }};
+  }
+
+  function updateUfo(dt) {
+    if (!ufoState) return;
+    ufoState.elapsed += dt;
+    const t = ufoState.elapsed;
+    const d = ufoState.duration;
+    const progress = Math.min(t / d, 1);
+
+    if (!ufoState.departing) {
+      // Arrive: fly in (0-30%), hover + beam down (30-80%), fly away (80-100%)
+      if (progress < 0.3) {
+        const p = progress / 0.3;
+        ufoState.x = -40 + (ufoState.targetX - 10) * p;
+        ufoState.y = 10 + Math.sin(p * Math.PI) * -10;
+        ufoState.beamOn = false;
+      } else if (progress < 0.8) {
+        ufoState.x = ufoState.targetX - 10;
+        ufoState.y = 10;
+        ufoState.beamOn = true;
+        // Make character appear partway through beam
+        const beamP = (progress - 0.3) / 0.5;
+        if (beamP > 0.5 && ufoState.character) {
+          const char = characters[ufoState.character];
+          if (char && !char.visible) {
+            char.x = ufoState.targetX;
+            char.y = ufoState.targetY;
+            char.baseX = ufoState.targetX;
+            char.baseY = ufoState.targetY;
+            char.visible = true;
+          }
+        }
+      } else {
+        const p = (progress - 0.8) / 0.2;
+        ufoState.x = (ufoState.targetX - 10) + (280 - ufoState.targetX) * p;
+        ufoState.y = 10 - p * 30;
+        ufoState.beamOn = false;
+      }
+    } else {
+      // Depart: fly in (0-25%), hover + beam up (25-75%), fly away (75-100%)
+      if (progress < 0.25) {
+        const p = progress / 0.25;
+        ufoState.x = 280 - (280 - ufoState.targetX + 10) * p;
+        ufoState.y = -20 + 30 * p;
+        ufoState.beamOn = false;
+      } else if (progress < 0.75) {
+        ufoState.x = ufoState.targetX - 10;
+        ufoState.y = 10;
+        ufoState.beamOn = true;
+        // Hide character partway through beam up
+        const beamP = (progress - 0.25) / 0.5;
+        if (beamP > 0.6 && ufoState.character) {
+          const char = characters[ufoState.character];
+          if (char) char.visible = false;
+        }
+      } else {
+        const p = (progress - 0.75) / 0.25;
+        ufoState.x = (ufoState.targetX - 10) - 60 * p;
+        ufoState.y = 10 - p * 50;
+        ufoState.beamOn = false;
+        if (ufoState.character) {
+          const char = characters[ufoState.character];
+          if (char) char.visible = false;
+        }
+      }
+    }
+  }
+
   function beginPin(action) {
     const char = getOrCreateCharacter(action.character);
     char.pinned = true;
@@ -437,6 +552,9 @@ const CutsceneEngine = (() => {
         activeEmote = null;
       }
     }
+
+    // UFO animation
+    updateUfo(dt);
 
     // Character animations (idle/mill/dance)
     updateCharacterAnimations(dt);
@@ -574,6 +692,11 @@ const CutsceneEngine = (() => {
       Renderer.drawEmoteBubble(activeEmote.character, activeEmote.emote, bob);
     }
 
+    // UFO
+    if (ufoState) {
+      Renderer.drawUfo(ufoState);
+    }
+
     Renderer.restoreCamera();
 
     // Dialogue box
@@ -635,6 +758,7 @@ const CutsceneEngine = (() => {
     danceActive = false;
     notesActive = false;
     notesCharId = null;
+    ufoState = null;
     activeProps.length = 0;
     currentActionState = null;
     autoAdvance = (options && options.autoAdvance) || false;
@@ -711,6 +835,7 @@ const CutsceneEngine = (() => {
     danceActive = false;
     notesActive = false;
     notesCharId = null;
+    ufoState = null;
     activeProps.length = 0;
     currentActionState = null;
     sceneIndex = index;

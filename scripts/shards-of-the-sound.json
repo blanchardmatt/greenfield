@@ -182,14 +182,13 @@
           "y": 96
         },
         {
-          "type": "enter",
+          "type": "ufoArrive",
           "character": "lyra",
-          "from": "right",
           "to": {
             "x": 195,
             "y": 58
           },
-          "duration": 800
+          "duration": 4000
         },
         {
           "type": "setScale",
@@ -787,6 +786,19 @@
         },
         {
           "type": "hideNotes"
+        },
+        {
+          "type": "wait",
+          "duration": 500
+        },
+        {
+          "type": "ufoDepart",
+          "character": "lyra",
+          "duration": 5000
+        },
+        {
+          "type": "wait",
+          "duration": 500
         },
         {
           "type": "wait",

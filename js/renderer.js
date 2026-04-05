@@ -1093,6 +1093,62 @@ const Renderer = (() => {
     },
   };
 
+  // --- UFO rendering ---
+
+  function drawUfo(state) {
+    const ux = Math.round(state.x);
+    const uy = Math.round(state.y);
+
+    // Draw the UFO sprite
+    SpriteLibrary.drawProp(ctx, 'ufo', ux, uy);
+
+    // Tractor beam
+    if (state.beamOn) {
+      const beamX = ux + 8;
+      const beamTopW = 16;
+      const beamBottomW = 30;
+      const beamH = INTERNAL_H - uy - 15;
+
+      // Beam: widening trapezoid of light
+      for (let row = 0; row < beamH; row++) {
+        const t = row / beamH;
+        const w = beamTopW + (beamBottomW - beamTopW) * t;
+        const x = beamX + (beamTopW - w) / 2;
+        // Alternating colors for shimmer
+        const shimmer = Math.sin(Date.now() / 100 + row * 0.3) * 0.1;
+        ctx.fillStyle = row % 3 === 0 ? '#88ffaa' : '#aaffcc';
+        ctx.globalAlpha = 0.15 + shimmer + Math.sin(Date.now() / 200 + row * 0.5) * 0.05;
+        ctx.fillRect(Math.floor(x), uy + 14 + row, Math.ceil(w), 1);
+      }
+
+      // Sparkles in the beam
+      ctx.fillStyle = '#ffffff';
+      for (let i = 0; i < 8; i++) {
+        const sparkY = uy + 15 + ((Date.now() / 8 + i * 30) % beamH);
+        const sparkT = (sparkY - uy - 15) / beamH;
+        const sparkW = beamTopW + (beamBottomW - beamTopW) * sparkT;
+        const sparkX = beamX + (beamTopW - sparkW) / 2 + Math.sin(Date.now() / 200 + i * 4) * sparkW * 0.3;
+        ctx.globalAlpha = 0.5 + Math.sin(Date.now() / 150 + i * 2) * 0.3;
+        ctx.fillRect(Math.floor(sparkX + sparkW / 2), Math.floor(sparkY), 1, 1);
+      }
+
+      ctx.globalAlpha = 1;
+    }
+
+    // UFO lights blinking
+    const lightPhase = Date.now() / 200;
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00'];
+    for (let i = 0; i < 4; i++) {
+      const on = Math.sin(lightPhase + i * 1.5) > 0.3;
+      if (on) {
+        ctx.fillStyle = colors[i];
+        ctx.globalAlpha = 0.8;
+        ctx.fillRect(ux + 6 + i * 5, uy + 12, 2, 1);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
   // --- Prop rendering ---
 
   function drawProp(propName, x, y) {
@@ -1369,7 +1425,7 @@ const Renderer = (() => {
 
   return {
     init, beginFrame, applyCamera, restoreCamera, present,
-    drawBackground, drawProp, drawCharacter, drawCharacterWithOffset, drawEmoteBubble, drawMusicNotes, drawSmoke,
+    drawBackground, drawProp, drawUfo, drawCharacter, drawCharacterWithOffset, drawEmoteBubble, drawMusicNotes, drawSmoke,
     drawDialogueBox, drawDialogueText, drawFadeOverlay,
     drawTitleOverlay, drawCreditsOverlay,
     getTextMaxWidth, getTextScale, getInternalSize,

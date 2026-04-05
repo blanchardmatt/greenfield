@@ -877,6 +877,23 @@ const SpriteLibrary = (() => {
 
   // Props — static objects
   const props = {
+    ufo: decode([
+      '..........KKKKKKKKKKKK..........',
+      '.........KyyyyyyyyyyyyK.........',
+      '........KyyyyyyyyyyyyyyK........',
+      '.......KyyyyyyyyyyyyyyyyK.......',
+      '......KyyyyyyyyyyyyyyyyyyK......',
+      '....KKyyyyyyyyyyyyyyyyyyyKK....',
+      '..KKyyyyyyyyyyyyyyyyyyyyyyKKK..',
+      '.KyyyyyyyyyyyyyyyyyyyyyyyyyykK.',
+      'KyyyykKKKKKKKKKKKKKKKkyyyyykK.',
+      'KyyyKrrrrrrrrrrrrrrrrKyyyyykK.',
+      '.KyyKrrrrrrrrrrrrrrrrKyyyyK...',
+      '..KKKrrrrrrrrrrrrrrrrKKKKK....',
+      '....KKKKKKKKKKKKKKKKKkK.......',
+      '......KkkkkkkkkkkkkkK..........',
+      '.......KKKKKKKKKKKKKK..........',
+    ]),
     amplifier: decode([
       '..KKKKKKKKKKKKKK..',
       '.KkkkkkkkkkkkkkkK.',
