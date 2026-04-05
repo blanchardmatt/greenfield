@@ -1967,7 +1967,21 @@ const Renderer = (() => {
         windowColor: '#ffcc44', deck: '#554422', deckDark: '#443311', fireScale: 2,
       });
 
-      // Disco ball (above deck area)
+      // Disco ball on LEFT tree
+      ctx.fillStyle = '#cccccc';
+      fillCircle(ctx, 32, 42, 7);
+      ctx.fillStyle = '#eeeeee';
+      ctx.fillRect(29, 43, 2, 1);
+      ctx.fillRect(33, 40, 2, 1);
+      ctx.fillRect(35, 44, 1, 2);
+      ctx.fillRect(28, 39, 1, 1);
+      ctx.fillRect(31, 37, 2, 1);
+      ctx.fillRect(34, 46, 1, 1);
+      // String to tree
+      ctx.fillStyle = '#888888';
+      ctx.fillRect(32, 35, 1, 7);
+
+      // Disco ball on deck (existing)
       ctx.fillStyle = '#cccccc';
       fillCircle(ctx, 210, 78, 6);
       ctx.fillStyle = '#eeeeee';
@@ -1975,20 +1989,59 @@ const Renderer = (() => {
       ctx.fillRect(211, 77, 2, 1);
       ctx.fillRect(213, 80, 1, 2);
       ctx.fillRect(207, 76, 1, 1);
-      // String to roof
       ctx.fillStyle = '#888888';
       ctx.fillRect(210, 72, 1, 6);
-      // Stage lights on ground
+
+      // String lights across trailer front
+      const lightColors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff', '#ff8844'];
+      for (let i = 0; i < 14; i++) {
+        const lx = 72 + i * 8.5;
+        const ly = 86 + Math.sin(i * 0.8) * 1.5;
+        ctx.fillStyle = lightColors[i % lightColors.length];
+        ctx.fillRect(Math.floor(lx), Math.floor(ly), 2, 2);
+      }
+      // String line
+      ctx.fillStyle = '#444444';
+      for (let i = 0; i < 120; i++) {
+        const lx = 70 + i;
+        const ly = 87 + Math.sin(i * 0.05) * 1;
+        ctx.fillRect(Math.floor(lx), Math.floor(ly), 1, 1);
+      }
+
+      // String lights on deck railing
+      for (let i = 0; i < 5; i++) {
+        const lx = 192 + i * 9;
+        ctx.fillStyle = lightColors[(i + 3) % lightColors.length];
+        ctx.fillRect(Math.floor(lx), 103, 2, 2);
+      }
+
+      // More stage lights on the ground (semicircle around fire area)
+      const stagePositions = [
+        {x: 60, c: '#ff4444'}, {x: 90, c: '#44ff44'}, {x: 115, c: '#ffff44'},
+        {x: 140, c: '#4444ff'}, {x: 170, c: '#ff44ff'}, {x: 195, c: '#44ffff'},
+        {x: 240, c: '#ff8844'},
+      ];
       ctx.fillStyle = '#333333';
-      ctx.fillRect(170, 132, 5, 4);
-      ctx.fillRect(240, 132, 5, 4);
-      ctx.fillRect(155, 134, 4, 3);
-      ctx.fillStyle = '#ff4444';
-      ctx.fillRect(171, 131, 3, 1);
-      ctx.fillStyle = '#4444ff';
-      ctx.fillRect(241, 131, 3, 1);
-      ctx.fillStyle = '#44ff44';
-      ctx.fillRect(156, 133, 2, 1);
+      for (const sl of stagePositions) {
+        ctx.fillRect(sl.x, 133, 4, 3);
+        ctx.fillStyle = sl.c;
+        ctx.fillRect(sl.x + 1, 132, 2, 1);
+        ctx.fillStyle = '#333333';
+      }
+
+      // String lights between trees (across the top)
+      ctx.fillStyle = '#444444';
+      for (let i = 0; i < 180; i++) {
+        const lx = 40 + i;
+        const ly = 52 + Math.sin(i * 0.03) * 8 + Math.sin(i * 0.07) * 3;
+        ctx.fillRect(Math.floor(lx), Math.floor(ly), 1, 1);
+      }
+      for (let i = 0; i < 20; i++) {
+        const lx = 40 + i * 9.5;
+        const ly = 52 + Math.sin(lx * 0.03) * 8 + Math.sin(lx * 0.07) * 3;
+        ctx.fillStyle = lightColors[i % lightColors.length];
+        ctx.fillRect(Math.floor(lx), Math.floor(ly), 2, 2);
+      }
     },
   };
 
@@ -2501,57 +2554,97 @@ const Renderer = (() => {
         ctx.fillRect(sx, sy, 1, 1);
       }
 
-      // Disco ball light beams
+      // Stage light beams from ALL ground lights
+      const stageBeams = [
+        { x: 61, color: '#ff4444' }, { x: 91, color: '#44ff44' },
+        { x: 116, color: '#ffff44' }, { x: 141, color: '#4444ff' },
+        { x: 171, color: '#ff44ff' }, { x: 196, color: '#44ffff' },
+        { x: 241, color: '#ff8844' },
+      ];
+      for (let i = 0; i < stageBeams.length; i++) {
+        const sl = stageBeams[i];
+        const sway = Math.sin(t / 600 + i * 1.3) * 12;
+        const targetY = 60 + Math.sin(t / 900 + i * 2) * 20;
+        ctx.fillStyle = sl.color;
+        ctx.globalAlpha = 0.08 + Math.sin(t / 350 + i) * 0.04;
+        ctx.beginPath();
+        ctx.moveTo(sl.x, 132);
+        ctx.lineTo(sl.x - 10 + sway, targetY);
+        ctx.lineTo(sl.x + 10 + sway, targetY);
+        ctx.lineTo(sl.x + 4, 132);
+        ctx.fill();
+      }
+
+      // Tree disco ball light beams
+      const treeDbx = 32, treeDby = 42;
+      const treeBeamColors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff', '#ffffff', '#ff8844'];
+      for (let i = 0; i < 8; i++) {
+        const angle = (t / 600 + i * 0.785) % (Math.PI * 2);
+        const len = 50 + Math.sin(t / 500 + i) * 15;
+        const ex = treeDbx + Math.cos(angle) * len;
+        const ey = treeDby + Math.sin(angle) * len;
+        ctx.strokeStyle = treeBeamColors[i];
+        ctx.globalAlpha = 0.12 + Math.sin(t / 250 + i * 2) * 0.06;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(treeDbx, treeDby);
+        ctx.lineTo(Math.floor(ex), Math.floor(ey));
+        ctx.stroke();
+      }
+      // Tree disco ball sparkle
+      ctx.fillStyle = '#ffffff';
+      ctx.globalAlpha = 0.6 + Math.sin(t / 120) * 0.3;
+      ctx.fillRect(treeDbx - 1, treeDby - 1, 3, 3);
+
+      // Deck disco ball beams (more of them)
       const dbx = 210, dby = 78;
-      const beamColors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff'];
-      for (let i = 0; i < 6; i++) {
-        const angle = (t / 800 + i * 1.047) % (Math.PI * 2);
-        const len = 40 + Math.sin(t / 600 + i) * 10;
+      for (let i = 0; i < 8; i++) {
+        const angle = (t / 700 + i * 0.785) % (Math.PI * 2);
+        const len = 45 + Math.sin(t / 600 + i) * 12;
         const ex = dbx + Math.cos(angle) * len;
         const ey = dby + Math.sin(angle) * len;
-        ctx.strokeStyle = beamColors[i];
-        ctx.globalAlpha = 0.15 + Math.sin(t / 300 + i * 2) * 0.08;
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = treeBeamColors[(i + 3) % treeBeamColors.length];
+        ctx.globalAlpha = 0.12 + Math.sin(t / 280 + i * 2) * 0.06;
         ctx.beginPath();
         ctx.moveTo(dbx, dby);
         ctx.lineTo(Math.floor(ex), Math.floor(ey));
         ctx.stroke();
       }
-      // Disco ball sparkle
       ctx.fillStyle = '#ffffff';
       ctx.globalAlpha = 0.5 + Math.sin(t / 150) * 0.3;
-      ctx.fillRect(dbx - 1, dby - 1, 2, 2);
-      ctx.globalAlpha = 0.3 + Math.sin(t / 200 + 1) * 0.2;
-      ctx.fillRect(dbx + 2, dby, 1, 1);
-      ctx.fillRect(dbx - 3, dby + 1, 1, 1);
+      ctx.fillRect(dbx - 1, dby - 1, 3, 3);
 
-      // Dance floor colored light patches on ground
-      for (let i = 0; i < 4; i++) {
-        const angle = (t / 1200 + i * 1.57) % (Math.PI * 2);
-        const px = 210 + Math.cos(angle) * 25;
-        const py = 130 + Math.sin(angle) * 8;
-        ctx.fillStyle = beamColors[i % beamColors.length];
-        ctx.globalAlpha = 0.08 + Math.sin(t / 400 + i) * 0.04;
-        fillCircle(ctx, Math.floor(px), Math.floor(py), 8);
+      // Twinkling string lights
+      for (let i = 0; i < 14; i++) {
+        const lx = 72 + i * 8.5;
+        const ly = 86 + Math.sin(i * 0.8) * 1.5;
+        ctx.globalAlpha = 0.5 + Math.sin(t / 200 + i * 1.7) * 0.4;
+        const colors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff', '#ff8844'];
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fillRect(Math.floor(lx), Math.floor(ly), 2, 2);
+        // Tiny glow
+        ctx.globalAlpha = 0.05 + Math.sin(t / 200 + i * 1.7) * 0.03;
+        fillCircle(ctx, Math.floor(lx) + 1, Math.floor(ly) + 1, 4);
+      }
+      // Tree string lights twinkling
+      for (let i = 0; i < 20; i++) {
+        const lx = 40 + i * 9.5;
+        const ly = 52 + Math.sin(lx * 0.03) * 8 + Math.sin(lx * 0.07) * 3;
+        ctx.globalAlpha = 0.4 + Math.sin(t / 180 + i * 2.1) * 0.4;
+        const colors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff', '#ff8844'];
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fillRect(Math.floor(lx), Math.floor(ly), 2, 2);
       }
 
-      // Stage light beams (night - colorful, animated)
-      const stageLights = [
-        { x: 172, color: '#ff4444' },
-        { x: 242, color: '#4444ff' },
-        { x: 157, color: '#44ff44' },
-      ];
-      for (let i = 0; i < stageLights.length; i++) {
-        const sl = stageLights[i];
-        const sway = Math.sin(t / 800 + i * 2) * 8;
-        ctx.fillStyle = sl.color;
-        ctx.globalAlpha = 0.1 + Math.sin(t / 400 + i) * 0.05;
-        ctx.beginPath();
-        ctx.moveTo(sl.x, 131);
-        ctx.lineTo(200 + sway, 85);
-        ctx.lineTo(210 + sway, 85);
-        ctx.lineTo(sl.x + 4, 131);
-        ctx.fill();
+      // Colored light patches on ground from all sources
+      for (let i = 0; i < 8; i++) {
+        const angle = (t / 900 + i * 0.785) % (Math.PI * 2);
+        const px = 128 + Math.cos(angle) * (40 + i * 8);
+        const py = 150 + Math.sin(angle) * 15;
+        const colors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff'];
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.globalAlpha = 0.06 + Math.sin(t / 350 + i) * 0.03;
+        fillCircle(ctx, Math.floor(px), Math.floor(py), 10);
       }
 
       // Bats flying across
