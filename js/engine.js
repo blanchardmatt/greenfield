@@ -14,6 +14,37 @@ const CutsceneEngine = (() => {
   // Active characters on screen
   const characters = {};
 
+  // Remap landscape-canonical coordinates to current mode
+  // Landscape reference: 256x224. Portrait: 144x256.
+  // Non-linear: center-biased so characters don't clip off edges
+  function remapPosition(x, y) {
+    const L = Renderer.getLayout();
+    const refW = 256, refH = 224;
+    if (L.width === refW && L.height === refH) return { x, y };
+
+    // X: proportional remap with center bias
+    // Map 0-256 → 0-144 but compress edges more than center
+    const xNorm = x / refW; // 0 to 1
+    const xCentered = (xNorm - 0.5) * 0.85 + 0.5; // compress toward center
+    const newX = Math.round(Math.max(0, Math.min(L.width - 1, xCentered * L.width)));
+
+    // Y: shift to account for different ground plane
+    // Landscape ground starts ~120, portrait ~90
+    // Scale y proportionally within the usable area
+    const refGround = 120, refBottom = 200;
+    const newGround = L.horizon, newBottom = L.height - 30;
+    if (y < refGround) {
+      // Above ground: proportional
+      const t = y / refGround;
+      return { x: newX, y: Math.round(t * newGround) };
+    } else {
+      // Ground area: remap from landscape ground range to portrait ground range
+      const t = (y - refGround) / (refBottom - refGround);
+      const newY = Math.round(newGround + t * (newBottom - newGround));
+      return { x: newX, y: newY };
+    }
+  }
+
   // Current state
   let currentBackground = null;
   let waitingForInput = false;
@@ -137,7 +168,8 @@ const CutsceneEngine = (() => {
   function beginEnter(action) {
     const char = getOrCreateCharacter(action.character);
     const from = getOffscreenPos(action.from || 'left');
-    const to = action.to || { x: 128, y: 120 };
+    const rawTo = action.to || { x: 128, y: 120 };
+    const to = remapPosition(rawTo.x, rawTo.y);
     const duration = action.duration || 800;
 
     char.x = from.x !== null ? from.x : to.x;
@@ -202,7 +234,8 @@ const CutsceneEngine = (() => {
 
   function beginMove(action) {
     const char = getOrCreateCharacter(action.character);
-    const to = action.to || { x: char.x, y: char.y };
+    const rawTo = action.to || { x: char.x, y: char.y };
+    const to = remapPosition(rawTo.x, rawTo.y);
     const duration = action.duration || 600;
 
     AnimationSystem.addTween(char, 'x', char.x, to.x, duration, 'linear');
@@ -242,7 +275,7 @@ const CutsceneEngine = (() => {
   function beginCredits(action) {
     const lines = action.lines || [];
     const speed = action.speed || 30; // pixels per second
-    const totalHeight = lines.length * 14 + 224; // enough to scroll everything off
+    const totalHeight = lines.length * 14 + Renderer.getInternalSize().height;
     const duration = (totalHeight / speed) * 1000;
     creditsOverlay = {
       lines: lines,
@@ -333,12 +366,16 @@ const CutsceneEngine = (() => {
 
   function beginUfoArrive(action) {
     const char = getOrCreateCharacter(action.character);
-    const targetX = action.to ? action.to.x : 195;
-    const targetY = action.to ? action.to.y : 58;
+    const rawX = action.to ? action.to.x : 195;
+    const rawY = action.to ? action.to.y : 58;
+    const pos = remapPosition(rawX, rawY);
+    const targetX = pos.x;
+    const targetY = pos.y;
     const duration = action.duration || 5000;
     char.visible = false;
+    const L = Renderer.getLayout();
     ufoState = {
-      x: -40, y: 20,
+      x: -60, y: 15,
       targetX: targetX, targetY: targetY,
       phase: 'flyIn', elapsed: 0, duration: duration,
       character: action.character, beamOn: false,
@@ -357,10 +394,11 @@ const CutsceneEngine = (() => {
   function beginUfoDepart(action) {
     const char = action.character ? characters[action.character] : null;
     const duration = action.duration || 5000;
-    const charX = char ? char.x : 195;
-    const charY = char ? char.y : 58;
+    const L = Renderer.getLayout();
+    const charX = char ? char.x : L.lyraX;
+    const charY = char ? char.y : L.lyraY;
     ufoState = {
-      x: 256, y: 15,
+      x: L.width + 20, y: 15,
       targetX: charX, targetY: charY,
       phase: 'flyIn', elapsed: 0, duration: duration,
       character: action.character, beamOn: false,
@@ -380,18 +418,19 @@ const CutsceneEngine = (() => {
     const d = ufoState.duration;
     const progress = Math.min(t / d, 1);
 
+    const W = Renderer.getInternalSize().width;
+
     if (!ufoState.departing) {
       // Arrive: fly in (0-30%), hover + beam down (30-80%), fly away (80-100%)
       if (progress < 0.3) {
         const p = progress / 0.3;
-        ufoState.x = -40 + (ufoState.targetX - 10) * p;
+        ufoState.x = -60 + (ufoState.targetX - 10 + 60) * p;
         ufoState.y = 10 + Math.sin(p * Math.PI) * -10;
         ufoState.beamOn = false;
       } else if (progress < 0.8) {
         ufoState.x = ufoState.targetX - 10;
         ufoState.y = 10;
         ufoState.beamOn = true;
-        // Make character appear partway through beam
         const beamP = (progress - 0.3) / 0.5;
         if (beamP > 0.5 && ufoState.character) {
           const char = characters[ufoState.character];
@@ -405,7 +444,7 @@ const CutsceneEngine = (() => {
         }
       } else {
         const p = (progress - 0.8) / 0.2;
-        ufoState.x = (ufoState.targetX - 10) + (280 - ufoState.targetX) * p;
+        ufoState.x = (ufoState.targetX - 10) + (W + 20 - ufoState.targetX) * p;
         ufoState.y = 10 - p * 30;
         ufoState.beamOn = false;
       }
@@ -413,14 +452,13 @@ const CutsceneEngine = (() => {
       // Depart: fly in (0-25%), hover + beam up (25-75%), fly away (75-100%)
       if (progress < 0.25) {
         const p = progress / 0.25;
-        ufoState.x = 280 - (280 - ufoState.targetX + 10) * p;
+        ufoState.x = (W + 20) - (W + 20 - ufoState.targetX + 10) * p;
         ufoState.y = -20 + 30 * p;
         ufoState.beamOn = false;
       } else if (progress < 0.75) {
         ufoState.x = ufoState.targetX - 10;
         ufoState.y = 10;
         ufoState.beamOn = true;
-        // Hide character partway through beam up
         const beamP = (progress - 0.25) / 0.5;
         if (beamP > 0.6 && ufoState.character) {
           const char = characters[ufoState.character];
@@ -452,10 +490,11 @@ const CutsceneEngine = (() => {
   }
 
   function beginShowProp(action) {
+    const pos = remapPosition(action.x || 0, action.y || 0);
     activeProps.push({
       name: action.prop || 'amplifier',
-      x: action.x || 0,
-      y: action.y || 0,
+      x: pos.x,
+      y: pos.y,
       scale: action.scale || 1,
     });
     return { done: true };
@@ -486,10 +525,11 @@ const CutsceneEngine = (() => {
         const di = dancingChars.indexOf(char);
         const totalDancers = dancingChars.length;
         const angle = (t / 2500 + (di / totalDancers) * Math.PI * 2) % (Math.PI * 2);
-        const centerX = 115;
-        const centerY = 148;
-        const radiusX = 65 + Math.sin(t / 2000) * 8;
-        const radiusY = 25 + Math.sin(t / 2500) * 5;
+        const L = Renderer.getLayout();
+        const centerX = L.danceCenterX;
+        const centerY = L.danceCenterY;
+        const radiusX = L.danceRadiusX + Math.sin(t / 2000) * 8;
+        const radiusY = L.danceRadiusY + Math.sin(t / 2500) * 5;
         char.x = centerX + Math.cos(angle) * radiusX;
         char.y = centerY + Math.sin(angle) * radiusY;
       } else if (char.milling) {
@@ -634,8 +674,9 @@ const CutsceneEngine = (() => {
     const visibleChars = Object.values(characters).filter(c => c.visible);
     for (const char of visibleChars) {
       if (!char.pinned) {
-        const minY = 115, maxY = 195;
-        const minScale = 0.45, maxScale = 1.3;
+        const L = Renderer.getLayout();
+        const minY = L.perspMinY, maxY = L.perspMaxY;
+        const minScale = L.perspMinScale, maxScale = L.perspMaxScale;
         const depthT = Math.max(0, Math.min(1, (char.y - minY) / (maxY - minY)));
         char.renderScale = minScale + depthT * (maxScale - minScale);
       }
@@ -694,7 +735,7 @@ const CutsceneEngine = (() => {
           if (attentionPhase < 0.4) {
             lookAtX = lyraX; // look at Lyra
           } else if (attentionPhase < 0.65) {
-            lookAtX = 115; // look at fire
+            lookAtX = Renderer.getLayout().fireX; // look at fire
           } else if (attentionPhase < 0.85) {
             // Look at a nearby character
             const nearIdx = Math.floor(char.idleSeed * visibleChars.length) % visibleChars.length;
@@ -713,8 +754,8 @@ const CutsceneEngine = (() => {
       if (char.visible && !char.pinned) {
         const charCenterX = char.x + SpriteLibrary.W / 2;
         const charBottom = char.y + SpriteLibrary.H;
-        const distX = Math.abs(charCenterX - 115);
-        const distY = Math.abs(charBottom - 148);
+        const distX = Math.abs(charCenterX - Renderer.getLayout().fireX);
+        const distY = Math.abs(charBottom - Renderer.getLayout().fireY);
         if (distX < 20 && distY < 20) {
           Renderer.drawSmoke(charCenterX, char.y, t, char.idleSeed);
         }
@@ -899,12 +940,14 @@ const CutsceneEngine = (() => {
           // Execute instantly without animation
           if (action.type === 'enter' || action.type === 'ufoArrive') {
             const char = getOrCreateCharacter(action.character);
-            const to = action.to || { x: 128, y: 120 };
+            const rawTo = action.to || { x: 128, y: 120 };
+            const to = remapPosition(rawTo.x, rawTo.y);
             char.x = to.x; char.y = to.y;
             char.baseX = to.x; char.baseY = to.y;
             char.visible = true;
           } else if (action.type === 'showProp') {
-            activeProps.push({ name: action.prop || 'amplifier', x: action.x || 0, y: action.y || 0, scale: action.scale || 1 });
+            const pp = remapPosition(action.x || 0, action.y || 0);
+            activeProps.push({ name: action.prop || 'amplifier', x: pp.x, y: pp.y, scale: action.scale || 1 });
           } else if (action.type === 'setScale') {
             const char = getOrCreateCharacter(action.character);
             char.renderScale = action.scale || 1;

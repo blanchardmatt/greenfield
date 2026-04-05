@@ -10,6 +10,95 @@ const Renderer = (() => {
   let displayCanvas, displayCtx;
   let offscreen, ctx;
 
+  // Layout descriptor — all key positions per mode
+  const LAYOUTS = {
+    landscape: {
+      width: 256, height: 224,
+      // Ground plane
+      horizon: 120, groundStart: 130, groundMid: 155,
+      // Biltroy structure
+      trailerX: 70, trailerY: 88, trailerW: 120, trailerH: 40,
+      roofY: 83,
+      deckX: 190, deckY: 108, deckW: 44, deckH: 26,
+      doorX: 120, doorY: 96,
+      // Trees
+      leftTreeX: 28, leftTreeY: 70,
+      rightTreeX: 215, rightTreeY: 80,
+      leftCanopyX: 32, leftCanopyY: 55,
+      rightCanopyX: 218, rightCanopyY: 68,
+      // Fire
+      fireX: 115, fireY: 148,
+      // Dance
+      danceCenterX: 115, danceCenterY: 148,
+      danceRadiusX: 65, danceRadiusY: 25,
+      // Perspective
+      perspMinY: 115, perspMaxY: 195,
+      perspMinScale: 0.45, perspMaxScale: 1.3,
+      // Stage/performance
+      lyraX: 195, lyraY: 58,
+      ampX: 190, ampY: 96,
+      // Grill area
+      grillX: 38, grillY: 122,
+      // Sky features
+      moonX: 200, moonY: 30,
+      sunDawnX: 200, sunDawnY: 118,
+      sunDayX: 128, sunDayY: 20,
+      sunSetX: 50, sunSetY: 110,
+      // Disco balls
+      treeDiscoBallX: 32, treeDiscoBallY: 42,
+      deckDiscoBallX: 210, deckDiscoBallY: 78,
+      // Ladder guy
+      ladderTopX: 30, ladderTopY: 62,
+      ladderBotX: 58, ladderBotY: 125,
+      // Wheelchair
+      wheelchairY: 78, wheelchairLeft: 72, wheelchairRight: 186,
+    },
+    portrait: {
+      width: 144, height: 256,
+      horizon: 90, groundStart: 105, groundMid: 145,
+      // Trailer: same width, centered with small margins
+      trailerX: 12, trailerY: 78, trailerW: 120, trailerH: 40,
+      roofY: 73,
+      deckX: 100, deckY: 98, deckW: 40, deckH: 24,
+      doorX: 62, doorY: 86,
+      // Trees: left partially offscreen, right shifted in
+      leftTreeX: -10, leftTreeY: 55,
+      rightTreeX: 125, rightTreeY: 65,
+      leftCanopyX: -6, leftCanopyY: 40,
+      rightCanopyX: 128, rightCanopyY: 53,
+      // Fire: centered below trailer
+      fireX: 72, fireY: 158,
+      // Dance: tighter orbit
+      danceCenterX: 72, danceCenterY: 158,
+      danceRadiusX: 42, danceRadiusY: 22,
+      // Perspective: extended for taller screen
+      perspMinY: 100, perspMaxY: 230,
+      perspMinScale: 0.4, perspMaxScale: 1.3,
+      // Stage
+      lyraX: 105, lyraY: 45,
+      ampX: 100, ampY: 86,
+      // Grill
+      grillX: 5, grillY: 105,
+      // Sky
+      moonX: 110, moonY: 25,
+      sunDawnX: 110, sunDawnY: 88,
+      sunDayX: 72, sunDayY: 15,
+      sunSetX: 30, sunSetY: 82,
+      // Disco balls
+      treeDiscoBallX: -4, treeDiscoBallY: 35,
+      deckDiscoBallX: 115, deckDiscoBallY: 68,
+      // Ladder
+      ladderTopX: -5, ladderTopY: 48,
+      ladderBotX: 20, ladderBotY: 102,
+      // Wheelchair
+      wheelchairY: 68, wheelchairLeft: 14, wheelchairRight: 130,
+    },
+  };
+
+  let layout = LAYOUTS.landscape;
+
+  function getLayout() { return layout; }
+
   // Dialogue box dimensions (recalculated on mode change)
   const DIALOG_MARGIN = 4;
   const DIALOG_HEIGHT = 32;
@@ -38,15 +127,10 @@ const Renderer = (() => {
 
   function setVerticalMode(on) {
     verticalMode = !!on;
-    if (verticalMode) {
-      INTERNAL_W = 144;
-      INTERNAL_H = 256;
-      SCALE = 3;
-    } else {
-      INTERNAL_W = 256;
-      INTERNAL_H = 224;
-      SCALE = 3;
-    }
+    layout = verticalMode ? LAYOUTS.portrait : LAYOUTS.landscape;
+    INTERNAL_W = layout.width;
+    INTERNAL_H = layout.height;
+    SCALE = 3;
     applyDimensions();
     return verticalMode;
   }
@@ -242,15 +326,23 @@ const Renderer = (() => {
     // Shared structure drawn by all time-of-day variants
     _biltroy_structure(ctx, palette) {
       const p = palette;
+      const L = layout;
 
-      // Sky (filled by caller before this)
+      // Compute offset from landscape reference to current layout
+      // Landscape reference: trailer at (70,88), ground at 120
+      const dx = L.trailerX - 70;
+      const dy = L.trailerY - 88;
 
-      // Green field
+      // Green field — always fills full width, shifted vertically
       ctx.fillStyle = p.grass;
-      ctx.fillRect(0, 120, INTERNAL_W, INTERNAL_H - 120);
+      ctx.fillRect(0, L.horizon, INTERNAL_W, INTERNAL_H - L.horizon);
       ctx.fillStyle = p.grassDark;
-      ctx.fillRect(0, 150, INTERNAL_W, 8);
-      ctx.fillRect(0, 175, INTERNAL_W, 6);
+      ctx.fillRect(0, L.horizon + 30, INTERNAL_W, 8);
+      ctx.fillRect(0, L.horizon + 55, INTERNAL_W, 6);
+
+      // Translate for all structure elements (trailer, trees, deck)
+      ctx.save();
+      ctx.translate(dx, dy);
 
       // Left oak tree
       ctx.fillStyle = p.trunk;
@@ -339,6 +431,8 @@ const Renderer = (() => {
       ctx.fillRect(55, 132, 3, 2);
       ctx.fillRect(245, 128, 2, 3);
       ctx.fillRect(10, 140, 3, 2);
+
+      ctx.restore(); // end structure translate
     },
 
     biltroy(ctx) {
@@ -357,9 +451,10 @@ const Renderer = (() => {
     },
 
     biltroy_dawn(ctx) {
+      const L = layout;
       // Dawn sky — pink/purple gradient
-      for (let y = 0; y < 120; y++) {
-        const t = y / 120;
+      for (let y = 0; y < L.horizon; y++) {
+        const t = y / L.horizon;
         const r = Math.floor(60 + t * 80);
         const g = Math.floor(30 + t * 50);
         const b = Math.floor(80 + t * 40);
@@ -368,9 +463,9 @@ const Renderer = (() => {
       }
       // Sun peeking over horizon
       ctx.fillStyle = '#ffdd88';
-      fillCircle(ctx, 200, 118, 14);
+      fillCircle(ctx, L.sunDawnX, L.sunDawnY, 14);
       ctx.fillStyle = '#ffcc66';
-      fillCircle(ctx, 200, 118, 10);
+      fillCircle(ctx, L.sunDawnX, L.sunDawnY, 10);
       // Pink clouds
       ctx.fillStyle = '#cc8899';
       ctx.globalAlpha = 0.5;
@@ -393,9 +488,9 @@ const Renderer = (() => {
       ctx.fillRect(0, 0, INTERNAL_W, 120);
       // Sun high in sky
       ctx.fillStyle = '#ffee88';
-      fillCircle(ctx, 128, 20, 12);
+      fillCircle(ctx, layout.sunDayX, layout.sunDayY, 12);
       ctx.fillStyle = '#ffff99';
-      fillCircle(ctx, 128, 20, 8);
+      fillCircle(ctx, layout.sunDayX, layout.sunDayY, 8);
       // White clouds
       ctx.fillStyle = '#ddeeff';
       fillCircle(ctx, 40, 35, 12);
@@ -423,11 +518,11 @@ const Renderer = (() => {
       }
       // Setting sun
       ctx.fillStyle = '#ff6633';
-      fillCircle(ctx, 50, 110, 16);
+      fillCircle(ctx, layout.sunSetX, layout.sunSetY, 16);
       ctx.fillStyle = '#ff8844';
-      fillCircle(ctx, 50, 110, 12);
+      fillCircle(ctx, layout.sunSetX, layout.sunSetY, 12);
       ctx.fillStyle = '#ffaa55';
-      fillCircle(ctx, 50, 110, 8);
+      fillCircle(ctx, layout.sunSetX, layout.sunSetY, 8);
       // Warm clouds
       ctx.fillStyle = '#cc6644';
       ctx.globalAlpha = 0.4;
@@ -469,13 +564,13 @@ const Renderer = (() => {
       ctx.globalAlpha = 1;
       // Spooky moon
       ctx.fillStyle = '#ddeeff';
-      fillCircle(ctx, 200, 30, 16);
+      fillCircle(ctx, layout.moonX, layout.moonY, 16);
       ctx.fillStyle = '#0a0a22';
-      fillCircle(ctx, 206, 26, 14);
+      fillCircle(ctx, layout.moonX + 6, layout.moonY - 4, 14);
       // Moon glow
       ctx.globalAlpha = 0.08;
       ctx.fillStyle = '#8888cc';
-      fillCircle(ctx, 200, 30, 30);
+      fillCircle(ctx, layout.moonX, layout.moonY, 30);
       ctx.globalAlpha = 1;
 
       backgrounds._biltroy_structure(ctx, {
@@ -513,7 +608,7 @@ const Renderer = (() => {
       // String lights across trailer front
       const lightColors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff', '#ff8844'];
       for (let i = 0; i < 14; i++) {
-        const lx = 72 + i * 8.5;
+        const lx = (layout.trailerX + 2) + i * ((layout.trailerW - 4) / 14);
         const ly = 86 + Math.sin(i * 0.8) * 1.5;
         ctx.fillStyle = lightColors[i % lightColors.length];
         ctx.fillRect(Math.floor(lx), Math.floor(ly), 2, 2);
@@ -555,7 +650,7 @@ const Renderer = (() => {
         ctx.fillRect(Math.floor(lx), Math.floor(ly), 1, 1);
       }
       for (let i = 0; i < 20; i++) {
-        const lx = 40 + i * 9.5;
+        const lx = (layout.leftCanopyX + 8) + i * ((layout.rightCanopyX - layout.leftCanopyX - 16) / 20);
         const ly = 52 + Math.sin(lx * 0.03) * 8 + Math.sin(lx * 0.07) * 3;
         ctx.fillStyle = lightColors[i % lightColors.length];
         ctx.fillRect(Math.floor(lx), Math.floor(ly), 2, 2);
@@ -756,8 +851,8 @@ const Renderer = (() => {
 
     _drawFire(ctx, t, scale) {
       const s = scale || 1;
-      const fireX = 115;
-      const fireY = 140;
+      const fireX = layout.fireX;
+      const fireY = layout.fireY - 8;
       const numFlames = Math.round(6 * s);
       for (let i = 0; i < numFlames; i++) {
         const fx = fireX - 3 * s + Math.sin(t / 100 + i * 1.5) * 3 * s;
@@ -789,8 +884,8 @@ const Renderer = (() => {
       ctx.fillStyle = '#448833';
       for (let i = 0; i < 8; i++) {
         const seed = i * 37;
-        const lx = (i < 4 ? 15 : 205) + Math.sin(t / 600 + seed) * 6;
-        const ly = (i < 4 ? 40 : 55) + Math.sin(t / 800 + seed * 1.3) * 4 + (i % 4) * 8;
+        const lx = (i < 4 ? layout.leftCanopyX - 17 : layout.rightCanopyX - 13) + Math.sin(t / 600 + seed) * 6;
+        const ly = (i < 4 ? layout.leftCanopyY - 15 : layout.rightCanopyY - 13) + Math.sin(t / 800 + seed * 1.3) * 4 + (i % 4) * 8;
         ctx.globalAlpha = 0.5 + Math.sin(t / 500 + seed) * 0.2;
         ctx.fillRect(Math.floor(lx), Math.floor(ly), 2, 1);
       }
@@ -822,7 +917,7 @@ const Renderer = (() => {
       // Grass swaying
       ctx.fillStyle = '#6aaa4a';
       for (let i = 0; i < 6; i++) {
-        const gx = 10 + i * 45;
+        const gx = 10 + i * (INTERNAL_W / 6);
         const sway = Math.sin(t / 700 + i * 2) * 2;
         ctx.globalAlpha = 0.6;
         ctx.fillRect(Math.floor(gx + sway), 133, 1, 3);
@@ -1139,7 +1234,7 @@ const Renderer = (() => {
       }
 
       // Tree disco ball light beams
-      const treeDbx = 32, treeDby = 42;
+      const treeDbx = layout.treeDiscoBallX, treeDby = layout.treeDiscoBallY;
       const treeBeamColors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff', '#ffffff', '#ff8844'];
       for (let i = 0; i < 8; i++) {
         const angle = (t / 600 + i * 0.785) % (Math.PI * 2);
@@ -1160,7 +1255,7 @@ const Renderer = (() => {
       ctx.fillRect(treeDbx - 1, treeDby - 1, 3, 3);
 
       // Deck disco ball beams (more of them)
-      const dbx = 210, dby = 78;
+      const dbx = layout.deckDiscoBallX, dby = layout.deckDiscoBallY;
       for (let i = 0; i < 8; i++) {
         const angle = (t / 700 + i * 0.785) % (Math.PI * 2);
         const len = 45 + Math.sin(t / 600 + i) * 12;
@@ -1179,7 +1274,7 @@ const Renderer = (() => {
 
       // Twinkling string lights
       for (let i = 0; i < 14; i++) {
-        const lx = 72 + i * 8.5;
+        const lx = (layout.trailerX + 2) + i * ((layout.trailerW - 4) / 14);
         const ly = 86 + Math.sin(i * 0.8) * 1.5;
         ctx.globalAlpha = 0.5 + Math.sin(t / 200 + i * 1.7) * 0.4;
         const colors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff', '#ff8844'];
@@ -1191,7 +1286,7 @@ const Renderer = (() => {
       }
       // Tree string lights twinkling
       for (let i = 0; i < 20; i++) {
-        const lx = 40 + i * 9.5;
+        const lx = (layout.leftCanopyX + 8) + i * ((layout.rightCanopyX - layout.leftCanopyX - 16) / 20);
         const ly = 52 + Math.sin(lx * 0.03) * 8 + Math.sin(lx * 0.07) * 3;
         ctx.globalAlpha = 0.4 + Math.sin(t / 180 + i * 2.1) * 0.4;
         const colors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff', '#ff8844'];
@@ -1202,7 +1297,7 @@ const Renderer = (() => {
       // Colored light patches on ground from all sources
       for (let i = 0; i < 8; i++) {
         const angle = (t / 900 + i * 0.785) % (Math.PI * 2);
-        const px = 128 + Math.cos(angle) * (40 + i * 8);
+        const px = (INTERNAL_W / 2) + Math.cos(angle) * (40 + i * 8);
         const py = 150 + Math.sin(angle) * 15;
         const colors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff'];
         ctx.fillStyle = colors[i % colors.length];
@@ -1248,8 +1343,8 @@ const Renderer = (() => {
       // Top of ladder rests at about x=30, y=65
       // Bottom of ladder at about x=55, y=125
       ctx.globalAlpha = 1;
-      const ladTopX = 30, ladTopY = 62;
-      const ladBotX = 58, ladBotY = 125;
+      const ladTopX = layout.ladderTopX, ladTopY = layout.ladderTopY;
+      const ladBotX = layout.ladderBotX, ladBotY = layout.ladderBotY;
       const ladDx = ladBotX - ladTopX;
       const ladDy = ladBotY - ladTopY;
       // Draw two diagonal rails
@@ -1324,9 +1419,9 @@ const Renderer = (() => {
       if (armR > 0.5) ctx.fillRect(Math.floor(ladX + 14 + leanX), raY - 3, 2, 3);
 
       // Wheelchair rider on the roof of the Biltroy
-      const roofY = 78;
-      const roofLeft = 72;
-      const roofRight = 186;
+      const roofY = layout.wheelchairY;
+      const roofLeft = layout.wheelchairLeft;
+      const roofRight = layout.wheelchairRight;
       const roofW = roofRight - roofLeft;
       // Ping-pong back and forth
       const wheelCycle = 8000;
@@ -1769,7 +1864,7 @@ const Renderer = (() => {
     drawBackground, drawProp, drawBonfire, drawUfo, drawCharacter, drawCharacterWithOffset, drawEmoteBubble, drawMusicNotes, drawSmoke,
     drawDialogueBox, drawDialogueText, drawFadeOverlay,
     drawTitleOverlay, drawCreditsOverlay,
-    getTextMaxWidth, getTextScale, getInternalSize, setVerticalMode, isVertical,
+    getTextMaxWidth, getTextScale, getInternalSize, setVerticalMode, isVertical, getLayout,
     getBackgroundNames, renderBackgroundToCanvas,
   };
 })();
