@@ -46,7 +46,8 @@ ${css}
 <canvas id="display-canvas" width="768" height="672"></canvas>
 </div>
 <div id="controls">
-<label class="toolbar-btn" id="btn-load" style="font-family:monospace;font-size:13px;background:#2a2a4e;color:#aaa;border:1px solid #444;padding:6px 14px;cursor:pointer">Load Script <input type="file" id="script-file" accept=".json" style="display:none"></label>
+<button id="btn-load">Load Script</button>
+<input type="file" id="script-file" accept=".json,text/plain" style="display:none">
 <button id="btn-demo">Demo</button>
 <button id="btn-serenade">Serenade</button>
 <button id="btn-restart">Restart</button>
@@ -79,20 +80,26 @@ ${engineJs}
     if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); CutsceneEngine.handleInput('advance'); }
     else if (e.code === 'Escape') CutsceneEngine.handleInput('skip');
   });
+  document.getElementById('btn-load').addEventListener('click', function() {
+    document.getElementById('script-file').click();
+  });
   document.getElementById('script-file').addEventListener('change', function(e) {
     var file = e.target.files[0];
     if (!file) return;
     var reader = new FileReader();
     reader.onload = function() {
       try {
-        var raw = JSON.parse(reader.result);
+        var text = reader.result;
+        if (typeof text !== 'string') { alert('Error: could not read file as text'); return; }
+        text = text.trim();
+        var raw = JSON.parse(text);
         var parsed = ScriptParser.loadFromObject(raw);
         window._lastScript = parsed;
         CutsceneEngine.stop();
         CutsceneEngine.play(parsed);
-      } catch (err) { alert('Error: ' + err.message); }
+      } catch (err) { alert('Error: ' + err.message + '\\nFirst 100 chars: ' + String(reader.result).substring(0, 100)); }
     };
-    reader.readAsText(file);
+    reader.readAsText(file, 'UTF-8');
   });
   document.getElementById('btn-demo').addEventListener('click', () => playScript(DEMO_SCRIPT));
   document.getElementById('btn-serenade').addEventListener('click', () => playScript(SERENADE_SCRIPT));
