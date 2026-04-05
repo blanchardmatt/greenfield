@@ -198,74 +198,64 @@ const Renderer = (() => {
       }
     },
 
-    biltroy(ctx) {
-      // Sky
-      ctx.fillStyle = '#6699cc';
-      ctx.fillRect(0, 0, INTERNAL_W, 120);
+    // --- The Biltroy helper ---
+    // Shared structure drawn by all time-of-day variants
+    _biltroy_structure(ctx, palette) {
+      const p = palette;
 
-      // Wispy clouds
-      ctx.fillStyle = '#aaccee';
-      fillCircle(ctx, 50, 25, 12);
-      fillCircle(ctx, 65, 22, 15);
-      fillCircle(ctx, 80, 26, 11);
-      fillCircle(ctx, 190, 35, 10);
-      fillCircle(ctx, 205, 32, 13);
+      // Sky (filled by caller before this)
 
       // Green field
-      ctx.fillStyle = '#5a9a3a';
+      ctx.fillStyle = p.grass;
       ctx.fillRect(0, 120, INTERNAL_W, INTERNAL_H - 120);
-      // Darker grass stripe
-      ctx.fillStyle = '#4a8a2a';
+      ctx.fillStyle = p.grassDark;
       ctx.fillRect(0, 150, INTERNAL_W, 8);
       ctx.fillRect(0, 175, INTERNAL_W, 6);
 
       // Left oak tree
-      ctx.fillStyle = '#554422';
-      ctx.fillRect(28, 70, 8, 55); // trunk
-      ctx.fillStyle = '#336622';
+      ctx.fillStyle = p.trunk;
+      ctx.fillRect(28, 70, 8, 55);
+      ctx.fillStyle = p.leafDark;
       fillCircle(ctx, 32, 55, 22);
-      ctx.fillStyle = '#448833';
+      ctx.fillStyle = p.leaf;
       fillCircle(ctx, 25, 50, 14);
       fillCircle(ctx, 40, 48, 16);
       fillCircle(ctx, 30, 42, 12);
 
-      // Right oak tree (further back, smaller)
-      ctx.fillStyle = '#554422';
-      ctx.fillRect(215, 80, 6, 42); // trunk
-      ctx.fillStyle = '#336622';
+      // Right oak tree
+      ctx.fillStyle = p.trunk;
+      ctx.fillRect(215, 80, 6, 42);
+      ctx.fillStyle = p.leafDark;
       fillCircle(ctx, 218, 68, 16);
-      ctx.fillStyle = '#448833';
+      ctx.fillStyle = p.leaf;
       fillCircle(ctx, 212, 64, 11);
       fillCircle(ctx, 225, 62, 13);
 
-      // The Biltroy — double-wide trailer
-      // Main body
-      ctx.fillStyle = '#ccbbaa'; // beige siding
+      // Trailer body
+      ctx.fillStyle = p.siding;
       ctx.fillRect(70, 88, 120, 40);
-      // Darker bottom half
-      ctx.fillStyle = '#bbaa99';
+      ctx.fillStyle = p.sidingDark;
       ctx.fillRect(70, 108, 120, 20);
       // Roof
-      ctx.fillStyle = '#777777';
+      ctx.fillStyle = p.roof;
       ctx.fillRect(68, 84, 124, 6);
-      ctx.fillStyle = '#666666';
+      ctx.fillStyle = p.roofDark;
       ctx.fillRect(68, 83, 124, 2);
       // Outline
       ctx.fillStyle = '#444444';
-      ctx.fillRect(70, 88, 120, 1); // top edge
-      ctx.fillRect(70, 127, 120, 1); // bottom edge
-      ctx.fillRect(70, 88, 1, 40); // left edge
-      ctx.fillRect(189, 88, 1, 40); // right edge
+      ctx.fillRect(70, 88, 120, 1);
+      ctx.fillRect(70, 127, 120, 1);
+      ctx.fillRect(70, 88, 1, 40);
+      ctx.fillRect(189, 88, 1, 40);
 
       // Windows
-      ctx.fillStyle = '#88bbdd';
+      ctx.fillStyle = p.windowColor;
       ctx.fillRect(80, 95, 14, 10);
       ctx.fillRect(100, 95, 14, 10);
       ctx.fillRect(140, 95, 14, 10);
       ctx.fillRect(160, 95, 14, 10);
-      // Window frames
       ctx.fillStyle = '#eeeeee';
-      ctx.fillRect(86, 95, 2, 10); // mullion
+      ctx.fillRect(86, 95, 2, 10);
       ctx.fillRect(106, 95, 2, 10);
       ctx.fillRect(146, 95, 2, 10);
       ctx.fillRect(166, 95, 2, 10);
@@ -275,51 +265,41 @@ const Renderer = (() => {
       ctx.fillRect(120, 96, 12, 32);
       ctx.fillStyle = '#775533';
       ctx.fillRect(120, 96, 12, 1);
-      // Doorknob
       ctx.fillStyle = '#ccaa44';
       ctx.fillRect(129, 112, 2, 2);
 
-      // Skirt (under trailer)
+      // Skirt & supports
       ctx.fillStyle = '#999988';
       ctx.fillRect(70, 128, 120, 4);
-
-      // Cinder block supports
       ctx.fillStyle = '#888888';
       ctx.fillRect(78, 128, 6, 6);
       ctx.fillRect(128, 128, 6, 6);
       ctx.fillRect(178, 128, 6, 6);
 
-      // Wooden deck on right side
-      ctx.fillStyle = '#aa8855';
+      // Deck
+      ctx.fillStyle = p.deck;
       ctx.fillRect(190, 108, 44, 26);
-      // Deck planks
-      ctx.fillStyle = '#997744';
+      ctx.fillStyle = p.deckDark;
       ctx.fillRect(190, 114, 44, 1);
       ctx.fillRect(190, 120, 44, 1);
       ctx.fillRect(190, 126, 44, 1);
-      // Deck railing posts
-      ctx.fillStyle = '#886633';
+      ctx.fillStyle = p.deckDark;
       ctx.fillRect(190, 102, 3, 8);
       ctx.fillRect(210, 102, 3, 8);
       ctx.fillRect(231, 102, 3, 8);
-      // Railing bar
       ctx.fillRect(190, 104, 44, 2);
-      // Deck steps
-      ctx.fillStyle = '#997744';
+      ctx.fillStyle = p.deckDark;
       ctx.fillRect(220, 132, 14, 4);
       ctx.fillRect(222, 136, 10, 4);
 
-      // Bonfire pit (in front yard)
-      // Stone ring
+      // Bonfire pit
       ctx.fillStyle = '#777766';
       fillCircle(ctx, 145, 148, 8);
-      ctx.fillStyle = '#5a9a3a'; // green center to match grass
+      ctx.fillStyle = p.grass;
       fillCircle(ctx, 145, 148, 5);
-      // Logs
       ctx.fillStyle = '#664422';
       ctx.fillRect(140, 146, 12, 3);
       ctx.fillRect(143, 144, 3, 8);
-      // Static fire base
       ctx.fillStyle = '#cc5522';
       ctx.fillRect(142, 140, 8, 6);
       ctx.fillStyle = '#ff8833';
@@ -327,11 +307,160 @@ const Renderer = (() => {
       ctx.fillStyle = '#ffcc44';
       ctx.fillRect(144, 136, 4, 4);
 
-      // Small grass tufts
-      ctx.fillStyle = '#6aaa4a';
+      // Grass tufts
+      ctx.fillStyle = p.leaf;
       ctx.fillRect(55, 132, 3, 2);
       ctx.fillRect(245, 128, 2, 3);
       ctx.fillRect(10, 140, 3, 2);
+    },
+
+    biltroy(ctx) {
+      ctx.fillStyle = '#6699cc';
+      ctx.fillRect(0, 0, INTERNAL_W, 120);
+      ctx.fillStyle = '#aaccee';
+      fillCircle(ctx, 50, 25, 12);
+      fillCircle(ctx, 65, 22, 15);
+      fillCircle(ctx, 80, 26, 11);
+      backgrounds._biltroy_structure(ctx, {
+        grass: '#5a9a3a', grassDark: '#4a8a2a', trunk: '#554422',
+        leaf: '#448833', leafDark: '#336622', siding: '#ccbbaa',
+        sidingDark: '#bbaa99', roof: '#777777', roofDark: '#666666',
+        windowColor: '#88bbdd', deck: '#aa8855', deckDark: '#997744',
+      });
+    },
+
+    biltroy_dawn(ctx) {
+      // Dawn sky — pink/purple gradient
+      for (let y = 0; y < 120; y++) {
+        const t = y / 120;
+        const r = Math.floor(60 + t * 80);
+        const g = Math.floor(30 + t * 50);
+        const b = Math.floor(80 + t * 40);
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fillRect(0, y, INTERNAL_W, 1);
+      }
+      // Sun peeking over horizon
+      ctx.fillStyle = '#ffdd88';
+      fillCircle(ctx, 200, 118, 14);
+      ctx.fillStyle = '#ffcc66';
+      fillCircle(ctx, 200, 118, 10);
+      // Pink clouds
+      ctx.fillStyle = '#cc8899';
+      ctx.globalAlpha = 0.5;
+      fillCircle(ctx, 60, 30, 12);
+      fillCircle(ctx, 75, 27, 14);
+      fillCircle(ctx, 160, 40, 10);
+      fillCircle(ctx, 175, 37, 12);
+      ctx.globalAlpha = 1;
+      backgrounds._biltroy_structure(ctx, {
+        grass: '#3a7a2a', grassDark: '#2a6a1a', trunk: '#443322',
+        leaf: '#336622', leafDark: '#224411', siding: '#aa9988',
+        sidingDark: '#998877', roof: '#666666', roofDark: '#555555',
+        windowColor: '#667799', deck: '#887744', deckDark: '#776633',
+      });
+    },
+
+    biltroy_day(ctx) {
+      // Bright blue sky
+      ctx.fillStyle = '#5599dd';
+      ctx.fillRect(0, 0, INTERNAL_W, 120);
+      // Sun high in sky
+      ctx.fillStyle = '#ffee88';
+      fillCircle(ctx, 128, 20, 12);
+      ctx.fillStyle = '#ffff99';
+      fillCircle(ctx, 128, 20, 8);
+      // White clouds
+      ctx.fillStyle = '#ddeeff';
+      fillCircle(ctx, 40, 35, 12);
+      fillCircle(ctx, 55, 31, 15);
+      fillCircle(ctx, 70, 35, 11);
+      fillCircle(ctx, 180, 25, 10);
+      fillCircle(ctx, 195, 22, 13);
+      backgrounds._biltroy_structure(ctx, {
+        grass: '#5aaa3a', grassDark: '#4a9a2a', trunk: '#664433',
+        leaf: '#55aa44', leafDark: '#338833', siding: '#ddccbb',
+        sidingDark: '#ccbbaa', roof: '#888888', roofDark: '#777777',
+        windowColor: '#99ccee', deck: '#bbaa66', deckDark: '#aa9955',
+      });
+    },
+
+    biltroy_sunset(ctx) {
+      // Orange/red sunset sky
+      for (let y = 0; y < 120; y++) {
+        const t = y / 120;
+        const r = Math.floor(180 - t * 40);
+        const g = Math.floor(80 + t * 30);
+        const b = Math.floor(40 + t * 20);
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fillRect(0, y, INTERNAL_W, 1);
+      }
+      // Setting sun
+      ctx.fillStyle = '#ff6633';
+      fillCircle(ctx, 50, 110, 16);
+      ctx.fillStyle = '#ff8844';
+      fillCircle(ctx, 50, 110, 12);
+      ctx.fillStyle = '#ffaa55';
+      fillCircle(ctx, 50, 110, 8);
+      // Warm clouds
+      ctx.fillStyle = '#cc6644';
+      ctx.globalAlpha = 0.4;
+      fillCircle(ctx, 90, 30, 14);
+      fillCircle(ctx, 108, 26, 16);
+      fillCircle(ctx, 200, 45, 12);
+      ctx.globalAlpha = 1;
+      backgrounds._biltroy_structure(ctx, {
+        grass: '#4a7a2a', grassDark: '#3a6a1a', trunk: '#443322',
+        leaf: '#447733', leafDark: '#335522', siding: '#bb9977',
+        sidingDark: '#aa8866', roof: '#666655', roofDark: '#555544',
+        windowColor: '#dd9966', deck: '#997744', deckDark: '#886633',
+      });
+    },
+
+    biltroy_night(ctx) {
+      // Dark night sky
+      ctx.fillStyle = '#0a0a22';
+      ctx.fillRect(0, 0, INTERNAL_W, 120);
+      // Stars
+      ctx.fillStyle = '#ffffff';
+      let seed = 54321;
+      for (let i = 0; i < 40; i++) {
+        seed = (seed * 16807) % 2147483647;
+        const sx = seed % INTERNAL_W;
+        seed = (seed * 16807) % 2147483647;
+        const sy = seed % 110;
+        ctx.globalAlpha = 0.3 + (seed % 50) / 100;
+        ctx.fillRect(sx, sy, 1, 1);
+      }
+      ctx.globalAlpha = 1;
+      // Spooky moon
+      ctx.fillStyle = '#ddeeff';
+      fillCircle(ctx, 200, 30, 16);
+      ctx.fillStyle = '#0a0a22';
+      fillCircle(ctx, 206, 26, 14);
+      // Moon glow
+      ctx.globalAlpha = 0.08;
+      ctx.fillStyle = '#8888cc';
+      fillCircle(ctx, 200, 30, 30);
+      ctx.globalAlpha = 1;
+
+      backgrounds._biltroy_structure(ctx, {
+        grass: '#1a3a1a', grassDark: '#0a2a0a', trunk: '#221100',
+        leaf: '#1a3311', leafDark: '#112208', siding: '#555544',
+        sidingDark: '#444433', roof: '#333333', roofDark: '#222222',
+        windowColor: '#ffcc44', deck: '#554422', deckDark: '#443311',
+      });
+
+      // Disco ball (above deck area)
+      ctx.fillStyle = '#cccccc';
+      fillCircle(ctx, 210, 78, 6);
+      ctx.fillStyle = '#eeeeee';
+      ctx.fillRect(208, 79, 2, 1);
+      ctx.fillRect(211, 77, 2, 1);
+      ctx.fillRect(213, 80, 1, 2);
+      ctx.fillRect(207, 76, 1, 1);
+      // String to roof
+      ctx.fillStyle = '#888888';
+      ctx.fillRect(210, 72, 1, 6);
     },
   };
 
@@ -598,6 +727,94 @@ const Renderer = (() => {
         ctx.fillRect(Math.floor(gx + sway), 133, 1, 3);
         ctx.fillRect(Math.floor(gx + sway + 2), 132, 1, 4);
       }
+      ctx.globalAlpha = 1;
+    },
+
+    biltroy_dawn(ctx, t) {
+      // Reuse biltroy fire + nature animations
+      bgAnimations.biltroy(ctx, t);
+    },
+
+    biltroy_day(ctx, t) {
+      bgAnimations.biltroy(ctx, t);
+    },
+
+    biltroy_sunset(ctx, t) {
+      bgAnimations.biltroy(ctx, t);
+    },
+
+    biltroy_night(ctx, t) {
+      // Bonfire (bigger glow at night)
+      const fireX = 145, fireY = 140;
+      for (let i = 0; i < 6; i++) {
+        const fx = fireX - 3 + Math.sin(t / 100 + i * 1.5) * 3;
+        const fy = fireY - 4 - i * 2 + Math.sin(t / 150 + i * 2) * 2;
+        const colors = ['#ff4411', '#ff6622', '#ff8833', '#ffaa44', '#ffcc55', '#ffee88'];
+        ctx.fillStyle = colors[i];
+        ctx.globalAlpha = 0.9 - i * 0.06;
+        const w = 7 - i * 0.5;
+        ctx.fillRect(Math.floor(fx), Math.floor(fy), Math.ceil(w), 3);
+      }
+      // Big sparks
+      ctx.fillStyle = '#ffcc44';
+      for (let i = 0; i < 8; i++) {
+        const age = ((t / 18 + i * 20) % 100);
+        const sx = fireX + Math.sin(t / 250 + i * 3) * (5 + age * 0.15);
+        const sy = fireY - 10 - age;
+        ctx.globalAlpha = Math.max(0, 0.8 - age * 0.008);
+        ctx.fillRect(Math.floor(sx), Math.floor(sy), 1, 1);
+      }
+      // Big fire glow
+      ctx.globalAlpha = 0.15 + Math.sin(t / 200) * 0.05;
+      ctx.fillStyle = '#ff6633';
+      fillCircle(ctx, fireX, fireY + 4, 20);
+
+      // Twinkling stars
+      let seed = 54321;
+      for (let i = 0; i < 40; i++) {
+        seed = (seed * 16807) % 2147483647;
+        const sx = seed % INTERNAL_W;
+        seed = (seed * 16807) % 2147483647;
+        const sy = seed % 110;
+        ctx.globalAlpha = 0.2 + Math.sin(t / 500 + i * 1.1) * 0.3;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(sx, sy, 1, 1);
+      }
+
+      // Disco ball light beams
+      const dbx = 210, dby = 78;
+      const beamColors = ['#ff4444', '#44ff44', '#4444ff', '#ffff44', '#ff44ff', '#44ffff'];
+      for (let i = 0; i < 6; i++) {
+        const angle = (t / 800 + i * 1.047) % (Math.PI * 2);
+        const len = 40 + Math.sin(t / 600 + i) * 10;
+        const ex = dbx + Math.cos(angle) * len;
+        const ey = dby + Math.sin(angle) * len;
+        ctx.strokeStyle = beamColors[i];
+        ctx.globalAlpha = 0.15 + Math.sin(t / 300 + i * 2) * 0.08;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(dbx, dby);
+        ctx.lineTo(Math.floor(ex), Math.floor(ey));
+        ctx.stroke();
+      }
+      // Disco ball sparkle
+      ctx.fillStyle = '#ffffff';
+      ctx.globalAlpha = 0.5 + Math.sin(t / 150) * 0.3;
+      ctx.fillRect(dbx - 1, dby - 1, 2, 2);
+      ctx.globalAlpha = 0.3 + Math.sin(t / 200 + 1) * 0.2;
+      ctx.fillRect(dbx + 2, dby, 1, 1);
+      ctx.fillRect(dbx - 3, dby + 1, 1, 1);
+
+      // Dance floor colored light patches on ground
+      for (let i = 0; i < 4; i++) {
+        const angle = (t / 1200 + i * 1.57) % (Math.PI * 2);
+        const px = 210 + Math.cos(angle) * 25;
+        const py = 130 + Math.sin(angle) * 8;
+        ctx.fillStyle = beamColors[i % beamColors.length];
+        ctx.globalAlpha = 0.08 + Math.sin(t / 400 + i) * 0.04;
+        fillCircle(ctx, Math.floor(px), Math.floor(py), 8);
+      }
+
       ctx.globalAlpha = 1;
     },
   };
