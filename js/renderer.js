@@ -11,9 +11,9 @@ const Renderer = (() => {
 
   // Dialogue box dimensions (in internal resolution)
   const DIALOG_MARGIN = 4;
-  const DIALOG_HEIGHT = 44;
+  const DIALOG_HEIGHT = 32;
   const DIALOG_Y = INTERNAL_H - DIALOG_HEIGHT - DIALOG_MARGIN;
-  const TEXT_PADDING = 4;
+  const TEXT_PADDING = 3;
   const TEXT_SCALE = 1;
 
   function init(canvasElement) {

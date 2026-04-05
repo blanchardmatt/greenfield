@@ -1502,9 +1502,9 @@ const Renderer = (() => {
 
   // Dialogue box dimensions (in internal resolution)
   const DIALOG_MARGIN = 4;
-  const DIALOG_HEIGHT = 44;
+  const DIALOG_HEIGHT = 32;
   const DIALOG_Y = INTERNAL_H - DIALOG_HEIGHT - DIALOG_MARGIN;
-  const TEXT_PADDING = 4;
+  const TEXT_PADDING = 3;
   const TEXT_SCALE = 1;
 
   function init(canvasElement) {
@@ -3318,7 +3318,7 @@ const SHARDS_SCRIPT = {
           "character": "elder",
           "from": "right",
           "to": {
-            "x": 10,
+            "x": 8,
             "y": 130
           },
           "duration": 600
@@ -3333,8 +3333,8 @@ const SHARDS_SCRIPT = {
           "character": "hero",
           "from": "left",
           "to": {
-            "x": 45,
-            "y": 125
+            "x": 40,
+            "y": 127
           },
           "duration": 600
         },
@@ -3348,8 +3348,8 @@ const SHARDS_SCRIPT = {
           "character": "gimli",
           "from": "left",
           "to": {
-            "x": 75,
-            "y": 135
+            "x": 72,
+            "y": 132
           },
           "duration": 600
         },
@@ -3368,7 +3368,7 @@ const SHARDS_SCRIPT = {
           "character": "swift",
           "from": "right",
           "to": {
-            "x": 155,
+            "x": 170,
             "y": 128
           },
           "duration": 600
@@ -3378,8 +3378,8 @@ const SHARDS_SCRIPT = {
           "character": "hank",
           "from": "left",
           "to": {
-            "x": 110,
-            "y": 133
+            "x": 100,
+            "y": 130
           },
           "duration": 600
         },
@@ -3481,8 +3481,8 @@ const SHARDS_SCRIPT = {
           "character": "princess",
           "from": "right",
           "to": {
-            "x": 165,
-            "y": 125
+            "x": 178,
+            "y": 126
           },
           "duration": 600
         },
@@ -3502,8 +3502,8 @@ const SHARDS_SCRIPT = {
           "character": "brother_sol",
           "from": "left",
           "to": {
-            "x": 25,
-            "y": 133
+            "x": 22,
+            "y": 132
           },
           "duration": 600
         },
@@ -3512,7 +3512,7 @@ const SHARDS_SCRIPT = {
           "character": "shade",
           "from": "right",
           "to": {
-            "x": 130,
+            "x": 160,
             "y": 130
           },
           "duration": 600
@@ -3532,7 +3532,7 @@ const SHARDS_SCRIPT = {
           "character": "wizard",
           "from": "left",
           "to": {
-            "x": 60,
+            "x": 55,
             "y": 128
           },
           "duration": 600
@@ -3542,8 +3542,8 @@ const SHARDS_SCRIPT = {
           "character": "lily",
           "from": "right",
           "to": {
-            "x": 95,
-            "y": 135
+            "x": 88,
+            "y": 133
           },
           "duration": 600
         },
@@ -3552,7 +3552,7 @@ const SHARDS_SCRIPT = {
           "character": "pip",
           "from": "left",
           "to": {
-            "x": 140,
+            "x": 175,
             "y": 132
           },
           "duration": 600
@@ -3628,7 +3628,7 @@ const SHARDS_SCRIPT = {
           "character": "morgana",
           "from": "right",
           "to": {
-            "x": 170,
+            "x": 185,
             "y": 130
           },
           "duration": 600
@@ -3649,8 +3649,8 @@ const SHARDS_SCRIPT = {
           "character": "dark_lord",
           "from": "right",
           "to": {
-            "x": 150,
-            "y": 125
+            "x": 165,
+            "y": 126
           },
           "duration": 600
         },
@@ -3659,8 +3659,8 @@ const SHARDS_SCRIPT = {
           "character": "duke",
           "from": "left",
           "to": {
-            "x": 35,
-            "y": 132
+            "x": 30,
+            "y": 131
           },
           "duration": 600
         },
@@ -4310,7 +4310,13 @@ const CutsceneEngine = (() => {
         // Wandering near base position — mostly horizontal, grounded
         const wx = Math.sin(t / 2000 + seed) * 10 + Math.sin(t / 3000 + seed * 2) * 5;
         const wy = Math.sin(t / 2500 + seed * 1.5) * 1.5;
-        char.x = char.baseX + wx;
+        let nx = char.baseX + wx;
+        // Avoid the bonfire zone (x=125-165)
+        const charRight = nx + SpriteLibrary.W;
+        if (nx < 165 && charRight > 125 && char.baseY > 120) {
+          nx = char.baseX < 145 ? Math.min(nx, 125 - SpriteLibrary.W) : Math.max(nx, 165);
+        }
+        char.x = nx;
         char.y = char.baseY + wy;
       } else {
         // Subtle idle bob — slight vertical bounce

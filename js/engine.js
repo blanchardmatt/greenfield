@@ -365,7 +365,13 @@ const CutsceneEngine = (() => {
         // Wandering near base position — mostly horizontal, grounded
         const wx = Math.sin(t / 2000 + seed) * 10 + Math.sin(t / 3000 + seed * 2) * 5;
         const wy = Math.sin(t / 2500 + seed * 1.5) * 1.5;
-        char.x = char.baseX + wx;
+        let nx = char.baseX + wx;
+        // Avoid the bonfire zone (x=125-165)
+        const charRight = nx + SpriteLibrary.W;
+        if (nx < 165 && charRight > 125 && char.baseY > 120) {
+          nx = char.baseX < 145 ? Math.min(nx, 125 - SpriteLibrary.W) : Math.max(nx, 165);
+        }
+        char.x = nx;
         char.y = char.baseY + wy;
       } else {
         // Subtle idle bob — slight vertical bounce
