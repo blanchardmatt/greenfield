@@ -21,6 +21,7 @@ const scriptParserJs = read('js/script-parser.js');
 const engineJs = read('js/engine.js');
 const demoJson = read('scripts/demo.json');
 const serenadeJson = read('scripts/the-serenade.json');
+const shardsJson = read('scripts/shards-of-the-sound.json');
 
 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -50,6 +51,7 @@ ${css}
 <input type="file" id="script-file" accept=".json,text/plain" style="display:none">
 <button id="btn-demo">Demo</button>
 <button id="btn-serenade">Serenade</button>
+<button id="btn-shards">Shards</button>
 <button id="btn-restart">Restart</button>
 </div>
 <div id="hint">Tap / Space to advance dialogue</div>
@@ -67,6 +69,8 @@ ${scriptParserJs}
 const DEMO_SCRIPT = ${demoJson.trim()};
 
 const SERENADE_SCRIPT = ${serenadeJson.trim()};
+
+const SHARDS_SCRIPT = ${shardsJson.trim()};
 
 ${engineJs}
 
@@ -103,6 +107,7 @@ ${engineJs}
   });
   document.getElementById('btn-demo').addEventListener('click', () => playScript(DEMO_SCRIPT));
   document.getElementById('btn-serenade').addEventListener('click', () => playScript(SERENADE_SCRIPT));
+  document.getElementById('btn-shards').addEventListener('click', () => playScript(SHARDS_SCRIPT));
   document.getElementById('btn-restart').addEventListener('click', () => { if (window._lastScript) { CutsceneEngine.stop(); CutsceneEngine.play(window._lastScript); } });
   playScript(DEMO_SCRIPT);
   function playScript(data) {

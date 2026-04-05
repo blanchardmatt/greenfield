@@ -122,6 +122,7 @@ button:hover {
 <input type="file" id="script-file" accept=".json,text/plain" style="display:none">
 <button id="btn-demo">Demo</button>
 <button id="btn-serenade">Serenade</button>
+<button id="btn-shards">Shards</button>
 <button id="btn-restart">Restart</button>
 </div>
 <div id="hint">Tap / Space to advance dialogue</div>
@@ -1679,6 +1680,161 @@ const SERENADE_SCRIPT = {
   ]
 };
 
+const SHARDS_SCRIPT = {
+  "title": "Misophonia",
+  "settings": {
+    "resolution": [256, 224],
+    "textSpeed": 40
+  },
+  "characters": {
+    "lyra": {
+      "sprite": "dark_elf_ranger",
+      "name": "Lyra",
+      "nameColor": "#aa66dd"
+    },
+    "elder": {
+      "sprite": "oldman",
+      "name": "Elder Morin",
+      "nameColor": "#ffaa55"
+    },
+    "hero": {
+      "sprite": "warrior",
+      "name": "Aldric",
+      "nameColor": "#55aaff"
+    },
+    "princess": {
+      "sprite": "princess",
+      "name": "Princess Elara",
+      "nameColor": "#ff88cc"
+    },
+    "wizard": {
+      "sprite": "mage",
+      "name": "Thalos",
+      "nameColor": "#cc88ff"
+    },
+    "dark_lord": {
+      "sprite": "villain",
+      "name": "Lord Malachar",
+      "nameColor": "#ff4444"
+    }
+  },
+  "scenes": [
+    {
+      "id": "verse1_noise",
+      "background": "village",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 2000 },
+        { "type": "enter", "character": "lyra", "from": "left", "to": { "x": 110, "y": 100 }, "duration": 1200 },
+        { "type": "wait", "duration": 800 },
+        { "type": "dialogue", "character": "lyra", "text": "White noise screaming out..." },
+        { "type": "shake", "intensity": 2, "duration": 400 },
+        { "type": "dialogue", "character": "lyra", "text": "Coach wheels on cobblestone." },
+        { "type": "enter", "character": "elder", "from": "right", "to": { "x": 200, "y": 108 }, "duration": 1000 },
+        { "type": "wait", "duration": 300 },
+        { "type": "dialogue", "character": "lyra", "text": "Ice picks peppered in... whispers and hushed tones." },
+        { "type": "wait", "duration": 500 },
+        { "type": "dialogue", "character": "lyra", "text": "Popcorn ceiling's a frown. Nerve endings barnacled." },
+        { "type": "shake", "intensity": 3, "duration": 500 },
+        { "type": "enter", "character": "hero", "from": "left", "to": { "x": 20, "y": 110 }, "duration": 800 },
+        { "type": "dialogue", "character": "lyra", "text": "Full stalled spinning out... unkempt and overgrown." },
+        { "type": "wait", "duration": 600 },
+        { "type": "emote", "character": "lyra", "emote": "anger", "duration": 1200 },
+        { "type": "dialogue", "character": "lyra", "text": "Why so loud..." },
+        { "type": "shake", "intensity": 4, "duration": 600 },
+        { "type": "emote", "character": "hero", "emote": "surprise", "duration": 1000 },
+        { "type": "wait", "duration": 400 },
+        { "type": "dialogue", "character": "lyra", "text": "Run it sideways and return." },
+        { "type": "dialogue", "character": "lyra", "text": "A plastic click of a pen and..." },
+        { "type": "wait", "duration": 500 },
+        { "type": "shake", "intensity": 5, "duration": 800 },
+        { "type": "dialogue", "character": "lyra", "text": "My spiral can't unwind." },
+        { "type": "wait", "duration": 1000 },
+        { "type": "transition", "effect": "fadeOut", "duration": 1500 }
+      ]
+    },
+    {
+      "id": "verse2_nature",
+      "background": "forest",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 2000 },
+        { "type": "enter", "character": "lyra", "from": "bottom", "to": { "x": 110, "y": 95 }, "duration": 1000 },
+        { "type": "enter", "character": "elder", "from": "right", "to": { "x": 195, "y": 103 }, "duration": 800 },
+        { "type": "enter", "character": "hero", "from": "left", "to": { "x": 15, "y": 105 }, "duration": 800 },
+        { "type": "wait", "duration": 600 },
+        { "type": "dialogue", "character": "lyra", "text": "Wind chimes howl..." },
+        { "type": "shake", "intensity": 1, "duration": 400 },
+        { "type": "wait", "duration": 300 },
+        { "type": "shake", "intensity": 1, "duration": 400 },
+        { "type": "dialogue", "character": "lyra", "text": "March in a symphony of thorns." },
+        { "type": "enter", "character": "princess", "from": "right", "to": { "x": 215, "y": 100 }, "duration": 900 },
+        { "type": "wait", "duration": 400 },
+        { "type": "dialogue", "character": "lyra", "text": "Sedge wren warbles... melody to paper untorn." },
+        { "type": "emote", "character": "princess", "emote": "happy", "duration": 1200 },
+        { "type": "wait", "duration": 500 },
+        { "type": "dialogue", "character": "lyra", "text": "I'm spun out..." },
+        { "type": "shake", "intensity": 3, "duration": 500 },
+        { "type": "enter", "character": "wizard", "from": "left", "to": { "x": 40, "y": 108 }, "duration": 1000 },
+        { "type": "dialogue", "character": "lyra", "text": "All the color drains from my view." },
+        { "type": "wait", "duration": 600 },
+        { "type": "shake", "intensity": 6, "duration": 800 },
+        { "type": "dialogue", "character": "lyra", "text": "Seismic waves inbound..." },
+        { "type": "emote", "character": "wizard", "emote": "surprise", "duration": 1000 },
+        { "type": "wait", "duration": 400 },
+        { "type": "dialogue", "character": "lyra", "text": "Slice through the layers unpeeled." },
+        { "type": "wait", "duration": 1000 },
+        { "type": "transition", "effect": "fadeOut", "duration": 1500 }
+      ]
+    },
+    {
+      "id": "verse3_shards",
+      "background": "night_sky",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 2500 },
+        { "type": "enter", "character": "lyra", "from": "bottom", "to": { "x": 110, "y": 95 }, "duration": 1200 },
+        { "type": "enter", "character": "elder", "from": "left", "to": { "x": 10, "y": 108 }, "duration": 800 },
+        { "type": "enter", "character": "hero", "from": "left", "to": { "x": 45, "y": 105 }, "duration": 900 },
+        { "type": "enter", "character": "princess", "from": "right", "to": { "x": 195, "y": 100 }, "duration": 800 },
+        { "type": "enter", "character": "wizard", "from": "right", "to": { "x": 170, "y": 108 }, "duration": 900 },
+        { "type": "wait", "duration": 800 },
+        { "type": "enter", "character": "dark_lord", "from": "right", "to": { "x": 220, "y": 105 }, "duration": 1200 },
+        { "type": "dialogue", "character": "lyra", "text": "Hollowed bell..." },
+        { "type": "shake", "intensity": 2, "duration": 600 },
+        { "type": "wait", "duration": 500 },
+        { "type": "dialogue", "character": "lyra", "text": "Wrings us out." },
+        { "type": "emote", "character": "elder", "emote": "happy", "duration": 1000 },
+        { "type": "wait", "duration": 600 },
+        { "type": "dialogue", "character": "lyra", "text": "Resonance..." },
+        { "type": "shake", "intensity": 3, "duration": 500 },
+        { "type": "wait", "duration": 400 },
+        { "type": "dialogue", "character": "lyra", "text": "Underground." },
+        { "type": "emote", "character": "hero", "emote": "happy", "duration": 1000 },
+        { "type": "wait", "duration": 800 },
+        { "type": "shake", "intensity": 5, "duration": 700 },
+        { "type": "dialogue", "character": "lyra", "text": "Outer shell..." },
+        { "type": "emote", "character": "dark_lord", "emote": "surprise", "duration": 1200 },
+        { "type": "wait", "duration": 400 },
+        { "type": "shake", "intensity": 7, "duration": 900 },
+        { "type": "dialogue", "character": "lyra", "text": "Splinters in front of the sound." },
+        { "type": "emote", "character": "princess", "emote": "happy", "duration": 1500 },
+        { "type": "wait", "duration": 800 },
+        { "type": "shake", "intensity": 8, "duration": 1000 },
+        { "type": "dialogue", "character": "lyra", "text": "Grasping for shards of the sound." },
+        { "type": "emote", "character": "wizard", "emote": "happy", "duration": 1200 },
+        { "type": "wait", "duration": 2000 },
+        { "type": "exit", "character": "lyra", "to": "bottom", "duration": 1500 },
+        { "type": "wait", "duration": 500 },
+        { "type": "exit", "character": "hero", "to": "left", "duration": 800 },
+        { "type": "exit", "character": "elder", "to": "left", "duration": 800 },
+        { "type": "exit", "character": "wizard", "to": "right", "duration": 800 },
+        { "type": "exit", "character": "princess", "to": "right", "duration": 800 },
+        { "type": "exit", "character": "dark_lord", "to": "right", "duration": 1000 },
+        { "type": "wait", "duration": 1500 },
+        { "type": "transition", "effect": "fadeOut", "duration": 3000 }
+      ]
+    }
+  ]
+};
+
 /**
  * CutsceneEngine — Main game loop, action sequencing, input handling.
  */
@@ -2115,6 +2271,7 @@ const CutsceneEngine = (() => {
   });
   document.getElementById('btn-demo').addEventListener('click', () => playScript(DEMO_SCRIPT));
   document.getElementById('btn-serenade').addEventListener('click', () => playScript(SERENADE_SCRIPT));
+  document.getElementById('btn-shards').addEventListener('click', () => playScript(SHARDS_SCRIPT));
   document.getElementById('btn-restart').addEventListener('click', () => { if (window._lastScript) { CutsceneEngine.stop(); CutsceneEngine.play(window._lastScript); } });
   playScript(DEMO_SCRIPT);
   function playScript(data) {
