@@ -353,10 +353,10 @@ const CutsceneEngine = (() => {
         const di = dancingChars.indexOf(char);
         const totalDancers = dancingChars.length;
         const angle = (t / 2500 + (di / totalDancers) * Math.PI * 2) % (Math.PI * 2);
-        const centerX = 128;
+        const centerX = 110;
         const centerY = 155;
-        const radiusX = 75 + Math.sin(t / 2000) * 8;
-        const radiusY = 30 + Math.sin(t / 2500) * 5;
+        const radiusX = 80 + Math.sin(t / 2000) * 8;
+        const radiusY = 35 + Math.sin(t / 2500) * 5;
         char.x = centerX + Math.cos(angle) * radiusX - SpriteLibrary.W / 2;
         char.y = centerY + Math.sin(angle) * radiusY - SpriteLibrary.H / 2;
       } else if (char.milling) {
@@ -504,7 +504,12 @@ const CutsceneEngine = (() => {
 
     // Characters — sorted by Y (back to front) with idle bob
     const t = Date.now();
-    const sortedChars = Object.values(characters).filter(c => c.visible).sort((a, b) => a.y - b.y);
+    // Sort by bottom edge (feet) for proper depth — characters in front overlap those behind
+    const sortedChars = Object.values(characters).filter(c => c.visible).sort((a, b) => {
+      const aBottom = a.y + SpriteLibrary.H * (a.renderScale || 1);
+      const bBottom = b.y + SpriteLibrary.H * (b.renderScale || 1);
+      return aBottom - bBottom;
+    });
     for (const char of sortedChars) {
       const idleBob = (!char.dancing && !char.milling) ? Math.sin(t / 600 + char.idleSeed * 10) * 1.5 : 0;
       Renderer.drawCharacterWithOffset(char, animFrame, 0, idleBob);
