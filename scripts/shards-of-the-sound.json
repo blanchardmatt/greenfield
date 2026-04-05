@@ -101,6 +101,7 @@
       "background": "village",
       "actions": [
         { "type": "transition", "effect": "fadeIn", "duration": 2000 },
+        { "type": "showProp", "prop": "amplifier", "x": 75, "y": 120 },
         { "type": "enter", "character": "lyra", "from": "left", "to": { "x": 100, "y": 80 }, "duration": 1200 },
         { "type": "setScale", "character": "lyra", "scale": 1.5 },
         { "type": "showNotes", "character": "lyra" },
@@ -140,6 +141,7 @@
       "background": "forest",
       "actions": [
         { "type": "transition", "effect": "fadeIn", "duration": 2000 },
+        { "type": "showProp", "prop": "amplifier", "x": 70, "y": 115 },
         { "type": "enter", "character": "lyra", "from": "bottom", "to": { "x": 100, "y": 75 }, "duration": 1000 },
         { "type": "setScale", "character": "lyra", "scale": 1.5 },
         { "type": "showNotes", "character": "lyra" },
@@ -180,6 +182,7 @@
       "background": "night_sky",
       "actions": [
         { "type": "transition", "effect": "fadeIn", "duration": 2500 },
+        { "type": "showProp", "prop": "amplifier", "x": 68, "y": 112 },
         { "type": "enter", "character": "lyra", "from": "bottom", "to": { "x": 100, "y": 70 }, "duration": 1200 },
         { "type": "setScale", "character": "lyra", "scale": 1.5 },
         { "type": "showNotes", "character": "lyra" },
@@ -232,6 +235,7 @@
       "background": "night_sky",
       "actions": [
         { "type": "transition", "effect": "fadeIn", "duration": 1500 },
+        { "type": "showProp", "prop": "amplifier", "x": 78, "y": 118 },
         { "type": "enter", "character": "lyra", "from": "bottom", "to": { "x": 112, "y": 85 }, "duration": 800 },
         { "type": "setScale", "character": "lyra", "scale": 1.5 },
         { "type": "showNotes", "character": "lyra" },

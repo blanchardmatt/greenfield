@@ -101,6 +101,10 @@ const CutsceneEngine = (() => {
         return beginHideNotes(action);
       case 'setScale':
         return beginSetScale(action);
+      case 'showProp':
+        return beginShowProp(action);
+      case 'hideProp':
+        return beginHideProp(action);
       default:
         return { done: true };
     }
@@ -299,6 +303,24 @@ const CutsceneEngine = (() => {
     return { done: true };
   }
 
+  // Props on screen
+  const activeProps = [];
+
+  function beginShowProp(action) {
+    activeProps.push({
+      name: action.prop || 'amplifier',
+      x: action.x || 0,
+      y: action.y || 0,
+    });
+    return { done: true };
+  }
+
+  function beginHideProp(action) {
+    const idx = activeProps.findIndex(p => p.name === (action.prop || 'amplifier'));
+    if (idx >= 0) activeProps.splice(idx, 1);
+    return { done: true };
+  }
+
   // Idle/dance animation update — called every frame
   function updateCharacterAnimations(dt) {
     const t = Date.now();
@@ -321,9 +343,9 @@ const CutsceneEngine = (() => {
         char.x = centerX + Math.cos(angle) * radiusX;
         char.y = centerY + Math.sin(angle) * radiusY;
       } else if (char.milling) {
-        // Gentle wandering near base position
-        const wx = Math.sin(t / 2000 + seed) * 8 + Math.sin(t / 3500 + seed * 2) * 4;
-        const wy = Math.sin(t / 2800 + seed * 1.5) * 3;
+        // Energetic wandering near base position with bounce
+        const wx = Math.sin(t / 1500 + seed) * 12 + Math.sin(t / 2500 + seed * 2) * 6;
+        const wy = Math.sin(t / 1800 + seed * 1.5) * 5 + Math.abs(Math.sin(t / 400 + seed * 3)) * -2;
         char.x = char.baseX + wx;
         char.y = char.baseY + wy;
       } else {
@@ -452,6 +474,11 @@ const CutsceneEngine = (() => {
     const camera = AnimationSystem.getCamera();
     Renderer.applyCamera(camera);
 
+    // Props (behind characters)
+    for (const prop of activeProps) {
+      Renderer.drawProp(prop.name, Math.round(prop.x), Math.round(prop.y));
+    }
+
     // Characters — with idle bob
     const t = Date.now();
     for (const char of Object.values(characters)) {
@@ -539,6 +566,7 @@ const CutsceneEngine = (() => {
     danceActive = false;
     notesActive = false;
     notesCharId = null;
+    activeProps.length = 0;
     currentActionState = null;
     autoAdvance = (options && options.autoAdvance) || false;
     autoAdvanceDelay = (options && options.autoAdvanceDelay) || 2000;
@@ -614,6 +642,7 @@ const CutsceneEngine = (() => {
     danceActive = false;
     notesActive = false;
     notesCharId = null;
+    activeProps.length = 0;
     currentActionState = null;
     sceneIndex = index;
     actionIndex = 0;

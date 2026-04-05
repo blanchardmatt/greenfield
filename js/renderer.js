@@ -391,6 +391,12 @@ const Renderer = (() => {
     },
   };
 
+  // --- Prop rendering ---
+
+  function drawProp(propName, x, y) {
+    SpriteLibrary.drawProp(ctx, propName, x, y);
+  }
+
   // --- Character rendering ---
 
   function drawCharacter(char, animFrame) {
@@ -637,7 +643,7 @@ const Renderer = (() => {
 
   return {
     init, beginFrame, applyCamera, restoreCamera, present,
-    drawBackground, drawCharacter, drawCharacterWithOffset, drawEmoteBubble, drawMusicNotes,
+    drawBackground, drawProp, drawCharacter, drawCharacterWithOffset, drawEmoteBubble, drawMusicNotes,
     drawDialogueBox, drawDialogueText, drawFadeOverlay,
     drawTitleOverlay, drawCreditsOverlay,
     getTextMaxWidth, getTextScale, getInternalSize,

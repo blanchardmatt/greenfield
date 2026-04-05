@@ -382,7 +382,7 @@ const SpriteLibrary = (() => {
 
   const villain_f2 = villain_f1;
 
-  // ===== DARK ELF RANGER — purple skin, silver hair, green cloak, guitar =====
+  // ===== DARK ELF RANGER — purple skin, silver hair, green cloak, electric guitar =====
   const dark_elf_ranger_f1 = decode([
     '..............KKKKKK............',
     '.............KSSSSSSK...........',
@@ -406,14 +406,14 @@ const SpriteLibrary = (() => {
     '.......KGgggggggggggggGgK.......',
     '.......KGgggggggggggggGgK.......',
     '......KDKKgggggggggggKKDK.......',
-    '......KDDKgggggggggggKDDK......K',
-    '.......KKKgggggggggggKKK......KT',
-    '........KGGgggggggGGGK.......KTT',
-    '........KbbbbbbbbbbbbK......KTTK',
-    '........KbbbbbbbbbbbbK.....KttK.',
-    '........KbbbbbbbbbbbbK....KttK..',
-    '........KbbbbKKKKbbbbK...KttK...',
-    '.........KbbK....KbbK....KK.....',
+    '......KDDKgggggggggggKDDK.......',
+    '.......KKKgggggggggggKKK..KK....',
+    '........KGGgggggggGGGK..KRRK....',
+    '........KbbbbbbbbbbbbK.KRRRK....',
+    '........KbbbbbbbbbbbbK.KRrRK....',
+    '........KbbbbbbbbbbbbKKRRRRK....',
+    '........KbbbbKKKKbbbbKKRRRK.....',
+    '.........KbbK....KbbK.KKKK......',
     '.........KbbK....KbbK...........',
     '........KbbbK....KbbbK..........',
     '........KKKKK....KKKKK..........',
@@ -456,18 +456,18 @@ const SpriteLibrary = (() => {
     '.......KggggggggggggggggK.......',
     '.......KGgggggggggggggGgK.......',
     '.......KGgggggggggggggGgK.......',
-    '......KDKKgggggggggggKKDK.......',
-    '..KTTK.KDDKgggggggggggKDDK......',
-    '..KTTK..KKKgggggggggggKKK.......',
-    '...KTTK..KGGgggggggGGGK.........',
-    '....KTTK.KbbbbbbbbbbbbK.........',
-    '.....KttK.KbbbbbbbbbbbbK........',
-    '......KttKKbbbbbbbbbbbbK........',
-    '.......KttKbbbbKKKKbbbbK........',
-    '.........KKKbbKK..KKbbK.........',
-    '..........KbbK......KbbK........',
-    '..........KbbK......KbbK........',
-    '..........KKKK......KKKK........',
+    '.......KDKKgggggggggggKKDK......',
+    '.......KDDKgggggggggggKDDK......',
+    '....KK..KKKgggggggggggKKK.......',
+    '...KRRK..KGGgggggggGGGK.........',
+    '...KRRRK.KbbbbbbbbbbbbK.........',
+    '...KRrRK.KbbbbbbbbbbbbK.........',
+    '...KRRRRK.KbbbbbbbbbbK..........',
+    '....KRRRK.KbbKKKKbbbbK..........',
+    '.....KKKK..KbbK..KbbK...........',
+    '..........KbbK....KbbK..........',
+    '..........KbbK....KbbK..........',
+    '..........KKKK....KKKK..........',
     '................................',
     '................................',
     '................................',
@@ -874,6 +874,44 @@ const SpriteLibrary = (() => {
     noble:    [noble_f1, noble_f2],
   };
 
+  // Props — static objects
+  const props = {
+    amplifier: decode([
+      '..KKKKKKKKKKKKKK..',
+      '.KkkkkkkkkkkkkkkK.',
+      'KkkkkkkkkkkkkkkkkK',
+      'KkKKKKKKKKKKKKKkK.',
+      'KkKkkkkkkkkkkKKkK.',
+      'KkKkkkkkkkkkkKKkK.',
+      'KkKkkKKKKKkkkKKkK.',
+      'KkKkKrrrrKkkkKKkK.',
+      'KkKkKrrrrKkkkKKkK.',
+      'KkKkkKKKKKkkkKKkK.',
+      'KkKkkkkkkkkkkKKkK.',
+      'KkKKKKKKKKKKKKKkK.',
+      'KkkkkkkkkkkkkkkkkK',
+      'KkkKKkkkkkkkKKkkkK',
+      'KkkKKkkkkkkkKKkkkK',
+      'KkkkkkkkkkkkkkkkkK',
+      '.KkkkkkkkkkkkkkkK.',
+      '..KKKKKKKKKKKKKK..',
+    ]),
+  };
+
+  function drawProp(ctx, propName, x, y) {
+    const data = props[propName];
+    if (!data) return;
+    for (let row = 0; row < data.length; row++) {
+      for (let col = 0; col < data[row].length; col++) {
+        const color = data[row][col];
+        if (color) {
+          ctx.fillStyle = color;
+          ctx.fillRect(x + col, y + row, 1, 1);
+        }
+      }
+    }
+  }
+
   // Emote bubbles — 12x12 pixel art
   const emotes = {
     surprise: decode([
@@ -965,5 +1003,5 @@ const SpriteLibrary = (() => {
     return Object.keys(emotes);
   }
 
-  return { drawSprite, drawEmote, getSpriteNames, getSprites, getEmotes, getEmoteNames, W, H };
+  return { drawSprite, drawEmote, drawProp, getSpriteNames, getSprites, getEmotes, getEmoteNames, W, H };
 })();
