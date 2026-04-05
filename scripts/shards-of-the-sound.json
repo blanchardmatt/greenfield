@@ -172,7 +172,7 @@
             "x": 160,
             "y": 108
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "dialogue",
@@ -187,7 +187,7 @@
             "x": 20,
             "y": 110
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "dialogue",
@@ -202,7 +202,7 @@
             "x": 5,
             "y": 112
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "dialogue",
@@ -222,7 +222,7 @@
             "x": 140,
             "y": 106
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -232,7 +232,7 @@
             "x": 38,
             "y": 112
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "mill"
@@ -341,7 +341,7 @@
             "x": 10,
             "y": 108
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -351,7 +351,7 @@
             "x": 40,
             "y": 105
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "mill"
@@ -374,7 +374,7 @@
             "x": 25,
             "y": 112
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "shake",
@@ -394,7 +394,7 @@
             "x": 150,
             "y": 100
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -404,7 +404,7 @@
             "x": 130,
             "y": 106
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "dialogue",
@@ -425,7 +425,7 @@
             "x": 5,
             "y": 108
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -435,7 +435,7 @@
             "x": 165,
             "y": 108
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "dialogue",
@@ -455,7 +455,7 @@
             "x": 55,
             "y": 108
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -465,7 +465,7 @@
             "x": 120,
             "y": 112
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -475,7 +475,7 @@
             "x": 70,
             "y": 105
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -485,7 +485,7 @@
             "x": 85,
             "y": 110
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "dialogue",
@@ -570,7 +570,7 @@
             "x": 5,
             "y": 108
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -580,7 +580,7 @@
             "x": 35,
             "y": 105
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -590,7 +590,7 @@
             "x": 160,
             "y": 100
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -600,7 +600,7 @@
             "x": 140,
             "y": 108
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -610,7 +610,7 @@
             "x": 50,
             "y": 112
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -620,7 +620,7 @@
             "x": 120,
             "y": 106
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -630,7 +630,7 @@
             "x": 20,
             "y": 112
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -640,7 +640,7 @@
             "x": 65,
             "y": 110
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -650,7 +650,7 @@
             "x": 105,
             "y": 110
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -660,7 +660,7 @@
             "x": 80,
             "y": 115
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -670,7 +670,7 @@
             "x": 90,
             "y": 108
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "mill"
@@ -693,7 +693,7 @@
             "x": 10,
             "y": 110
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -703,7 +703,7 @@
             "x": 155,
             "y": 108
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "dialogue",
@@ -724,7 +724,7 @@
             "x": 170,
             "y": 105
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -734,7 +734,7 @@
             "x": 45,
             "y": 107
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "dialogue",
@@ -862,7 +862,7 @@
             "x": 60,
             "y": 108
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -872,7 +872,7 @@
             "x": 165,
             "y": 105
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -882,7 +882,7 @@
             "x": 15,
             "y": 110
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -892,7 +892,7 @@
             "x": 200,
             "y": 110
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -902,7 +902,7 @@
             "x": 145,
             "y": 115
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -912,7 +912,7 @@
             "x": 30,
             "y": 112
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -922,7 +922,7 @@
             "x": 180,
             "y": 108
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -932,7 +932,7 @@
             "x": 75,
             "y": 110
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -942,7 +942,7 @@
             "x": 130,
             "y": 112
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -952,7 +952,7 @@
             "x": 45,
             "y": 106
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "enter",
@@ -962,7 +962,7 @@
             "x": 210,
             "y": 113
           },
-          "duration": 50
+          "duration": 600
         },
         {
           "type": "wait",
