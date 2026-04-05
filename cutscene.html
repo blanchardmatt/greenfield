@@ -118,6 +118,7 @@ button:hover {
 <canvas id="display-canvas" width="768" height="672"></canvas>
 </div>
 <div id="controls">
+<label class="toolbar-btn" id="btn-load" style="font-family:monospace;font-size:13px;background:#2a2a4e;color:#aaa;border:1px solid #444;padding:6px 14px;cursor:pointer">Load Script <input type="file" id="script-file" accept=".json" style="display:none"></label>
 <button id="btn-demo">Play Demo</button>
 <button id="btn-restart">Restart</button>
 </div>
@@ -1784,6 +1785,21 @@ const CutsceneEngine = (() => {
   document.addEventListener('keydown', (e) => {
     if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); CutsceneEngine.handleInput('advance'); }
     else if (e.code === 'Escape') CutsceneEngine.handleInput('skip');
+  });
+  document.getElementById('script-file').addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(evt) {
+      try {
+        var raw = JSON.parse(evt.target.result);
+        var parsed = ScriptParser.loadFromObject(raw);
+        window._lastScript = parsed;
+        CutsceneEngine.stop();
+        CutsceneEngine.play(parsed);
+      } catch (err) { alert('Error: ' + err.message); }
+    };
+    reader.readAsText(file);
   });
   document.getElementById('btn-demo').addEventListener('click', () => loadDemo());
   document.getElementById('btn-restart').addEventListener('click', () => { if (window._lastScript) { CutsceneEngine.stop(); CutsceneEngine.play(window._lastScript); } });
