@@ -171,20 +171,42 @@ ${engineJs}
     });
   });
 
+  // Detect best video format
+  function getVideoFormat() {
+    var formats = [
+      { mimeType: 'video/mp4;codecs=avc1', ext: 'mp4', type: 'video/mp4' },
+      { mimeType: 'video/mp4', ext: 'mp4', type: 'video/mp4' },
+      { mimeType: 'video/webm;codecs=vp9', ext: 'webm', type: 'video/webm' },
+      { mimeType: 'video/webm;codecs=vp8', ext: 'webm', type: 'video/webm' },
+      { mimeType: 'video/webm', ext: 'webm', type: 'video/webm' },
+    ];
+    for (var i = 0; i < formats.length; i++) {
+      if (MediaRecorder.isTypeSupported(formats[i].mimeType)) {
+        return formats[i];
+      }
+    }
+    return formats[0]; // fallback
+  }
+
   function startRecording() {
     var canvas = document.getElementById('display-canvas');
     var stream = canvas.captureStream(30);
+    var fmt = getVideoFormat();
     recordedChunks = [];
-    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9' });
+    var options = {};
+    if (MediaRecorder.isTypeSupported(fmt.mimeType)) {
+      options.mimeType = fmt.mimeType;
+    }
+    mediaRecorder = new MediaRecorder(stream, options);
     mediaRecorder.ondataavailable = function(e) {
       if (e.data.size > 0) recordedChunks.push(e.data);
     };
     mediaRecorder.onstop = function() {
-      var blob = new Blob(recordedChunks, { type: 'video/webm' });
+      var blob = new Blob(recordedChunks, { type: fmt.type });
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
       a.href = url;
-      a.download = 'cutscene.webm';
+      a.download = 'cutscene.' + fmt.ext;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -194,14 +216,15 @@ ${engineJs}
       statusEl.style.display = 'none';
     };
     mediaRecorder.onerror = function(e) {
-      alert('Recording error: ' + e.error);
+      alert('Recording error: ' + (e.error || e.message || 'unknown'));
       recordBtn.textContent = 'Record';
       statusEl.style.display = 'none';
     };
-    mediaRecorder.start();
+    mediaRecorder.start(1000); // collect data every second
     recordBtn.textContent = 'Stop';
     recordBtn.style.background = '#cc3333';
     statusEl.style.display = 'block';
+    statusEl.textContent = 'Recording (' + fmt.ext.toUpperCase() + ')...';
   }
 
   playScript(DEMO_SCRIPT);
