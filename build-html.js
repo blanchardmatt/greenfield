@@ -20,6 +20,7 @@ const rendererJs = read('js/renderer.js');
 const scriptParserJs = read('js/script-parser.js');
 const engineJs = read('js/engine.js');
 const demoJson = read('scripts/demo.json');
+const serenadeJson = read('scripts/the-serenade.json');
 
 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -46,7 +47,8 @@ ${css}
 </div>
 <div id="controls">
 <label class="toolbar-btn" id="btn-load" style="font-family:monospace;font-size:13px;background:#2a2a4e;color:#aaa;border:1px solid #444;padding:6px 14px;cursor:pointer">Load Script <input type="file" id="script-file" accept=".json" style="display:none"></label>
-<button id="btn-demo">Play Demo</button>
+<button id="btn-demo">Demo</button>
+<button id="btn-serenade">Serenade</button>
 <button id="btn-restart">Restart</button>
 </div>
 <div id="hint">Tap / Space to advance dialogue</div>
@@ -62,6 +64,8 @@ ${rendererJs}
 ${scriptParserJs}
 
 const DEMO_SCRIPT = ${demoJson.trim()};
+
+const SERENADE_SCRIPT = ${serenadeJson.trim()};
 
 ${engineJs}
 
@@ -79,9 +83,9 @@ ${engineJs}
     var file = e.target.files[0];
     if (!file) return;
     var reader = new FileReader();
-    reader.onload = function(evt) {
+    reader.onload = function() {
       try {
-        var raw = JSON.parse(evt.target.result);
+        var raw = JSON.parse(reader.result);
         var parsed = ScriptParser.loadFromObject(raw);
         window._lastScript = parsed;
         CutsceneEngine.stop();
@@ -90,11 +94,12 @@ ${engineJs}
     };
     reader.readAsText(file);
   });
-  document.getElementById('btn-demo').addEventListener('click', () => loadDemo());
+  document.getElementById('btn-demo').addEventListener('click', () => playScript(DEMO_SCRIPT));
+  document.getElementById('btn-serenade').addEventListener('click', () => playScript(SERENADE_SCRIPT));
   document.getElementById('btn-restart').addEventListener('click', () => { if (window._lastScript) { CutsceneEngine.stop(); CutsceneEngine.play(window._lastScript); } });
-  loadDemo();
-  function loadDemo() {
-    const parsed = ScriptParser.loadFromObject(DEMO_SCRIPT);
+  playScript(DEMO_SCRIPT);
+  function playScript(data) {
+    var parsed = ScriptParser.loadFromObject(data);
     window._lastScript = parsed;
     CutsceneEngine.stop();
     CutsceneEngine.play(parsed);
