@@ -299,6 +299,81 @@ const Renderer = (() => {
     ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
   }
 
+  // --- Title overlay ---
+
+  function drawTitleOverlay(state) {
+    const { text, subtitle, color, subtitleColor, duration, fadeIn, fadeOut, elapsed } = state;
+
+    // Calculate alpha for fade in/out
+    let alpha = 1;
+    if (elapsed < fadeIn) {
+      alpha = elapsed / fadeIn;
+    } else if (elapsed > duration - fadeOut) {
+      alpha = Math.max(0, (duration - elapsed) / fadeOut);
+    }
+
+    ctx.globalAlpha = alpha;
+
+    // Title text — large, centered
+    const titleScale = 2;
+    const titleSize = PixelFont.measureText(text, titleScale);
+    const tx = Math.floor((INTERNAL_W - titleSize.width) / 2);
+    const ty = Math.floor(INTERNAL_H / 2 - titleSize.height - 8);
+    PixelFont.drawText(ctx, text, tx, ty, color, titleScale);
+
+    // Subtitle — smaller, below
+    if (subtitle) {
+      const subScale = 1;
+      const subSize = PixelFont.measureText(subtitle, subScale);
+      const sx = Math.floor((INTERNAL_W - subSize.width) / 2);
+      const sy = ty + titleSize.height + 10;
+      PixelFont.drawText(ctx, subtitle, sx, sy, subtitleColor, subScale);
+    }
+
+    // Decorative line under title
+    const lineW = Math.max(titleSize.width, 80);
+    const lineX = Math.floor((INTERNAL_W - lineW) / 2);
+    const lineY = ty + titleSize.height + 4;
+    ctx.fillStyle = subtitleColor;
+    ctx.fillRect(lineX, lineY, lineW, 1);
+
+    ctx.globalAlpha = 1;
+  }
+
+  // --- Credits overlay ---
+
+  function drawCreditsOverlay(state) {
+    const { lines, color, highlightColor, speed, elapsed } = state;
+    const scrollOffset = (elapsed / 1000) * speed;
+    const lineHeight = 14;
+    const startY = INTERNAL_H - scrollOffset;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const y = Math.floor(startY + i * lineHeight);
+
+      // Skip lines off screen
+      if (y < -lineHeight || y > INTERNAL_H) continue;
+
+      // Lines starting with # are headers (highlighted, larger)
+      if (line.startsWith('#')) {
+        const headerText = line.substring(1).trim();
+        const scale = 1;
+        const size = PixelFont.measureText(headerText, scale);
+        const x = Math.floor((INTERNAL_W - size.width) / 2);
+        PixelFont.drawText(ctx, headerText, x, y, highlightColor, scale);
+      } else if (line.trim() === '') {
+        // Empty line — just spacing
+      } else {
+        // Normal credit line — centered
+        const scale = 1;
+        const size = PixelFont.measureText(line, scale);
+        const x = Math.floor((INTERNAL_W - size.width) / 2);
+        PixelFont.drawText(ctx, line, x, y, color, scale);
+      }
+    }
+  }
+
   // --- Frame pipeline ---
 
   function beginFrame() {
@@ -352,6 +427,7 @@ const Renderer = (() => {
     init, beginFrame, applyCamera, restoreCamera, present,
     drawBackground, drawCharacter, drawEmoteBubble,
     drawDialogueBox, drawDialogueText, drawFadeOverlay,
+    drawTitleOverlay, drawCreditsOverlay,
     getTextMaxWidth, getTextScale, getInternalSize,
     getBackgroundNames, renderBackgroundToCanvas,
   };

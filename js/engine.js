@@ -20,6 +20,7 @@ const CutsceneEngine = (() => {
   let waitTimer = 0;
   let currentActionTween = null;
   let activeEmote = null;
+  let sceneElapsed = 0; // ms since scene started, for timecodes
   let emoteTimer = 0;
 
   // Input state
@@ -80,6 +81,10 @@ const CutsceneEngine = (() => {
         return beginMove(action);
       case 'setBackground':
         return beginSetBackground(action);
+      case 'title':
+        return beginTitle(action);
+      case 'credits':
+        return beginCredits(action);
       default:
         return { done: true };
     }
@@ -178,6 +183,45 @@ const CutsceneEngine = (() => {
     return { done: true };
   }
 
+  // Title/credits overlay state
+  let titleOverlay = null;
+  let creditsOverlay = null;
+
+  function beginTitle(action) {
+    const duration = action.duration || 4000;
+    const fadeIn = action.fadeIn || 800;
+    const fadeOut = action.fadeOut || 800;
+    titleOverlay = {
+      text: action.text || '',
+      subtitle: action.subtitle || '',
+      color: action.color || '#ffffff',
+      subtitleColor: action.subtitleColor || '#8888cc',
+      duration: duration,
+      fadeIn: fadeIn,
+      fadeOut: fadeOut,
+      elapsed: 0,
+    };
+    waitTimer = duration;
+    return { done: false, type: 'timed', onDone: () => { titleOverlay = null; } };
+  }
+
+  function beginCredits(action) {
+    const lines = action.lines || [];
+    const speed = action.speed || 30; // pixels per second
+    const totalHeight = lines.length * 14 + 224; // enough to scroll everything off
+    const duration = (totalHeight / speed) * 1000;
+    creditsOverlay = {
+      lines: lines,
+      color: action.color || '#cccccc',
+      highlightColor: action.highlightColor || '#ffffff',
+      speed: speed,
+      elapsed: 0,
+      duration: duration,
+    };
+    waitTimer = duration;
+    return { done: false, type: 'timed', onDone: () => { creditsOverlay = null; } };
+  }
+
   // --- Main loop ---
 
   let currentActionState = null;
@@ -194,6 +238,7 @@ const CutsceneEngine = (() => {
       // Move to next scene
       sceneIndex++;
       actionIndex = 0;
+      sceneElapsed = 0;
       if (sceneIndex < script.scenes.length) {
         const nextScene = script.scenes[sceneIndex];
         if (nextScene.background) {
@@ -205,6 +250,17 @@ const CutsceneEngine = (() => {
     }
 
     const action = scene.actions[actionIndex];
+
+    // Timecode support: if action has "at" field, wait until scene time reaches it
+    if (action.at !== undefined && sceneElapsed < action.at) {
+      waitTimer = action.at - sceneElapsed;
+      currentActionState = { done: false, type: 'timed', onDone: () => {
+        currentActionState = beginAction(action);
+        if (currentActionState.done) { actionIndex++; processNextAction(); }
+      }};
+      return;
+    }
+
     currentActionState = beginAction(action);
 
     if (currentActionState.done) {
@@ -216,6 +272,7 @@ const CutsceneEngine = (() => {
   function update(dt) {
     if (!running || !currentActionState) return;
 
+    sceneElapsed += dt;
     AnimationSystem.update(dt);
 
     // Sprite animation
@@ -232,6 +289,10 @@ const CutsceneEngine = (() => {
         activeEmote = null;
       }
     }
+
+    // Update overlay timers
+    if (titleOverlay) titleOverlay.elapsed += dt;
+    if (creditsOverlay) creditsOverlay.elapsed += dt;
 
     if (currentActionState.type === 'timed') {
       waitTimer -= dt;
@@ -303,6 +364,16 @@ const CutsceneEngine = (() => {
       Renderer.drawDialogueText(AnimationSystem.getTypewriterState());
     }
 
+    // Title overlay
+    if (titleOverlay) {
+      Renderer.drawTitleOverlay(titleOverlay);
+    }
+
+    // Credits overlay
+    if (creditsOverlay) {
+      Renderer.drawCreditsOverlay(creditsOverlay);
+    }
+
     // Fade overlay
     const fadeAlpha = AnimationSystem.getFadeAlpha();
     Renderer.drawFadeOverlay(fadeAlpha);
@@ -335,6 +406,9 @@ const CutsceneEngine = (() => {
     waitingForInput = false;
     waitTimer = 0;
     activeEmote = null;
+    titleOverlay = null;
+    creditsOverlay = null;
+    sceneElapsed = 0;
     currentActionState = null;
     autoAdvance = (options && options.autoAdvance) || false;
     autoAdvanceDelay = (options && options.autoAdvanceDelay) || 2000;

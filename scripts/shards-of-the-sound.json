@@ -38,6 +38,15 @@
   },
   "scenes": [
     {
+      "id": "title_screen",
+      "background": "night_sky",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 1500 },
+        { "type": "title", "text": "MISOPHONIA", "subtitle": "Performed by Lyra the Dark Elf", "color": "#ffffff", "subtitleColor": "#aa66dd", "duration": 5000, "fadeIn": 1500, "fadeOut": 1500 },
+        { "type": "transition", "effect": "fadeOut", "duration": 1000 }
+      ]
+    },
+    {
       "id": "verse1_noise",
       "background": "village",
       "actions": [
@@ -199,6 +208,46 @@
         { "type": "exit", "character": "lyra", "to": "bottom", "duration": 1500 },
         { "type": "wait", "duration": 1500 },
         { "type": "transition", "effect": "fadeOut", "duration": 3000 }
+      ]
+    },
+    {
+      "id": "credits",
+      "background": "night_sky",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 1000 },
+        { "type": "credits", "lines": [
+          "",
+          "",
+          "#MISOPHONIA",
+          "",
+          "#Performed by",
+          "Lyra the Dark Elf Ranger",
+          "",
+          "",
+          "#Cast",
+          "",
+          "Lyra . . . . . Dark Elf Ranger",
+          "Aldric . . . . . . . . Warrior",
+          "Elder Morin . . . . . . . Sage",
+          "Princess Elara . . . . Royalty",
+          "Thalos . . . . . . . . . Mage",
+          "Lord Malachar . . . . Villain",
+          "",
+          "",
+          "#Created with",
+          "Pixel Cutscene Renderer",
+          "",
+          "",
+          "#Music and Lyrics",
+          "Misophonia",
+          "",
+          "",
+          "",
+          "#Thank you for watching",
+          "",
+          ""
+        ], "speed": 20, "color": "#aaaaaa", "highlightColor": "#ffffff" },
+        { "type": "transition", "effect": "fadeOut", "duration": 2000 }
       ]
     }
   ]
