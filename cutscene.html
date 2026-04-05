@@ -125,6 +125,9 @@ button:hover {
 <button id="btn-shards">Shards</button>
 <button id="btn-restart">Restart</button>
 <div class="toolbar-sep" style="width:1px;height:20px;background:#333;margin:0 4px;display:inline-block"></div>
+<button id="btn-prev">Prev</button>
+<button id="btn-next">Next</button>
+<div class="toolbar-sep" style="width:1px;height:20px;background:#333;margin:0 4px;display:inline-block"></div>
 <button id="btn-record" style="background:#553333;border-color:#774444">Record</button>
 <button id="btn-export-vid" style="background:#333355;border-color:#444477">Export Video</button>
 </div>
@@ -2953,6 +2956,42 @@ const CutsceneEngine = (() => {
     render();
   }
 
+  function jumpToScene(index) {
+    if (!script || index < 0 || index >= script.scenes.length) return;
+    // Reset state
+    for (const key of Object.keys(characters)) delete characters[key];
+    AnimationSystem.clear();
+    waitingForInput = false;
+    waitTimer = 0;
+    activeEmote = null;
+    titleOverlay = null;
+    creditsOverlay = null;
+    sceneElapsed = 0;
+    currentActionState = null;
+    sceneIndex = index;
+    actionIndex = 0;
+    const scene = script.scenes[sceneIndex];
+    if (scene && scene.background) currentBackground = scene.background;
+    running = true;
+    lastTime = 0;
+    processNextAction();
+    requestAnimationFrame(gameLoop);
+  }
+
+  function nextScene() {
+    if (!script) return;
+    jumpToScene(sceneIndex + 1);
+  }
+
+  function prevScene() {
+    if (!script) return;
+    jumpToScene(Math.max(0, sceneIndex - 1));
+  }
+
+  function getSceneCount() {
+    return script ? script.scenes.length : 0;
+  }
+
   function getState() {
     return {
       sceneIndex,
@@ -2961,6 +3000,7 @@ const CutsceneEngine = (() => {
       waitingForInput,
       currentBackground,
       characterCount: Object.keys(characters).length,
+      sceneCount: script ? script.scenes.length : 0,
     };
   }
 
@@ -2973,7 +3013,7 @@ const CutsceneEngine = (() => {
   }
 
   function isRunning() { return running; }
-  return { play, stop, pause, resume, step, getState, handleInput, isRunning };
+  return { play, stop, pause, resume, step, getState, handleInput, isRunning, nextScene, prevScene, jumpToScene, getSceneCount };
 })();
 
 
@@ -3012,6 +3052,10 @@ const CutsceneEngine = (() => {
   document.getElementById('btn-serenade').addEventListener('click', () => playScript(SERENADE_SCRIPT));
   document.getElementById('btn-shards').addEventListener('click', () => playScript(SHARDS_SCRIPT));
   document.getElementById('btn-restart').addEventListener('click', () => { if (window._lastScript) { CutsceneEngine.stop(); CutsceneEngine.play(window._lastScript); } });
+
+  // --- Scene navigation ---
+  document.getElementById('btn-prev').addEventListener('click', () => CutsceneEngine.prevScene());
+  document.getElementById('btn-next').addEventListener('click', () => CutsceneEngine.nextScene());
 
   // --- Video Recording ---
   var mediaRecorder = null;

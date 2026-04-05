@@ -470,6 +470,42 @@ const CutsceneEngine = (() => {
     render();
   }
 
+  function jumpToScene(index) {
+    if (!script || index < 0 || index >= script.scenes.length) return;
+    // Reset state
+    for (const key of Object.keys(characters)) delete characters[key];
+    AnimationSystem.clear();
+    waitingForInput = false;
+    waitTimer = 0;
+    activeEmote = null;
+    titleOverlay = null;
+    creditsOverlay = null;
+    sceneElapsed = 0;
+    currentActionState = null;
+    sceneIndex = index;
+    actionIndex = 0;
+    const scene = script.scenes[sceneIndex];
+    if (scene && scene.background) currentBackground = scene.background;
+    running = true;
+    lastTime = 0;
+    processNextAction();
+    requestAnimationFrame(gameLoop);
+  }
+
+  function nextScene() {
+    if (!script) return;
+    jumpToScene(sceneIndex + 1);
+  }
+
+  function prevScene() {
+    if (!script) return;
+    jumpToScene(Math.max(0, sceneIndex - 1));
+  }
+
+  function getSceneCount() {
+    return script ? script.scenes.length : 0;
+  }
+
   function getState() {
     return {
       sceneIndex,
@@ -478,6 +514,7 @@ const CutsceneEngine = (() => {
       waitingForInput,
       currentBackground,
       characterCount: Object.keys(characters).length,
+      sceneCount: script ? script.scenes.length : 0,
     };
   }
 
@@ -490,5 +527,5 @@ const CutsceneEngine = (() => {
   }
 
   function isRunning() { return running; }
-  return { play, stop, pause, resume, step, getState, handleInput, isRunning };
+  return { play, stop, pause, resume, step, getState, handleInput, isRunning, nextScene, prevScene, jumpToScene, getSceneCount };
 })();

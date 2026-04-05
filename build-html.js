@@ -54,6 +54,9 @@ ${css}
 <button id="btn-shards">Shards</button>
 <button id="btn-restart">Restart</button>
 <div class="toolbar-sep" style="width:1px;height:20px;background:#333;margin:0 4px;display:inline-block"></div>
+<button id="btn-prev">Prev</button>
+<button id="btn-next">Next</button>
+<div class="toolbar-sep" style="width:1px;height:20px;background:#333;margin:0 4px;display:inline-block"></div>
 <button id="btn-record" style="background:#553333;border-color:#774444">Record</button>
 <button id="btn-export-vid" style="background:#333355;border-color:#444477">Export Video</button>
 </div>
@@ -113,6 +116,10 @@ ${engineJs}
   document.getElementById('btn-serenade').addEventListener('click', () => playScript(SERENADE_SCRIPT));
   document.getElementById('btn-shards').addEventListener('click', () => playScript(SHARDS_SCRIPT));
   document.getElementById('btn-restart').addEventListener('click', () => { if (window._lastScript) { CutsceneEngine.stop(); CutsceneEngine.play(window._lastScript); } });
+
+  // --- Scene navigation ---
+  document.getElementById('btn-prev').addEventListener('click', () => CutsceneEngine.prevScene());
+  document.getElementById('btn-next').addEventListener('click', () => CutsceneEngine.nextScene());
 
   // --- Video Recording ---
   var mediaRecorder = null;
