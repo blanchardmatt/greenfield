@@ -180,8 +180,8 @@
           "character": "gimli",
           "from": "left",
           "to": {
-            "x": 7,
-            "y": 130
+            "x": 120,
+            "y": 145
           },
           "duration": 600
         },
@@ -223,8 +223,8 @@
           "character": "hank",
           "from": "left",
           "to": {
-            "x": 115,
-            "y": 156
+            "x": 158,
+            "y": 148
           },
           "duration": 600
         },
@@ -233,8 +233,8 @@
           "character": "townsfolk3",
           "from": "left",
           "to": {
-            "x": 105,
-            "y": 147
+            "x": 25,
+            "y": 135
           },
           "duration": 600
         },
@@ -243,8 +243,8 @@
           "character": "townsfolk2",
           "from": "left",
           "to": {
-            "x": 45,
-            "y": 150
+            "x": 130,
+            "y": 180
           },
           "duration": 600
         },
@@ -253,8 +253,8 @@
           "character": "townsfolk4",
           "from": "left",
           "to": {
-            "x": 140,
-            "y": 131
+            "x": 75,
+            "y": 168
           },
           "duration": 600
         },
@@ -268,7 +268,7 @@
           "character": "hero",
           "from": "left",
           "to": {
-            "x": 3,
+            "x": 85,
             "y": 150
           },
           "duration": 600
@@ -283,8 +283,8 @@
           "character": "swift",
           "from": "right",
           "to": {
-            "x": 35,
-            "y": 176
+            "x": 170,
+            "y": 140
           },
           "duration": 600
         },
@@ -298,8 +298,8 @@
           "character": "elder",
           "from": "left",
           "to": {
-            "x": 135,
-            "y": 143
+            "x": 50,
+            "y": 138
           },
           "duration": 600
         },
@@ -313,8 +313,8 @@
           "character": "townsfolk1",
           "from": "right",
           "to": {
-            "x": 174,
-            "y": 159
+            "x": 140,
+            "y": 162
           },
           "duration": 600
         },
@@ -398,8 +398,8 @@
           "character": "townsfolk7",
           "from": "left",
           "to": {
-            "x": 145,
-            "y": 164
+            "x": 65,
+            "y": 162
           },
           "duration": 600
         },
@@ -408,8 +408,8 @@
           "character": "townsfolk6",
           "from": "left",
           "to": {
-            "x": 169,
-            "y": 130
+            "x": 185,
+            "y": 158
           },
           "duration": 600
         },
@@ -421,8 +421,8 @@
           "character": "lily",
           "from": "right",
           "to": {
-            "x": 12,
-            "y": 176
+            "x": 110,
+            "y": 178
           },
           "duration": 600
         },
@@ -431,8 +431,8 @@
           "character": "brother_sol",
           "from": "right",
           "to": {
-            "x": 100,
-            "y": 177
+            "x": 135,
+            "y": 152
           },
           "duration": 600
         },
@@ -441,8 +441,8 @@
           "character": "shade",
           "from": "right",
           "to": {
-            "x": 5,
-            "y": 185
+            "x": 48,
+            "y": 175
           },
           "duration": 600
         },
@@ -456,8 +456,8 @@
           "character": "townsfolk5",
           "from": "right",
           "to": {
-            "x": 114,
-            "y": 131
+            "x": 148,
+            "y": 135
           },
           "duration": 600
         },
@@ -471,8 +471,8 @@
           "character": "pip",
           "from": "right",
           "to": {
-            "x": 180,
-            "y": 171
+            "x": 160,
+            "y": 174
           },
           "duration": 600
         },
@@ -486,8 +486,8 @@
           "character": "princess",
           "from": "left",
           "to": {
-            "x": 33,
-            "y": 136
+            "x": 100,
+            "y": 148
           },
           "duration": 600
         },
@@ -496,8 +496,8 @@
           "character": "wizard",
           "from": "left",
           "to": {
-            "x": 134,
-            "y": 175
+            "x": 62,
+            "y": 142
           },
           "duration": 600
         },
@@ -578,8 +578,8 @@
           "character": "dark_lord",
           "from": "left",
           "to": {
-            "x": 2,
-            "y": 160
+            "x": 30,
+            "y": 172
           },
           "duration": 600
         },
@@ -588,8 +588,8 @@
           "character": "townsfolk10",
           "from": "left",
           "to": {
-            "x": 68,
-            "y": 161
+            "x": 42,
+            "y": 148
           },
           "duration": 600
         },
@@ -598,8 +598,8 @@
           "character": "morgana",
           "from": "left",
           "to": {
-            "x": 67,
-            "y": 143
+            "x": 180,
+            "y": 145
           },
           "duration": 600
         },
@@ -616,8 +616,8 @@
           "character": "ser_valen",
           "from": "left",
           "to": {
-            "x": 73,
-            "y": 136
+            "x": 15,
+            "y": 158
           },
           "duration": 600
         },
@@ -626,7 +626,7 @@
           "character": "townsfolk8",
           "from": "left",
           "to": {
-            "x": 65,
+            "x": 175,
             "y": 170
           },
           "duration": 600
@@ -636,8 +636,8 @@
           "character": "duke",
           "from": "left",
           "to": {
-            "x": 181,
-            "y": 143
+            "x": 92,
+            "y": 155
           },
           "duration": 600
         },
@@ -651,8 +651,8 @@
           "character": "townsfolk9",
           "from": "left",
           "to": {
-            "x": 45,
-            "y": 164
+            "x": 8,
+            "y": 165
           },
           "duration": 600
         },
