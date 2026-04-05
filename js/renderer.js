@@ -97,18 +97,24 @@ const Renderer = (() => {
     },
 
     night_sky(ctx) {
-      // Dark sky
+      // Dark sky — fill ENTIRE canvas first
       ctx.fillStyle = '#0a0a22';
       ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+
+      // Ground — visible darker band
+      ctx.fillStyle = '#151530';
+      ctx.fillRect(0, 160, INTERNAL_W, INTERNAL_H - 160);
+      ctx.fillStyle = '#1a1a38';
+      ctx.fillRect(0, 180, INTERNAL_W, INTERNAL_H - 180);
 
       // Stars (seeded pseudo-random for consistency)
       ctx.fillStyle = '#ffffff';
       let seed = 12345;
-      for (let i = 0; i < 60; i++) {
+      for (let i = 0; i < 80; i++) {
         seed = (seed * 16807 + 0) % 2147483647;
         const sx = seed % INTERNAL_W;
         seed = (seed * 16807 + 0) % 2147483647;
-        const sy = seed % (INTERNAL_H - 60);
+        const sy = seed % 155;
         seed = (seed * 16807 + 0) % 2147483647;
         const bright = 0.3 + (seed % 70) / 100;
         ctx.globalAlpha = bright;
@@ -121,10 +127,6 @@ const Renderer = (() => {
       fillCircle(ctx, 200, 30, 12);
       ctx.fillStyle = '#0a0a22';
       fillCircle(ctx, 204, 27, 10);
-
-      // Ground
-      ctx.fillStyle = '#111122';
-      ctx.fillRect(0, 170, INTERNAL_W, INTERNAL_H - 170);
     },
 
     dark_tower(ctx) {
