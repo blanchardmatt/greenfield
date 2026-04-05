@@ -53,7 +53,11 @@ const CutsceneEngine = (() => {
         name: def.name,
         nameColor: def.nameColor,
         x: 0, y: 0,
+        baseX: 0, baseY: 0, // home position for milling
         visible: false,
+        idleSeed: Math.random() * 1000, // unique per character for varied idle
+        milling: false, // wandering around
+        dancing: false, // active dancing
       };
     }
     return characters[charId];
@@ -85,6 +89,18 @@ const CutsceneEngine = (() => {
         return beginTitle(action);
       case 'credits':
         return beginCredits(action);
+      case 'mill':
+        return beginMill(action);
+      case 'dance':
+        return beginDance(action);
+      case 'stopDance':
+        return beginStopDance(action);
+      case 'showNotes':
+        return beginShowNotes(action);
+      case 'hideNotes':
+        return beginHideNotes(action);
+      case 'setScale':
+        return beginSetScale(action);
       default:
         return { done: true };
     }
@@ -111,6 +127,8 @@ const CutsceneEngine = (() => {
 
     char.x = from.x !== null ? from.x : to.x;
     char.y = from.y !== null ? from.y : to.y;
+    char.baseX = to.x;
+    char.baseY = to.y;
     char.visible = true;
 
     const tweenX = AnimationSystem.addTween(char, 'x', char.x, to.x, duration, 'easeOut');
@@ -224,6 +242,97 @@ const CutsceneEngine = (() => {
 
   // --- Main loop ---
 
+  // Mill: characters wander near their base position
+  function beginMill(action) {
+    for (const char of Object.values(characters)) {
+      if (char.visible) char.milling = true;
+    }
+    return { done: true };
+  }
+
+  // Dance: characters orbit/move in coordinated patterns
+  let danceActive = false;
+  let danceElapsed = 0;
+
+  function beginDance(action) {
+    danceActive = true;
+    danceElapsed = 0;
+    for (const char of Object.values(characters)) {
+      if (char.visible) char.dancing = true;
+    }
+    const duration = action.duration || 8000;
+    waitTimer = duration;
+    return { done: false, type: 'timed', onDone: () => {
+      // Dance keeps going until stopDance
+    }};
+  }
+
+  function beginStopDance(action) {
+    danceActive = false;
+    for (const char of Object.values(characters)) {
+      char.dancing = false;
+      char.milling = false;
+    }
+    return { done: true };
+  }
+
+  // Music notes state
+  let notesActive = false;
+  let notesCharId = null;
+
+  function beginShowNotes(action) {
+    notesActive = true;
+    notesCharId = action.character || null;
+    return { done: true };
+  }
+
+  function beginHideNotes(action) {
+    notesActive = false;
+    notesCharId = null;
+    return { done: true };
+  }
+
+  // Scale a character
+  function beginSetScale(action) {
+    const char = getOrCreateCharacter(action.character);
+    char.renderScale = action.scale || 1;
+    return { done: true };
+  }
+
+  // Idle/dance animation update — called every frame
+  function updateCharacterAnimations(dt) {
+    const t = Date.now();
+    if (danceActive) danceElapsed += dt;
+
+    const visibleChars = Object.values(characters).filter(c => c.visible);
+
+    for (let i = 0; i < visibleChars.length; i++) {
+      const char = visibleChars[i];
+      const seed = char.idleSeed;
+
+      if (char.dancing) {
+        // Coordinated dance: characters orbit in a circle pattern
+        const totalChars = visibleChars.length;
+        const angle = (t / 3000 + (i / totalChars) * Math.PI * 2) % (Math.PI * 2);
+        const centerX = 112;
+        const centerY = 100;
+        const radiusX = 60 + Math.sin(t / 2000) * 15;
+        const radiusY = 25 + Math.sin(t / 2500) * 8;
+        char.x = centerX + Math.cos(angle) * radiusX;
+        char.y = centerY + Math.sin(angle) * radiusY;
+      } else if (char.milling) {
+        // Gentle wandering near base position
+        const wx = Math.sin(t / 2000 + seed) * 8 + Math.sin(t / 3500 + seed * 2) * 4;
+        const wy = Math.sin(t / 2800 + seed * 1.5) * 3;
+        char.x = char.baseX + wx;
+        char.y = char.baseY + wy;
+      } else {
+        // Subtle idle bob — slight vertical bounce
+        // Don't override if a tween is actively moving the character
+      }
+    }
+  }
+
   let currentActionState = null;
 
   function processNextAction() {
@@ -290,6 +399,9 @@ const CutsceneEngine = (() => {
       }
     }
 
+    // Character animations (idle/mill/dance)
+    updateCharacterAnimations(dt);
+
     // Update overlay timers
     if (titleOverlay) titleOverlay.elapsed += dt;
     if (creditsOverlay) creditsOverlay.elapsed += dt;
@@ -340,9 +452,24 @@ const CutsceneEngine = (() => {
     const camera = AnimationSystem.getCamera();
     Renderer.applyCamera(camera);
 
-    // Characters
+    // Characters — with idle bob
+    const t = Date.now();
     for (const char of Object.values(characters)) {
-      Renderer.drawCharacter(char, animFrame);
+      const idleBob = (!char.dancing && !char.milling) ? Math.sin(t / 600 + char.idleSeed * 10) * 1.5 : 0;
+      Renderer.drawCharacterWithOffset(char, animFrame, 0, idleBob);
+    }
+
+    // Music notes
+    if (notesActive && notesCharId && characters[notesCharId]) {
+      const nc = characters[notesCharId];
+      if (nc.visible) {
+        const scale = nc.renderScale || 1;
+        Renderer.drawMusicNotes(
+          nc.x + (SpriteLibrary.W * scale) / 2,
+          nc.y,
+          Date.now()
+        );
+      }
     }
 
     // Emote
@@ -409,6 +536,9 @@ const CutsceneEngine = (() => {
     titleOverlay = null;
     creditsOverlay = null;
     sceneElapsed = 0;
+    danceActive = false;
+    notesActive = false;
+    notesCharId = null;
     currentActionState = null;
     autoAdvance = (options && options.autoAdvance) || false;
     autoAdvanceDelay = (options && options.autoAdvanceDelay) || 2000;
@@ -481,6 +611,9 @@ const CutsceneEngine = (() => {
     titleOverlay = null;
     creditsOverlay = null;
     sceneElapsed = 0;
+    danceActive = false;
+    notesActive = false;
+    notesCharId = null;
     currentActionState = null;
     sceneIndex = index;
     actionIndex = 0;

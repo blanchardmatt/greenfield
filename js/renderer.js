@@ -398,6 +398,46 @@ const Renderer = (() => {
     SpriteLibrary.drawSprite(ctx, char.sprite, Math.round(char.x), Math.round(char.y), animFrame);
   }
 
+  function drawCharacterWithOffset(char, animFrame, ox, oy) {
+    if (!char.visible) return;
+    const scale = char.renderScale || 1;
+    if (scale === 1) {
+      SpriteLibrary.drawSprite(ctx, char.sprite, Math.round(char.x + ox), Math.round(char.y + oy), animFrame);
+    } else {
+      // Draw scaled: render to temp canvas then scale up
+      const sw = SpriteLibrary.W;
+      const sh = SpriteLibrary.H;
+      const tmpCanvas = document.createElement('canvas');
+      tmpCanvas.width = sw;
+      tmpCanvas.height = sh;
+      const tmpCtx = tmpCanvas.getContext('2d');
+      SpriteLibrary.drawSprite(tmpCtx, char.sprite, 0, 0, animFrame);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(tmpCanvas,
+        Math.round(char.x + ox), Math.round(char.y + oy),
+        Math.round(sw * scale), Math.round(sh * scale));
+    }
+  }
+
+  // Draw floating music notes around a position
+  function drawMusicNotes(x, y, time) {
+    ctx.fillStyle = '#ddcc44';
+    for (let i = 0; i < 5; i++) {
+      const angle = (time / 1200 + i * 1.256) % (Math.PI * 2);
+      const r = 20 + Math.sin(time / 800 + i) * 5;
+      const nx = x + Math.cos(angle) * r;
+      const ny = y - 10 + Math.sin(angle) * r * 0.4 - Math.sin(time / 400 + i * 2) * 3;
+      ctx.globalAlpha = 0.6 + Math.sin(time / 300 + i * 1.5) * 0.3;
+      // Note head
+      ctx.fillRect(Math.floor(nx), Math.floor(ny), 2, 2);
+      // Note stem
+      ctx.fillRect(Math.floor(nx) + 2, Math.floor(ny) - 3, 1, 4);
+      // Note flag
+      ctx.fillRect(Math.floor(nx) + 2, Math.floor(ny) - 3, 2, 1);
+    }
+    ctx.globalAlpha = 1;
+  }
+
   // --- Emote rendering ---
 
   function drawEmoteBubble(char, emoteName, bobOffset) {
@@ -597,7 +637,7 @@ const Renderer = (() => {
 
   return {
     init, beginFrame, applyCamera, restoreCamera, present,
-    drawBackground, drawCharacter, drawEmoteBubble,
+    drawBackground, drawCharacter, drawCharacterWithOffset, drawEmoteBubble, drawMusicNotes,
     drawDialogueBox, drawDialogueText, drawFadeOverlay,
     drawTitleOverlay, drawCreditsOverlay,
     getTextMaxWidth, getTextScale, getInternalSize,
