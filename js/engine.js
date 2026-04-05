@@ -468,12 +468,12 @@ const CutsceneEngine = (() => {
         const di = dancingChars.indexOf(char);
         const totalDancers = dancingChars.length;
         const angle = (t / 2500 + (di / totalDancers) * Math.PI * 2) % (Math.PI * 2);
-        const centerX = 145;
-        const centerY = 150;
-        const radiusX = 70 + Math.sin(t / 2000) * 8;
-        const radiusY = 30 + Math.sin(t / 2500) * 5;
-        char.x = centerX + Math.cos(angle) * radiusX - SpriteLibrary.W / 2;
-        char.y = centerY + Math.sin(angle) * radiusY - SpriteLibrary.H / 2;
+        const centerX = 115;
+        const centerY = 148;
+        const radiusX = 65 + Math.sin(t / 2000) * 8;
+        const radiusY = 25 + Math.sin(t / 2500) * 5;
+        char.x = centerX + Math.cos(angle) * radiusX;
+        char.y = centerY + Math.sin(angle) * radiusY;
       } else if (char.milling) {
         // Wandering near base position — orbit loosely around fire
         const wx = Math.sin(t / 2500 + seed) * 10 + Math.sin(t / 4000 + seed * 2) * 5;
@@ -665,7 +665,7 @@ const CutsceneEngine = (() => {
       if (char.visible && !char.pinned) {
         const charCenterX = char.x + SpriteLibrary.W / 2;
         const charBottom = char.y + SpriteLibrary.H;
-        const distX = Math.abs(charCenterX - 145);
+        const distX = Math.abs(charCenterX - 115);
         const distY = Math.abs(charBottom - 148);
         if (distX < 20 && distY < 20) {
           Renderer.drawSmoke(charCenterX, char.y, t, char.idleSeed);

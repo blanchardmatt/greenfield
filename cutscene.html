@@ -1803,18 +1803,18 @@ const Renderer = (() => {
       // Bonfire pit
       const fs = p.fireScale || 1;
       ctx.fillStyle = '#777766';
-      fillCircle(ctx, 145, 148, Math.round(8 * fs));
+      fillCircle(ctx, 115, 148, Math.round(8 * fs));
       ctx.fillStyle = p.grass;
-      fillCircle(ctx, 145, 148, Math.round(5 * fs));
+      fillCircle(ctx, 115, 148, Math.round(5 * fs));
       ctx.fillStyle = '#664422';
-      ctx.fillRect(145 - Math.round(6 * fs), 146, Math.round(12 * fs), 3);
-      ctx.fillRect(143, 144, 3, Math.round(8 * fs));
+      ctx.fillRect(115 - Math.round(6 * fs), 146, Math.round(12 * fs), 3);
+      ctx.fillRect(113, 144, 3, Math.round(8 * fs));
       ctx.fillStyle = '#cc5522';
-      ctx.fillRect(145 - Math.round(4 * fs), 140 - Math.round(2 * (fs - 1)), Math.round(8 * fs), Math.round(6 * fs));
+      ctx.fillRect(115 - Math.round(4 * fs), 140 - Math.round(2 * (fs - 1)), Math.round(8 * fs), Math.round(6 * fs));
       ctx.fillStyle = '#ff8833';
-      ctx.fillRect(145 - Math.round(3 * fs), 138 - Math.round(3 * (fs - 1)), Math.round(6 * fs), Math.round(5 * fs));
+      ctx.fillRect(115 - Math.round(3 * fs), 138 - Math.round(3 * (fs - 1)), Math.round(6 * fs), Math.round(5 * fs));
       ctx.fillStyle = '#ffcc44';
-      ctx.fillRect(145 - Math.round(2 * fs), 136 - Math.round(4 * (fs - 1)), Math.round(4 * fs), Math.round(4 * fs));
+      ctx.fillRect(115 - Math.round(2 * fs), 136 - Math.round(4 * (fs - 1)), Math.round(4 * fs), Math.round(4 * fs));
 
       // Grass tufts
       ctx.fillStyle = p.leaf;
@@ -2185,7 +2185,7 @@ const Renderer = (() => {
 
     _drawFire(ctx, t, scale) {
       const s = scale || 1;
-      const fireX = 145;
+      const fireX = 115;
       const fireY = 140;
       const numFlames = Math.round(6 * s);
       for (let i = 0; i < numFlames; i++) {
@@ -4658,12 +4658,12 @@ const CutsceneEngine = (() => {
         const di = dancingChars.indexOf(char);
         const totalDancers = dancingChars.length;
         const angle = (t / 2500 + (di / totalDancers) * Math.PI * 2) % (Math.PI * 2);
-        const centerX = 145;
-        const centerY = 150;
-        const radiusX = 70 + Math.sin(t / 2000) * 8;
-        const radiusY = 30 + Math.sin(t / 2500) * 5;
-        char.x = centerX + Math.cos(angle) * radiusX - SpriteLibrary.W / 2;
-        char.y = centerY + Math.sin(angle) * radiusY - SpriteLibrary.H / 2;
+        const centerX = 115;
+        const centerY = 148;
+        const radiusX = 65 + Math.sin(t / 2000) * 8;
+        const radiusY = 25 + Math.sin(t / 2500) * 5;
+        char.x = centerX + Math.cos(angle) * radiusX;
+        char.y = centerY + Math.sin(angle) * radiusY;
       } else if (char.milling) {
         // Wandering near base position — orbit loosely around fire
         const wx = Math.sin(t / 2500 + seed) * 10 + Math.sin(t / 4000 + seed * 2) * 5;
@@ -4855,7 +4855,7 @@ const CutsceneEngine = (() => {
       if (char.visible && !char.pinned) {
         const charCenterX = char.x + SpriteLibrary.W / 2;
         const charBottom = char.y + SpriteLibrary.H;
-        const distX = Math.abs(charCenterX - 145);
+        const distX = Math.abs(charCenterX - 115);
         const distY = Math.abs(charBottom - 148);
         if (distX < 20 && distY < 20) {
           Renderer.drawSmoke(charCenterX, char.y, t, char.idleSeed);

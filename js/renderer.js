@@ -295,18 +295,18 @@ const Renderer = (() => {
       // Bonfire pit
       const fs = p.fireScale || 1;
       ctx.fillStyle = '#777766';
-      fillCircle(ctx, 145, 148, Math.round(8 * fs));
+      fillCircle(ctx, 115, 148, Math.round(8 * fs));
       ctx.fillStyle = p.grass;
-      fillCircle(ctx, 145, 148, Math.round(5 * fs));
+      fillCircle(ctx, 115, 148, Math.round(5 * fs));
       ctx.fillStyle = '#664422';
-      ctx.fillRect(145 - Math.round(6 * fs), 146, Math.round(12 * fs), 3);
-      ctx.fillRect(143, 144, 3, Math.round(8 * fs));
+      ctx.fillRect(115 - Math.round(6 * fs), 146, Math.round(12 * fs), 3);
+      ctx.fillRect(113, 144, 3, Math.round(8 * fs));
       ctx.fillStyle = '#cc5522';
-      ctx.fillRect(145 - Math.round(4 * fs), 140 - Math.round(2 * (fs - 1)), Math.round(8 * fs), Math.round(6 * fs));
+      ctx.fillRect(115 - Math.round(4 * fs), 140 - Math.round(2 * (fs - 1)), Math.round(8 * fs), Math.round(6 * fs));
       ctx.fillStyle = '#ff8833';
-      ctx.fillRect(145 - Math.round(3 * fs), 138 - Math.round(3 * (fs - 1)), Math.round(6 * fs), Math.round(5 * fs));
+      ctx.fillRect(115 - Math.round(3 * fs), 138 - Math.round(3 * (fs - 1)), Math.round(6 * fs), Math.round(5 * fs));
       ctx.fillStyle = '#ffcc44';
-      ctx.fillRect(145 - Math.round(2 * fs), 136 - Math.round(4 * (fs - 1)), Math.round(4 * fs), Math.round(4 * fs));
+      ctx.fillRect(115 - Math.round(2 * fs), 136 - Math.round(4 * (fs - 1)), Math.round(4 * fs), Math.round(4 * fs));
 
       // Grass tufts
       ctx.fillStyle = p.leaf;
@@ -677,7 +677,7 @@ const Renderer = (() => {
 
     _drawFire(ctx, t, scale) {
       const s = scale || 1;
-      const fireX = 145;
+      const fireX = 115;
       const fireY = 140;
       const numFlames = Math.round(6 * s);
       for (let i = 0; i < numFlames; i++) {
