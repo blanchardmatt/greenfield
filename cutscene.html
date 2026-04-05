@@ -2236,6 +2236,113 @@ const Renderer = (() => {
         ctx.fillRect(Math.floor(gx + sway), 133, 1, 3);
         ctx.fillRect(Math.floor(gx + sway + 2), 132, 1, 4);
       }
+
+      // Person going in/out of door
+      const doorCycle = 15000;
+      const doorPhase = (t % doorCycle) / doorCycle;
+      // 0-0.1: walk to door from left, 0.1-0.15: at door, 0.15-0.2: go inside
+      // 0.5-0.55: come out, 0.55-0.6: at door, 0.6-0.7: walk away right
+      ctx.globalAlpha = 0.9;
+      if (doorPhase < 0.1) {
+        // Walking toward door from left
+        const px = 90 + (doorPhase / 0.1) * 30;
+        ctx.fillStyle = '#886644';
+        ctx.fillRect(Math.floor(px), 120, 4, 8);
+        ctx.fillStyle = '#ddbb88';
+        ctx.fillRect(Math.floor(px), 117, 4, 3);
+      } else if (doorPhase >= 0.1 && doorPhase < 0.2) {
+        // At door / going in (shrink into doorway)
+        const shrink = (doorPhase - 0.1) / 0.1;
+        if (shrink < 0.5) {
+          ctx.fillStyle = '#886644';
+          ctx.fillRect(122, 120, 4, 8);
+          ctx.fillStyle = '#ddbb88';
+          ctx.fillRect(122, 117, 4, 3);
+        }
+      } else if (doorPhase >= 0.5 && doorPhase < 0.55) {
+        // Coming out of door
+        ctx.fillStyle = '#556688';
+        ctx.fillRect(122, 120, 4, 8);
+        ctx.fillStyle = '#ddbb88';
+        ctx.fillRect(122, 117, 4, 3);
+      } else if (doorPhase >= 0.55 && doorPhase < 0.7) {
+        // Walking away to right
+        const px = 122 + ((doorPhase - 0.55) / 0.15) * 40;
+        ctx.fillStyle = '#556688';
+        ctx.fillRect(Math.floor(px), 120, 4, 8);
+        ctx.fillStyle = '#ddbb88';
+        ctx.fillRect(Math.floor(px), 117, 4, 3);
+      }
+
+      // Second person, offset timing
+      const door2Cycle = 22000;
+      const door2Phase = (t % door2Cycle) / door2Cycle;
+      if (door2Phase >= 0.3 && door2Phase < 0.38) {
+        const px = 170 - ((door2Phase - 0.3) / 0.08) * 48;
+        ctx.fillStyle = '#cc5544';
+        ctx.fillRect(Math.floor(px), 119, 4, 9);
+        ctx.fillStyle = '#ddbb88';
+        ctx.fillRect(Math.floor(px), 116, 4, 3);
+      } else if (door2Phase >= 0.38 && door2Phase < 0.42) {
+        // At door going in
+        if (door2Phase < 0.40) {
+          ctx.fillStyle = '#cc5544';
+          ctx.fillRect(122, 119, 4, 9);
+          ctx.fillStyle = '#ddbb88';
+          ctx.fillRect(122, 116, 4, 3);
+        }
+      } else if (door2Phase >= 0.7 && door2Phase < 0.74) {
+        // Coming out
+        ctx.fillStyle = '#cc5544';
+        ctx.fillRect(122, 119, 4, 9);
+        ctx.fillStyle = '#ddbb88';
+        ctx.fillRect(122, 116, 4, 3);
+      } else if (door2Phase >= 0.74 && door2Phase < 0.85) {
+        const px = 122 - ((door2Phase - 0.74) / 0.11) * 50;
+        ctx.fillStyle = '#cc5544';
+        ctx.fillRect(Math.floor(px), 119, 4, 9);
+        ctx.fillStyle = '#ddbb88';
+        ctx.fillRect(Math.floor(px), 116, 4, 3);
+      }
+
+      // Window peek — someone looks out window occasionally
+      const peekCycle = 18000;
+      const peekPhase = (t % peekCycle) / peekCycle;
+      if (peekPhase > 0.2 && peekPhase < 0.35) {
+        // Face in first window
+        ctx.fillStyle = '#ddbb88';
+        ctx.globalAlpha = 0.8;
+        ctx.fillRect(85, 97, 3, 3);
+        ctx.fillStyle = '#111111';
+        ctx.fillRect(85, 97, 1, 1);
+        ctx.fillRect(87, 97, 1, 1);
+      }
+      if (peekPhase > 0.6 && peekPhase < 0.72) {
+        // Face in third window
+        ctx.fillStyle = '#ddbb88';
+        ctx.globalAlpha = 0.8;
+        ctx.fillRect(145, 97, 3, 3);
+        ctx.fillStyle = '#111111';
+        ctx.fillRect(145, 97, 1, 1);
+        ctx.fillRect(147, 97, 1, 1);
+      }
+
+      // Window light turning on/off
+      const lightCycle = 25000;
+      const lightPhase = (t % lightCycle) / lightCycle;
+      if (lightPhase > 0.3 && lightPhase < 0.7) {
+        // Second window glows warm
+        ctx.fillStyle = '#ffdd88';
+        ctx.globalAlpha = 0.4;
+        ctx.fillRect(100, 95, 14, 10);
+      }
+      if (lightPhase > 0.1 && lightPhase < 0.5) {
+        // Fourth window glows warm
+        ctx.fillStyle = '#ffdd88';
+        ctx.globalAlpha = 0.35;
+        ctx.fillRect(160, 95, 14, 10);
+      }
+
       ctx.globalAlpha = 1;
     },
 
