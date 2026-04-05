@@ -2874,49 +2874,49 @@ const Renderer = (() => {
   function drawUfo(state) {
     const ux = Math.round(state.x);
     const uy = Math.round(state.y);
-    const ufoW = 48;
-    const ufoH = 20;
 
-    // Draw UFO procedurally (larger than sprite for legible text)
-    // Dome (top half)
+    // Large UFO with clear UBER branding
+    // Dome
     ctx.fillStyle = '#cccccc';
-    fillCircle(ctx, ux + 24, uy + 6, 12);
-    ctx.fillStyle = '#aaaaaa';
-    fillCircle(ctx, ux + 24, uy + 6, 9);
-    ctx.fillStyle = '#888888';
-    fillCircle(ctx, ux + 24, uy + 8, 7);
+    fillCircle(ctx, ux + 30, uy + 8, 14);
+    ctx.fillStyle = '#bbbbbb';
+    fillCircle(ctx, ux + 30, uy + 8, 11);
 
-    // "UBER" text on the dome
+    // White panel on dome for logo
     ctx.fillStyle = '#111111';
-    PixelFont.drawText(ctx, 'UBER', ux + 9, uy + 3, '#111111', 1);
+    ctx.fillRect(ux + 14, uy + 2, 32, 11);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(ux + 15, uy + 3, 30, 9);
 
-    // Body (disc)
+    // "UBER" in black on white panel, scale 1
+    PixelFont.drawText(ctx, 'UBER', ux + 18, uy + 4, '#111111', 1);
+
+    // Body disc
     ctx.fillStyle = '#dddddd';
-    for (let dy = 0; dy < 6; dy++) {
-      const w = ufoW - dy * 4;
-      const xOff = (ufoW - w) / 2;
-      ctx.fillRect(ux + Math.floor(xOff), uy + 10 + dy, Math.ceil(w), 1);
+    for (let dy = 0; dy < 7; dy++) {
+      const w = 60 - dy * 5;
+      const xOff = (60 - w) / 2;
+      ctx.fillRect(ux + Math.floor(xOff), uy + 14 + dy, Math.ceil(w), 1);
     }
-    // Body outline
-    ctx.fillStyle = '#888888';
-    ctx.fillRect(ux + 2, uy + 10, 44, 1);
-    ctx.fillRect(ux + 10, uy + 15, 28, 1);
+    ctx.fillStyle = '#999999';
+    ctx.fillRect(ux + 2, uy + 14, 56, 1);
+    ctx.fillRect(ux + 12, uy + 20, 36, 1);
 
-    // Colored running lights on body
-    const lightColors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'];
-    for (let i = 0; i < 5; i++) {
-      const on = Math.sin(Date.now() / 150 + i * 1.2) > 0.2;
+    // Colored running lights
+    const lightColors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+    for (let i = 0; i < 6; i++) {
+      const on = Math.sin(Date.now() / 150 + i * 1.0) > 0.2;
       if (on) {
         ctx.fillStyle = lightColors[i];
-        ctx.fillRect(ux + 8 + i * 7, uy + 11, 3, 2);
+        ctx.fillRect(ux + 8 + i * 8, uy + 15, 3, 2);
       }
     }
 
     // Tractor beam
     if (state.beamOn) {
-      const beamX = ux + 10;
-      const beamTopW = 28;
-      const beamBottomW = 40;
+      const beamX = ux + 12;
+      const beamTopW = 36;
+      const beamBottomW = 48;
       const beamH = INTERNAL_H - uy - 15;
 
       // Beam: widening trapezoid of light
