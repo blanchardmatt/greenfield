@@ -1242,6 +1242,65 @@ const Renderer = (() => {
       fillCircle(ctx, Math.floor(sc2x), 50, 10);
       fillCircle(ctx, Math.floor(sc2x) + 12, 47, 12);
 
+      // Pale man dancing on a ladder against left tree
+      const ladX = 42;
+      const ladY = 70; // ladder leans against tree
+      // Ladder (two rails + rungs)
+      ctx.fillStyle = '#aa8855';
+      ctx.fillRect(ladX, ladY, 2, 55);       // left rail
+      ctx.fillRect(ladX + 8, ladY, 2, 55);    // right rail
+      for (let r = 0; r < 6; r++) {
+        ctx.fillRect(ladX, ladY + 5 + r * 9, 10, 1); // rungs
+      }
+      // Guy standing on ladder mid-height, dancing
+      const guyY = ladY + 18;
+      const dancePhase = Math.sin(t / 250);
+      const armPhase = Math.sin(t / 200);
+      const leanX = Math.sin(t / 400) * 2;
+
+      // Legs on rung
+      ctx.fillStyle = '#ddcc99'; // pale skin
+      ctx.fillRect(Math.floor(ladX + 2 + leanX), guyY + 12, 2, 4); // left leg
+      ctx.fillRect(Math.floor(ladX + 6 + leanX), guyY + 12, 2, 4); // right leg
+      // Shorts
+      ctx.fillStyle = '#6688aa'; // blue shorts
+      ctx.fillRect(Math.floor(ladX + 1 + leanX), guyY + 9, 8, 4);
+      // Tank top (white)
+      ctx.fillStyle = '#eeeeee';
+      ctx.fillRect(Math.floor(ladX + 2 + leanX), guyY + 3, 6, 6);
+      // Skin showing on sides (tank top straps)
+      ctx.fillStyle = '#ddcc99';
+      ctx.fillRect(Math.floor(ladX + 2 + leanX), guyY + 4, 1, 4);
+      ctx.fillRect(Math.floor(ladX + 7 + leanX), guyY + 4, 1, 4);
+      // Head
+      ctx.fillStyle = '#ddcc99';
+      ctx.fillRect(Math.floor(ladX + 3 + leanX), guyY - 1, 4, 4);
+      // Hair (short brown)
+      ctx.fillStyle = '#885522';
+      ctx.fillRect(Math.floor(ladX + 3 + leanX), guyY - 2, 4, 2);
+      // Eyes
+      ctx.fillStyle = '#111111';
+      ctx.fillRect(Math.floor(ladX + 4 + leanX), guyY, 1, 1);
+      ctx.fillRect(Math.floor(ladX + 6 + leanX), guyY, 1, 1);
+      // Mouth (grinning)
+      ctx.fillRect(Math.floor(ladX + 4 + leanX), guyY + 2, 2, 1);
+      // Arms — flailing while dancing
+      ctx.fillStyle = '#ddcc99';
+      // Left arm
+      if (armPhase > 0) {
+        ctx.fillRect(Math.floor(ladX + leanX), guyY + 2, 2, 1);
+        ctx.fillRect(Math.floor(ladX - 1 + leanX), guyY, 1, 2);  // arm up
+      } else {
+        ctx.fillRect(Math.floor(ladX + leanX), guyY + 5, 2, 1);   // arm down
+      }
+      // Right arm
+      if (dancePhase > 0) {
+        ctx.fillRect(Math.floor(ladX + 8 + leanX), guyY + 1, 2, 1);
+        ctx.fillRect(Math.floor(ladX + 10 + leanX), guyY - 1, 1, 2); // arm up
+      } else {
+        ctx.fillRect(Math.floor(ladX + 8 + leanX), guyY + 6, 2, 1);  // arm down
+      }
+
       // Wheelchair rider on the roof of the Biltroy
       const roofY = 78;
       const roofLeft = 72;
