@@ -1117,68 +1117,60 @@
           "duration": 1000
         },
         {
-          "type": "emote",
-          "character": "zorp",
-          "emote": "happy",
-          "duration": 1500
-        },
-        {
-          "type": "emote",
-          "character": "blix",
-          "emote": "happy",
-          "duration": 1500
-        },
-        {
-          "type": "emote",
-          "character": "quee",
-          "emote": "happy",
-          "duration": 1500
-        },
-        {
-          "type": "wait",
-          "duration": 2000
-        },
-        {
-          "type": "ufoDepart",
-          "character": "zorp",
-          "duration": 4000
-        },
-        {
-          "type": "wait",
-          "duration": 500
-        },
-        {
-          "type": "ufoDepart",
-          "character": "blix",
-          "duration": 4000
-        },
-        {
-          "type": "wait",
-          "duration": 500
-        },
-        {
-          "type": "ufoDepart",
-          "character": "quee",
-          "duration": 4000
-        },
-        {
-          "type": "wait",
-          "duration": 2000
-        },
-        {
           "type": "transition",
           "effect": "fadeOut",
-          "duration": 3000
+          "duration": 1500
         }
       ]
     },
     {
       "id": "credits",
-      "background": "night_sky",
+      "background": "biltroy_night",
       "actions": [
         {
           "type": "transition",
           "effect": "fadeIn",
+          "duration": 1500
+        },
+        {
+          "type": "emote",
+          "character": "zorp",
+          "emote": "happy",
+          "duration": 1500
+        },
+        {
+          "type": "emote",
+          "character": "blix",
+          "emote": "happy",
+          "duration": 1500
+        },
+        {
+          "type": "emote",
+          "character": "quee",
+          "emote": "happy",
+          "duration": 1500
+        },
+        {
+          "type": "wait",
+          "duration": 2000
+        },
+        {
+          "type": "ufoDepart",
+          "character": "zorp",
+          "duration": 3500
+        },
+        {
+          "type": "ufoDepart",
+          "character": "blix",
+          "duration": 3500
+        },
+        {
+          "type": "ufoDepart",
+          "character": "quee",
+          "duration": 3500
+        },
+        {
+          "type": "wait",
           "duration": 1000
         },
         {
@@ -1241,7 +1233,7 @@
             "",
             ""
           ],
-          "speed": 20,
+          "speed": 18,
           "color": "#aaaaaa",
           "highlightColor": "#ffffff"
         },
