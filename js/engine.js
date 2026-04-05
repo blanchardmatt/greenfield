@@ -504,14 +504,19 @@ const CutsceneEngine = (() => {
 
     // Characters — sorted by Y (back to front) with idle bob
     const t = Date.now();
-    // Sort by bottom edge (feet) for proper depth — characters in front overlap those behind
-    const sortedChars = Object.values(characters).filter(c => c.visible).sort((a, b) => {
-      const aBottom = a.y + SpriteLibrary.H * (a.renderScale || 1);
-      const bBottom = b.y + SpriteLibrary.H * (b.renderScale || 1);
-      return aBottom - bBottom;
-    });
+    // Sort by Y position for depth — characters further down are in front
+    const sortedChars = Object.values(characters).filter(c => c.visible).sort((a, b) => a.y - b.y);
     for (const char of sortedChars) {
       const idleBob = (!char.dancing && !char.milling) ? Math.sin(t / 600 + char.idleSeed * 10) * 1.5 : 0;
+
+      // Perspective scale based on Y depth (unless manually scaled)
+      if (!char.pinned) {
+        const minY = 120, maxY = 190;
+        const minScale = 0.6, maxScale = 1.15;
+        const depthT = Math.max(0, Math.min(1, (char.y - minY) / (maxY - minY)));
+        char.renderScale = minScale + depthT * (maxScale - minScale);
+      }
+
       Renderer.drawCharacterWithOffset(char, animFrame, 0, idleBob);
 
       // Smoke if touching the bonfire (fire center ~145, 148)
