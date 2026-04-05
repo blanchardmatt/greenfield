@@ -34,6 +34,56 @@
       "sprite": "villain",
       "name": "Lord Malachar",
       "nameColor": "#ff4444"
+    },
+    "gimli": {
+      "sprite": "dwarf",
+      "name": "Gimli",
+      "nameColor": "#cc6633"
+    },
+    "swift": {
+      "sprite": "archer",
+      "name": "Swift",
+      "nameColor": "#66cc66"
+    },
+    "brother_sol": {
+      "sprite": "monk",
+      "name": "Brother Sol",
+      "nameColor": "#ddaa44"
+    },
+    "shade": {
+      "sprite": "thief",
+      "name": "Shade",
+      "nameColor": "#888899"
+    },
+    "ser_valen": {
+      "sprite": "knight",
+      "name": "Ser Valen",
+      "nameColor": "#cccc66"
+    },
+    "pip": {
+      "sprite": "bard",
+      "name": "Pip",
+      "nameColor": "#44cccc"
+    },
+    "morgana": {
+      "sprite": "witch",
+      "name": "Morgana",
+      "nameColor": "#cc66cc"
+    },
+    "hank": {
+      "sprite": "farmer",
+      "name": "Hank",
+      "nameColor": "#88aa44"
+    },
+    "lily": {
+      "sprite": "child",
+      "name": "Lily",
+      "nameColor": "#ff8888"
+    },
+    "duke": {
+      "sprite": "noble",
+      "name": "Duke Ashford",
+      "nameColor": "#cc88cc"
     }
   },
   "scenes": [
@@ -64,11 +114,14 @@
         { "type": "shake", "intensity": 3, "duration": 500 },
         { "type": "enter", "character": "hero", "from": "left", "to": { "x": 20, "y": 110 }, "duration": 800 },
         { "type": "dialogue", "character": "lyra", "text": "Full stalled spinning out... unkempt and overgrown." },
+        { "type": "enter", "character": "gimli", "from": "left", "to": { "x": 5, "y": 112 }, "duration": 700 },
         { "type": "wait", "duration": 600 },
+        { "type": "enter", "character": "swift", "from": "right", "to": { "x": 220, "y": 106 }, "duration": 700 },
         { "type": "emote", "character": "lyra", "emote": "anger", "duration": 1200 },
         { "type": "dialogue", "character": "lyra", "text": "Why so loud..." },
         { "type": "shake", "intensity": 4, "duration": 600 },
         { "type": "emote", "character": "hero", "emote": "surprise", "duration": 1000 },
+        { "type": "enter", "character": "hank", "from": "left", "to": { "x": 38, "y": 112 }, "duration": 800 },
         { "type": "wait", "duration": 400 },
         { "type": "dialogue", "character": "lyra", "text": "Run it sideways and return." },
         { "type": "dialogue", "character": "lyra", "text": "A plastic click of a pen and..." },
@@ -97,10 +150,14 @@
         { "type": "wait", "duration": 400 },
         { "type": "dialogue", "character": "lyra", "text": "Sedge wren warbles... melody to paper untorn." },
         { "type": "emote", "character": "princess", "emote": "happy", "duration": 1200 },
+        { "type": "enter", "character": "brother_sol", "from": "left", "to": { "x": 5, "y": 108 }, "duration": 700 },
+        { "type": "enter", "character": "shade", "from": "right", "to": { "x": 225, "y": 108 }, "duration": 600 },
         { "type": "wait", "duration": 500 },
         { "type": "dialogue", "character": "lyra", "text": "I'm spun out..." },
         { "type": "shake", "intensity": 3, "duration": 500 },
         { "type": "enter", "character": "wizard", "from": "left", "to": { "x": 40, "y": 108 }, "duration": 1000 },
+        { "type": "enter", "character": "lily", "from": "right", "to": { "x": 180, "y": 112 }, "duration": 600 },
+        { "type": "enter", "character": "pip", "from": "left", "to": { "x": 25, "y": 105 }, "duration": 700 },
         { "type": "dialogue", "character": "lyra", "text": "All the color drains from my view." },
         { "type": "wait", "duration": 600 },
         { "type": "shake", "intensity": 6, "duration": 800 },
@@ -117,13 +174,23 @@
       "background": "night_sky",
       "actions": [
         { "type": "transition", "effect": "fadeIn", "duration": 2500 },
-        { "type": "enter", "character": "lyra", "from": "bottom", "to": { "x": 110, "y": 95 }, "duration": 1200 },
-        { "type": "enter", "character": "elder", "from": "left", "to": { "x": 10, "y": 108 }, "duration": 800 },
-        { "type": "enter", "character": "hero", "from": "left", "to": { "x": 45, "y": 105 }, "duration": 900 },
+        { "type": "enter", "character": "lyra", "from": "bottom", "to": { "x": 110, "y": 90 }, "duration": 1200 },
+        { "type": "enter", "character": "elder", "from": "left", "to": { "x": 5, "y": 108 }, "duration": 800 },
+        { "type": "enter", "character": "hero", "from": "left", "to": { "x": 40, "y": 105 }, "duration": 900 },
         { "type": "enter", "character": "princess", "from": "right", "to": { "x": 195, "y": 100 }, "duration": 800 },
-        { "type": "enter", "character": "wizard", "from": "right", "to": { "x": 170, "y": 108 }, "duration": 900 },
+        { "type": "enter", "character": "wizard", "from": "right", "to": { "x": 175, "y": 108 }, "duration": 900 },
+        { "type": "enter", "character": "gimli", "from": "left", "to": { "x": 55, "y": 112 }, "duration": 600 },
+        { "type": "enter", "character": "swift", "from": "right", "to": { "x": 145, "y": 106 }, "duration": 600 },
+        { "type": "enter", "character": "hank", "from": "left", "to": { "x": 20, "y": 112 }, "duration": 600 },
+        { "type": "enter", "character": "brother_sol", "from": "left", "to": { "x": 70, "y": 110 }, "duration": 600 },
+        { "type": "enter", "character": "shade", "from": "right", "to": { "x": 160, "y": 110 }, "duration": 600 },
+        { "type": "enter", "character": "lily", "from": "right", "to": { "x": 130, "y": 115 }, "duration": 500 },
+        { "type": "enter", "character": "pip", "from": "left", "to": { "x": 85, "y": 108 }, "duration": 600 },
+        { "type": "enter", "character": "ser_valen", "from": "left", "to": { "x": 5, "y": 110 }, "duration": 700 },
+        { "type": "enter", "character": "morgana", "from": "right", "to": { "x": 210, "y": 108 }, "duration": 700 },
         { "type": "wait", "duration": 800 },
-        { "type": "enter", "character": "dark_lord", "from": "right", "to": { "x": 220, "y": 105 }, "duration": 1200 },
+        { "type": "enter", "character": "dark_lord", "from": "right", "to": { "x": 225, "y": 105 }, "duration": 1200 },
+        { "type": "enter", "character": "duke", "from": "left", "to": { "x": 35, "y": 107 }, "duration": 800 },
         { "type": "dialogue", "character": "lyra", "text": "Hollowed bell..." },
         { "type": "shake", "intensity": 2, "duration": 600 },
         { "type": "wait", "duration": 500 },
@@ -232,6 +299,16 @@
           "Princess Elara . . . . Royalty",
           "Thalos . . . . . . . . . Mage",
           "Lord Malachar . . . . Villain",
+          "Gimli . . . . . . . . . Dwarf",
+          "Swift . . . . . . . .  Archer",
+          "Brother Sol . . . . . .  Monk",
+          "Shade . . . . . . . . . Thief",
+          "Ser Valen . . . . . . Knight",
+          "Pip . . . . . . . . . .  Bard",
+          "Morgana . . . . . . . . Witch",
+          "Hank . . . . . . . .  Farmer",
+          "Lily . . . . . . . . . Child",
+          "Duke Ashford . . . .  Noble",
           "",
           "",
           "#Created with",
