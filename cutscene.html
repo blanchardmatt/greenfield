@@ -3319,7 +3319,7 @@ const SHARDS_SCRIPT = {
           "from": "right",
           "to": {
             "x": 8,
-            "y": 130
+            "y": 140
           },
           "duration": 600
         },
@@ -3333,8 +3333,8 @@ const SHARDS_SCRIPT = {
           "character": "hero",
           "from": "left",
           "to": {
-            "x": 40,
-            "y": 127
+            "x": 45,
+            "y": 155
           },
           "duration": 600
         },
@@ -3348,8 +3348,8 @@ const SHARDS_SCRIPT = {
           "character": "gimli",
           "from": "left",
           "to": {
-            "x": 72,
-            "y": 132
+            "x": 75,
+            "y": 170
           },
           "duration": 600
         },
@@ -3369,7 +3369,7 @@ const SHARDS_SCRIPT = {
           "from": "right",
           "to": {
             "x": 170,
-            "y": 128
+            "y": 145
           },
           "duration": 600
         },
@@ -3379,7 +3379,7 @@ const SHARDS_SCRIPT = {
           "from": "left",
           "to": {
             "x": 100,
-            "y": 130
+            "y": 165
           },
           "duration": 600
         },
@@ -3482,7 +3482,7 @@ const SHARDS_SCRIPT = {
           "from": "right",
           "to": {
             "x": 178,
-            "y": 126
+            "y": 160
           },
           "duration": 600
         },
@@ -3503,7 +3503,7 @@ const SHARDS_SCRIPT = {
           "from": "left",
           "to": {
             "x": 22,
-            "y": 132
+            "y": 150
           },
           "duration": 600
         },
@@ -3512,8 +3512,8 @@ const SHARDS_SCRIPT = {
           "character": "shade",
           "from": "right",
           "to": {
-            "x": 160,
-            "y": 130
+            "x": 175,
+            "y": 175
           },
           "duration": 600
         },
@@ -3533,7 +3533,7 @@ const SHARDS_SCRIPT = {
           "from": "left",
           "to": {
             "x": 55,
-            "y": 128
+            "y": 175
           },
           "duration": 600
         },
@@ -3543,7 +3543,7 @@ const SHARDS_SCRIPT = {
           "from": "right",
           "to": {
             "x": 88,
-            "y": 133
+            "y": 145
           },
           "duration": 600
         },
@@ -3552,8 +3552,8 @@ const SHARDS_SCRIPT = {
           "character": "pip",
           "from": "left",
           "to": {
-            "x": 175,
-            "y": 132
+            "x": 185,
+            "y": 135
           },
           "duration": 600
         },
@@ -3622,7 +3622,7 @@ const SHARDS_SCRIPT = {
           "from": "left",
           "to": {
             "x": 5,
-            "y": 128
+            "y": 165
           },
           "duration": 600
         },
@@ -3631,8 +3631,8 @@ const SHARDS_SCRIPT = {
           "character": "morgana",
           "from": "right",
           "to": {
-            "x": 185,
-            "y": 130
+            "x": 170,
+            "y": 150
           },
           "duration": 600
         },
@@ -3652,8 +3652,8 @@ const SHARDS_SCRIPT = {
           "character": "dark_lord",
           "from": "right",
           "to": {
-            "x": 165,
-            "y": 126
+            "x": 110,
+            "y": 180
           },
           "duration": 600
         },
@@ -3663,7 +3663,7 @@ const SHARDS_SCRIPT = {
           "from": "left",
           "to": {
             "x": 30,
-            "y": 131
+            "y": 180
           },
           "duration": 600
         },
@@ -4300,16 +4300,16 @@ const CutsceneEngine = (() => {
         const di = dancingChars.indexOf(char);
         const totalDancers = dancingChars.length;
         const angle = (t / 2500 + (di / totalDancers) * Math.PI * 2) % (Math.PI * 2);
-        const centerX = 145;
-        const centerY = 140;
-        const radiusX = 65 + Math.sin(t / 2000) * 8;
-        const radiusY = 18 + Math.sin(t / 2500) * 4;
+        const centerX = 128;
+        const centerY = 155;
+        const radiusX = 75 + Math.sin(t / 2000) * 8;
+        const radiusY = 30 + Math.sin(t / 2500) * 5;
         char.x = centerX + Math.cos(angle) * radiusX - SpriteLibrary.W / 2;
         char.y = centerY + Math.sin(angle) * radiusY - SpriteLibrary.H / 2;
       } else if (char.milling) {
-        // Wandering near base position — mostly horizontal, grounded
-        const wx = Math.sin(t / 2000 + seed) * 10 + Math.sin(t / 3000 + seed * 2) * 5;
-        const wy = Math.sin(t / 2500 + seed * 1.5) * 1.5;
+        // Wandering near base position
+        const wx = Math.sin(t / 2000 + seed) * 12 + Math.sin(t / 3000 + seed * 2) * 6;
+        const wy = Math.sin(t / 2500 + seed * 1.5) * 5;
         let nx = char.baseX + wx;
         // Avoid the bonfire zone (x=125-165)
         const charRight = nx + SpriteLibrary.W;

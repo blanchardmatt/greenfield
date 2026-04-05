@@ -170,7 +170,7 @@
           "from": "right",
           "to": {
             "x": 8,
-            "y": 130
+            "y": 140
           },
           "duration": 600
         },
@@ -184,8 +184,8 @@
           "character": "hero",
           "from": "left",
           "to": {
-            "x": 40,
-            "y": 127
+            "x": 45,
+            "y": 155
           },
           "duration": 600
         },
@@ -199,8 +199,8 @@
           "character": "gimli",
           "from": "left",
           "to": {
-            "x": 72,
-            "y": 132
+            "x": 75,
+            "y": 170
           },
           "duration": 600
         },
@@ -220,7 +220,7 @@
           "from": "right",
           "to": {
             "x": 170,
-            "y": 128
+            "y": 145
           },
           "duration": 600
         },
@@ -230,7 +230,7 @@
           "from": "left",
           "to": {
             "x": 100,
-            "y": 130
+            "y": 165
           },
           "duration": 600
         },
@@ -333,7 +333,7 @@
           "from": "right",
           "to": {
             "x": 178,
-            "y": 126
+            "y": 160
           },
           "duration": 600
         },
@@ -354,7 +354,7 @@
           "from": "left",
           "to": {
             "x": 22,
-            "y": 132
+            "y": 150
           },
           "duration": 600
         },
@@ -363,8 +363,8 @@
           "character": "shade",
           "from": "right",
           "to": {
-            "x": 160,
-            "y": 130
+            "x": 175,
+            "y": 175
           },
           "duration": 600
         },
@@ -384,7 +384,7 @@
           "from": "left",
           "to": {
             "x": 55,
-            "y": 128
+            "y": 175
           },
           "duration": 600
         },
@@ -394,7 +394,7 @@
           "from": "right",
           "to": {
             "x": 88,
-            "y": 133
+            "y": 145
           },
           "duration": 600
         },
@@ -403,8 +403,8 @@
           "character": "pip",
           "from": "left",
           "to": {
-            "x": 175,
-            "y": 132
+            "x": 185,
+            "y": 135
           },
           "duration": 600
         },
@@ -473,7 +473,7 @@
           "from": "left",
           "to": {
             "x": 5,
-            "y": 128
+            "y": 165
           },
           "duration": 600
         },
@@ -482,8 +482,8 @@
           "character": "morgana",
           "from": "right",
           "to": {
-            "x": 185,
-            "y": 130
+            "x": 170,
+            "y": 150
           },
           "duration": 600
         },
@@ -503,8 +503,8 @@
           "character": "dark_lord",
           "from": "right",
           "to": {
-            "x": 165,
-            "y": 126
+            "x": 110,
+            "y": 180
           },
           "duration": 600
         },
@@ -514,7 +514,7 @@
           "from": "left",
           "to": {
             "x": 30,
-            "y": 131
+            "y": 180
           },
           "duration": 600
         },

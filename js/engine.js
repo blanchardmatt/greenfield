@@ -353,16 +353,16 @@ const CutsceneEngine = (() => {
         const di = dancingChars.indexOf(char);
         const totalDancers = dancingChars.length;
         const angle = (t / 2500 + (di / totalDancers) * Math.PI * 2) % (Math.PI * 2);
-        const centerX = 145;
-        const centerY = 140;
-        const radiusX = 65 + Math.sin(t / 2000) * 8;
-        const radiusY = 18 + Math.sin(t / 2500) * 4;
+        const centerX = 128;
+        const centerY = 155;
+        const radiusX = 75 + Math.sin(t / 2000) * 8;
+        const radiusY = 30 + Math.sin(t / 2500) * 5;
         char.x = centerX + Math.cos(angle) * radiusX - SpriteLibrary.W / 2;
         char.y = centerY + Math.sin(angle) * radiusY - SpriteLibrary.H / 2;
       } else if (char.milling) {
-        // Wandering near base position — mostly horizontal, grounded
-        const wx = Math.sin(t / 2000 + seed) * 10 + Math.sin(t / 3000 + seed * 2) * 5;
-        const wy = Math.sin(t / 2500 + seed * 1.5) * 1.5;
+        // Wandering near base position
+        const wx = Math.sin(t / 2000 + seed) * 12 + Math.sin(t / 3000 + seed * 2) * 6;
+        const wy = Math.sin(t / 2500 + seed * 1.5) * 5;
         let nx = char.baseX + wx;
         // Avoid the bonfire zone (x=125-165)
         const charRight = nx + SpriteLibrary.W;
