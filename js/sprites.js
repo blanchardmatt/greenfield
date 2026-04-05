@@ -277,5 +277,17 @@ const SpriteLibrary = (() => {
     return Object.keys(sprites);
   }
 
-  return { drawSprite, drawEmote, getSpriteNames, W, H };
+  function getSprites() {
+    return sprites;
+  }
+
+  function getEmotes() {
+    return emotes;
+  }
+
+  function getEmoteNames() {
+    return Object.keys(emotes);
+  }
+
+  return { drawSprite, drawEmote, getSpriteNames, getSprites, getEmotes, getEmoteNames, W, H };
 })();

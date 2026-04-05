@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cutscene Editor</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #0a0a0f;
+  color: #c0c0c0;
+  font-family: monospace;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* --- Header --- */
+#editor-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #111120;
+  border-bottom: 1px solid #333;
+  flex-wrap: wrap;
+}
+
+#editor-header h1 {
+  font-size: 14px;
+  color: #8888cc;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-right: 12px;
+}
+
+.toolbar-btn {
+  font-family: monospace;
+  font-size: 12px;
+  background: #2a2a4e;
+  color: #aaa;
+  border: 1px solid #444;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.toolbar-btn:hover { background: #3a3a5e; color: #ccc; }
+.toolbar-btn.primary { background: #335533; border-color: #557755; }
+.toolbar-btn.primary:hover { background: #446644; }
+
+.toolbar-sep {
+  width: 1px;
+  height: 20px;
+  background: #333;
+  margin: 0 4px;
+}
+
+#state-display {
+  font-size: 11px;
+  color: #666;
+  margin-left: auto;
+}
+
+/* --- Main Layout --- */
+#editor-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* --- Left Panel --- */
+#left-panel {
+  width: 420px;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #333;
+  background: #0d0d18;
+}
+
+/* Tabs */
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid #333;
+}
+
+.tab-btn {
+  font-family: monospace;
+  font-size: 12px;
+  background: #111120;
+  color: #666;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 16px;
+  cursor: pointer;
+  flex: 1;
+}
+
+.tab-btn:hover { color: #aaa; }
+.tab-btn.active { color: #aaa; border-bottom-color: #6666aa; background: #161628; }
+
+.tab-panel {
+  display: none;
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+}
+
+.tab-panel.active { display: flex; flex-direction: column; }
+
+/* Script textarea */
+#script-textarea {
+  font-family: monospace;
+  font-size: 12px;
+  background: #0a0a14;
+  color: #ccccdd;
+  border: 1px solid #333;
+  padding: 8px;
+  flex: 1;
+  resize: none;
+  tab-size: 2;
+  line-height: 1.4;
+  outline: none;
+}
+
+#script-textarea:focus { border-color: #5555aa; }
+
+.validation-msg {
+  font-size: 11px;
+  padding: 6px 8px;
+  margin-top: 4px;
+  border-radius: 2px;
+}
+
+.validation-msg.ok { color: #55aa55; }
+.validation-msg.error { color: #cc5555; white-space: pre-wrap; }
+
+/* Galleries */
+.gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 4px;
+}
+
+.gallery-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.gallery-item:hover { border-color: #444; background: #1a1a2e; }
+
+.sprite-thumb {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border: 1px solid #333;
+  background: #111;
+}
+
+.bg-thumb {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border: 1px solid #333;
+}
+
+.gallery-label {
+  font-size: 10px;
+  color: #888;
+  margin-top: 4px;
+  text-align: center;
+}
+
+.gallery-hint {
+  font-size: 11px;
+  color: #555;
+  padding: 8px 0;
+}
+
+/* --- Right Panel --- */
+#right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  background: #0a0a12;
+  overflow: auto;
+}
+
+#preview-wrapper {
+  border: 3px solid #333;
+  box-shadow: 0 0 20px rgba(80, 80, 160, 0.3);
+  background: #000;
+  cursor: pointer;
+  max-width: 100%;
+}
+
+#preview-canvas {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  max-width: 100%;
+  height: auto;
+}
+
+#preview-hint {
+  font-size: 11px;
+  color: #555;
+  margin-top: 8px;
+}
+
+/* --- Hidden --- */
+.hidden { display: none; }
+
+/* --- Responsive --- */
+@media (max-width: 800px) {
+  #editor-main { flex-direction: column; }
+  #left-panel { width: 100%; min-width: 0; max-height: 50vh; border-right: none; border-bottom: 1px solid #333; }
+  #right-panel { flex: 1; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header / Toolbar -->
+<div id="editor-header">
+  <h1>Cutscene Editor</h1>
+  <button class="toolbar-btn" id="btn-load-json">Open</button>
+  <button class="toolbar-btn" id="btn-save-json">Save JSON</button>
+  <button class="toolbar-btn" id="btn-export-html">Export HTML</button>
+  <div class="toolbar-sep"></div>
+  <button class="toolbar-btn primary" id="btn-play">Play</button>
+  <button class="toolbar-btn" id="btn-pause">Pause</button>
+  <button class="toolbar-btn" id="btn-step">Step</button>
+  <button class="toolbar-btn" id="btn-ed-restart">Restart</button>
+  <div id="state-display"></div>
+</div>
+
+<!-- Main Layout -->
+<div id="editor-main">
+
+  <!-- Left Panel: Tabs -->
+  <div id="left-panel">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="script">Script</button>
+      <button class="tab-btn" data-tab="chars">Characters</button>
+      <button class="tab-btn" data-tab="bgs">Backgrounds</button>
+    </div>
+
+    <!-- Script Tab -->
+    <div class="tab-panel active" id="tab-script">
+      <textarea id="script-textarea" spellcheck="false"></textarea>
+      <div id="validation-errors" class="validation-msg"></div>
+    </div>
+
+    <!-- Characters Tab -->
+    <div class="tab-panel" id="tab-chars">
+      <div class="gallery-hint">Click a sprite to copy its name. Use in your script's character definitions.</div>
+      <div class="gallery-grid" id="sprite-gallery"></div>
+    </div>
+
+    <!-- Backgrounds Tab -->
+    <div class="tab-panel" id="tab-bgs">
+      <div class="gallery-hint">Click a background to copy its name. Use as scene backgrounds.</div>
+      <div class="gallery-grid" id="bg-gallery"></div>
+    </div>
+  </div>
+
+  <!-- Right Panel: Preview -->
+  <div id="right-panel">
+    <div id="preview-wrapper">
+      <canvas id="preview-canvas" width="768" height="672"></canvas>
+    </div>
+    <div id="preview-hint">Click canvas or press Space to advance dialogue</div>
+  </div>
+
+</div>
+
+<!-- Hidden file input -->
+<input type="file" id="json-file-input" class="hidden" accept=".json">
+
+<!-- Scripts -->
+<script src="js/font.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/animations.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/script-parser.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/editor.js"></script>
+<script>
+  Renderer.init(document.getElementById('preview-canvas'));
+  CutsceneEditor.init();
+</script>
+</body>
+</html>

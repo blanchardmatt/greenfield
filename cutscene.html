@@ -36,16 +36,12 @@ h1 {
   box-shadow: 0 0 20px rgba(80, 80, 160, 0.3);
   background: #000;
   cursor: pointer;
-  max-width: 100%;
-  width: 768px;
 }
 
 #display-canvas {
   display: block;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  width: 100%;
-  height: auto;
 }
 
 #controls {
@@ -106,6 +102,14 @@ button:hover {
   color: #555;
 }
 
+#display-canvas {
+  width: 100%;
+  height: auto;
+}
+#canvas-wrapper {
+  max-width: 100%;
+  width: 768px;
+}
 </style>
 </head>
 <body>
@@ -283,6 +287,7 @@ const PixelFont = (() => {
 
   return { drawText, measureText, wrapText, CHAR_W, CHAR_H };
 })();
+
 
 /**
  * SpriteLibrary — Built-in 16x24 pixel character sprites.
@@ -563,8 +568,21 @@ const SpriteLibrary = (() => {
     return Object.keys(sprites);
   }
 
-  return { drawSprite, drawEmote, getSpriteNames, W, H };
+  function getSprites() {
+    return sprites;
+  }
+
+  function getEmotes() {
+    return emotes;
+  }
+
+  function getEmoteNames() {
+    return Object.keys(emotes);
+  }
+
+  return { drawSprite, drawEmote, getSpriteNames, getSprites, getEmotes, getEmoteNames, W, H };
 })();
+
 
 /**
  * AnimationSystem — Manages tweens, screen effects, and typewriter text.
@@ -724,6 +742,7 @@ const AnimationSystem = (() => {
     getCamera, isTweenActive, clear,
   };
 })();
+
 
 /**
  * Renderer — Canvas rendering for backgrounds, sprites, dialogue, and effects.
@@ -1058,13 +1077,32 @@ const Renderer = (() => {
     return { width: INTERNAL_W, height: INTERNAL_H };
   }
 
+  function getBackgroundNames() {
+    return Object.keys(backgrounds);
+  }
+
+  function renderBackgroundToCanvas(name, targetCanvas) {
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = INTERNAL_W;
+    tmpCanvas.height = INTERNAL_H;
+    const tmpCtx = tmpCanvas.getContext('2d');
+    if (backgrounds[name]) {
+      backgrounds[name](tmpCtx);
+    }
+    const tCtx = targetCanvas.getContext('2d');
+    tCtx.imageSmoothingEnabled = false;
+    tCtx.drawImage(tmpCanvas, 0, 0, targetCanvas.width, targetCanvas.height);
+  }
+
   return {
     init, beginFrame, applyCamera, restoreCamera, present,
     drawBackground, drawCharacter, drawEmoteBubble,
     drawDialogueBox, drawDialogueText, drawFadeOverlay,
     getTextMaxWidth, getTextScale, getInternalSize,
+    getBackgroundNames, renderBackgroundToCanvas,
   };
 })();
+
 
 /**
  * ScriptParser — Loads, validates, and normalizes cutscene JSON scripts.
@@ -1164,6 +1202,7 @@ const ScriptParser = (() => {
 
   return { loadFromUrl, loadFromObject, validate };
 })();
+
 
 const DEMO_SCRIPT = {
   "title": "The Quest Begins",
@@ -1270,8 +1309,8 @@ const DEMO_SCRIPT = {
       ]
     }
   ]
-}
-;
+};
+
 /**
  * CutsceneEngine — Main game loop, action sequencing, input handling.
  */
@@ -1620,6 +1659,49 @@ const CutsceneEngine = (() => {
     running = false;
   }
 
+  function pause() {
+    running = false;
+  }
+
+  function resume() {
+    if (!script || !currentActionState) return;
+    running = true;
+    lastTime = 0;
+    requestAnimationFrame(gameLoop);
+  }
+
+  function step() {
+    if (!script) return;
+    running = false;
+    // Advance one action — skip instant actions until we hit a timed/dialogue one
+    if (currentActionState) {
+      if (currentActionState.onDone) currentActionState.onDone();
+      if (currentActionState.type === 'dialogue') waitingForInput = false;
+      actionIndex++;
+    }
+    // Process next actions, stopping at the first non-instant one
+    const scene = script.scenes[sceneIndex];
+    if (!scene) return;
+    while (actionIndex < scene.actions.length || sceneIndex < script.scenes.length - 1) {
+      processNextAction();
+      if (!currentActionState || !currentActionState.done) break;
+    }
+    // Render one frame
+    AnimationSystem.update(16);
+    render();
+  }
+
+  function getState() {
+    return {
+      sceneIndex,
+      actionIndex,
+      running,
+      waitingForInput,
+      currentBackground,
+      characterCount: Object.keys(characters).length,
+    };
+  }
+
   function handleInput(type) {
     if (type === 'advance') {
       advancePressed = true;
@@ -1628,12 +1710,11 @@ const CutsceneEngine = (() => {
     }
   }
 
-  return { play, stop, handleInput };
+  return { play, stop, pause, resume, step, getState, handleInput };
 })();
 
 
-
-// --- Page initialization ---
+// --- Self-contained page initialization ---
 (function initPage() {
   const canvas = document.getElementById('display-canvas');
   Renderer.init(canvas);
@@ -1653,7 +1734,6 @@ const CutsceneEngine = (() => {
     CutsceneEngine.play(parsed);
   }
 })();
-
 </script>
 </body>
 </html>

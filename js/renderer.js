@@ -331,10 +331,28 @@ const Renderer = (() => {
     return { width: INTERNAL_W, height: INTERNAL_H };
   }
 
+  function getBackgroundNames() {
+    return Object.keys(backgrounds);
+  }
+
+  function renderBackgroundToCanvas(name, targetCanvas) {
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = INTERNAL_W;
+    tmpCanvas.height = INTERNAL_H;
+    const tmpCtx = tmpCanvas.getContext('2d');
+    if (backgrounds[name]) {
+      backgrounds[name](tmpCtx);
+    }
+    const tCtx = targetCanvas.getContext('2d');
+    tCtx.imageSmoothingEnabled = false;
+    tCtx.drawImage(tmpCanvas, 0, 0, targetCanvas.width, targetCanvas.height);
+  }
+
   return {
     init, beginFrame, applyCamera, restoreCamera, present,
     drawBackground, drawCharacter, drawEmoteBubble,
     drawDialogueBox, drawDialogueText, drawFadeOverlay,
     getTextMaxWidth, getTextScale, getInternalSize,
+    getBackgroundNames, renderBackgroundToCanvas,
   };
 })();

@@ -346,6 +346,49 @@ const CutsceneEngine = (() => {
     running = false;
   }
 
+  function pause() {
+    running = false;
+  }
+
+  function resume() {
+    if (!script || !currentActionState) return;
+    running = true;
+    lastTime = 0;
+    requestAnimationFrame(gameLoop);
+  }
+
+  function step() {
+    if (!script) return;
+    running = false;
+    // Advance one action — skip instant actions until we hit a timed/dialogue one
+    if (currentActionState) {
+      if (currentActionState.onDone) currentActionState.onDone();
+      if (currentActionState.type === 'dialogue') waitingForInput = false;
+      actionIndex++;
+    }
+    // Process next actions, stopping at the first non-instant one
+    const scene = script.scenes[sceneIndex];
+    if (!scene) return;
+    while (actionIndex < scene.actions.length || sceneIndex < script.scenes.length - 1) {
+      processNextAction();
+      if (!currentActionState || !currentActionState.done) break;
+    }
+    // Render one frame
+    AnimationSystem.update(16);
+    render();
+  }
+
+  function getState() {
+    return {
+      sceneIndex,
+      actionIndex,
+      running,
+      waitingForInput,
+      currentBackground,
+      characterCount: Object.keys(characters).length,
+    };
+  }
+
   function handleInput(type) {
     if (type === 'advance') {
       advancePressed = true;
@@ -354,76 +397,5 @@ const CutsceneEngine = (() => {
     }
   }
 
-  return { play, stop, handleInput };
-})();
-
-// --- Page initialization ---
-
-(function initPage() {
-  const canvas = document.getElementById('display-canvas');
-  Renderer.init(canvas);
-
-  // Input handlers
-  canvas.addEventListener('click', () => {
-    CutsceneEngine.handleInput('advance');
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' || e.code === 'Enter') {
-      e.preventDefault();
-      CutsceneEngine.handleInput('advance');
-    } else if (e.code === 'Escape') {
-      CutsceneEngine.handleInput('skip');
-    }
-  });
-
-  // Load custom script from file input
-  document.getElementById('script-file').addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const raw = JSON.parse(evt.target.result);
-        const parsed = ScriptParser.loadFromObject(raw);
-        CutsceneEngine.stop();
-        CutsceneEngine.play(parsed);
-      } catch (err) {
-        alert('Error loading script: ' + err.message);
-      }
-    };
-    reader.readAsText(file);
-  });
-
-  // Demo button
-  document.getElementById('btn-demo').addEventListener('click', () => {
-    loadDemo();
-  });
-
-  // Restart button
-  document.getElementById('btn-restart').addEventListener('click', () => {
-    if (window._lastScript) {
-      CutsceneEngine.stop();
-      CutsceneEngine.play(window._lastScript);
-    }
-  });
-
-  // Auto-load demo
-  loadDemo();
-
-  async function loadDemo() {
-    try {
-      const parsed = await ScriptParser.loadFromUrl('scripts/demo.json');
-      window._lastScript = parsed;
-      CutsceneEngine.stop();
-      CutsceneEngine.play(parsed);
-    } catch (err) {
-      console.warn('Could not load demo script:', err.message);
-      console.info('Serve via HTTP server or load a script file manually.');
-      // Show a message on canvas
-      Renderer.beginFrame();
-      Renderer.drawBackground(null);
-      Renderer.present();
-    }
-  }
+  return { play, stop, pause, resume, step, getState, handleInput };
 })();
