@@ -2890,18 +2890,38 @@ const Renderer = (() => {
       fillCircle(ctx, Math.floor(sc2x), 50, 10);
       fillCircle(ctx, Math.floor(sc2x) + 12, 47, 12);
 
-      // Pale man dancing on a ladder against left tree
-      const ladX = 44;
-      const ladY = 60;
+      // Pale man dancing on a ladder leaning diagonally against tree trunk
+      // Ladder leans from ground-right to tree-trunk-left
+      // Tree trunk is at x=28, ground at y=125
+      // Top of ladder rests at about x=30, y=65
+      // Bottom of ladder at about x=55, y=125
       ctx.globalAlpha = 1;
-      // Ladder (two rails + rungs) — bright yellow
+      const ladTopX = 30, ladTopY = 62;
+      const ladBotX = 58, ladBotY = 125;
+      const ladDx = ladBotX - ladTopX;
+      const ladDy = ladBotY - ladTopY;
+      // Draw two diagonal rails
       ctx.fillStyle = '#ccaa44';
-      ctx.fillRect(ladX, ladY, 2, 65);        // left rail
-      ctx.fillRect(ladX + 12, ladY, 2, 65);   // right rail
+      for (let i = 0; i < 60; i++) {
+        const t2 = i / 60;
+        const rx = ladTopX + t2 * ladDx;
+        const ry = ladTopY + t2 * ladDy;
+        ctx.fillRect(Math.floor(rx), Math.floor(ry), 2, 2);
+        ctx.fillRect(Math.floor(rx) + 10 - Math.floor(t2 * 2), Math.floor(ry), 2, 2);
+      }
+      // Rungs (perpendicular-ish across the rails)
       ctx.fillStyle = '#bbaa44';
       for (let r = 0; r < 7; r++) {
-        ctx.fillRect(ladX, ladY + 4 + r * 9, 14, 2); // rungs
+        const t2 = (r + 0.5) / 7;
+        const rx = ladTopX + t2 * ladDx;
+        const ry = ladTopY + t2 * ladDy;
+        const rungW = 12 - Math.floor(t2 * 2);
+        ctx.fillRect(Math.floor(rx), Math.floor(ry), rungW, 2);
       }
+      // Guy position: standing on a rung about 40% up
+      const guyT = 0.35;
+      const ladX = Math.floor(ladTopX + guyT * ladDx);
+      const ladY = Math.floor(ladTopY + guyT * ladDy);
       // Guy standing on ladder, dancing wildly
       const guyY = ladY + 14;
       const bounce = Math.abs(Math.sin(t / 200)) * 3;
