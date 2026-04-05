@@ -26,6 +26,11 @@ const SpriteLibrary = (() => {
   const PP = '#8844aa'; // purple
   const PD = '#663388'; // purple dark
   const OR = '#dd8833'; // orange
+  const DS = '#6644aa'; // dark elf skin
+  const DD = '#553399'; // dark elf skin dark
+  const SV = '#bbbbcc'; // silver/white hair
+  const TN = '#aa7744'; // tan/wood (guitar body)
+  const TD = '#775533'; // tan dark (guitar neck)
 
   // Warrior — blue armor, brown hair
   const warrior_f1 = [
@@ -202,12 +207,68 @@ const SpriteLibrary = (() => {
 
   const villain_f2 = villain_f1;
 
+  // Dark elf ranger — purple skin, silver hair, green cloak, guitar
+  const dark_elf_ranger_f1 = [
+    [_,_,_,_,_,BK,BK,BK,BK,BK,_,_,_,_,_,_],
+    [_,_,_,_,BK,SV,SV,SV,SV,SV,BK,_,_,_,_,_],
+    [_,_,_,BK,SV,SV,SV,SV,SV,SV,SV,BK,_,_,_,_],
+    [_,_,_,BK,SV,DS,DS,DS,DS,DS,DS,BK,_,_,_,_],
+    [_,_,_,BK,SV,DS,RD,DS,DS,RD,DS,BK,_,_,_,_],
+    [_,_,_,BK,SV,DS,DS,DS,DS,DS,DS,BK,_,_,_,_],
+    [_,_,_,_,BK,DS,DS,DD,DD,DS,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BK,BK,BK,BK,_,_,_,_,_,_],
+    [_,_,_,BK,GR,GR,GR,GR,GR,GR,GR,GR,BK,_,_,_],
+    [_,_,BK,GR,GR,GR,GR,GR,GR,GR,GR,GR,GR,BK,_,_],
+    [_,_,BK,GD,GR,GR,GR,GR,GR,GR,GR,GR,GD,BK,_,_],
+    [_,_,BK,DS,BK,GR,GR,GR,GR,GR,GR,BK,DS,BK,_,_],
+    [_,_,_,BK,_,BK,GR,GR,GR,GR,BK,_,BK,TN,BK,_],
+    [_,_,_,_,_,BK,GD,GD,GD,GD,BK,_,BK,TN,BK,_],
+    [_,_,_,_,_,BK,GR,GR,GR,GR,BK,_,BK,TD,BK,_],
+    [_,_,_,_,_,BK,BR,BR,BR,BR,BK,_,BK,TD,BK,_],
+    [_,_,_,_,_,BK,BR,BK,BK,BR,BK,_,_,BK,_,_],
+    [_,_,_,_,_,BK,BR,BK,BK,BR,BK,_,_,_,_,_],
+    [_,_,_,_,BK,BR,BR,BK,BK,BR,BR,BK,_,_,_,_],
+    [_,_,_,_,BK,BK,BK,_,_,BK,BK,BK,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+  ];
+
+  const dark_elf_ranger_f2 = [
+    [_,_,_,_,_,BK,BK,BK,BK,BK,_,_,_,_,_,_],
+    [_,_,_,_,BK,SV,SV,SV,SV,SV,BK,_,_,_,_,_],
+    [_,_,_,BK,SV,SV,SV,SV,SV,SV,SV,BK,_,_,_,_],
+    [_,_,_,BK,SV,DS,DS,DS,DS,DS,DS,BK,_,_,_,_],
+    [_,_,_,BK,SV,DS,RD,DS,DS,RD,DS,BK,_,_,_,_],
+    [_,_,_,BK,SV,DS,DS,DS,DS,DS,DS,BK,_,_,_,_],
+    [_,_,_,_,BK,DS,DS,DD,DD,DS,BK,_,_,_,_,_],
+    [_,_,_,_,_,BK,BK,BK,BK,BK,_,_,_,_,_,_],
+    [_,_,_,BK,GR,GR,GR,GR,GR,GR,GR,GR,BK,_,_,_],
+    [_,_,BK,GR,GR,GR,GR,GR,GR,GR,GR,GR,GR,BK,_,_],
+    [_,_,BK,GD,GR,GR,GR,GR,GR,GR,GR,GR,GD,BK,_,_],
+    [_,_,BK,DS,BK,GR,GR,GR,GR,GR,GR,BK,DS,BK,_,_],
+    [_,BK,TN,BK,_,BK,GR,GR,GR,GR,BK,_,BK,_,_,_],
+    [_,BK,TN,BK,_,BK,GD,GD,GD,GD,BK,_,_,_,_,_],
+    [_,BK,TD,BK,_,BK,GR,GR,GR,GR,BK,_,_,_,_,_],
+    [_,BK,TD,BK,_,BK,BR,BR,BR,BR,BK,_,_,_,_,_],
+    [_,_,BK,_,_,BK,BK,BR,BR,BK,BK,_,_,_,_,_],
+    [_,_,_,_,BK,BR,BK,_,_,BK,BR,BK,_,_,_,_],
+    [_,_,_,_,BK,BK,BK,_,_,BK,BK,BK,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+  ];
+
   const sprites = {
     warrior:  [warrior_f1, warrior_f2],
     oldman:   [oldman_f1, oldman_f2],
     mage:     [mage_f1, mage_f2],
     princess: [princess_f1, princess_f2],
     villain:  [villain_f1, villain_f2],
+    dark_elf_ranger: [dark_elf_ranger_f1, dark_elf_ranger_f2],
   };
 
   // Emote bubbles — 8x8 pixel art
