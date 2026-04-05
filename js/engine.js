@@ -516,8 +516,31 @@ const CutsceneEngine = (() => {
       return aFeet - bFeet;
     });
 
+    // Find Lyra's position for facing direction
+    const lyraChar = characters['lyra'];
+    const lyraX = lyraChar ? lyraChar.x + SpriteLibrary.W / 2 : 210;
+
     for (const char of sortedChars) {
       const idleBob = (!char.dancing && !char.milling) ? Math.sin(t / 600 + char.idleSeed * 10) * 1.5 : 0;
+
+      // Face toward points of interest: Lyra, fire, or neighbors
+      if (!char.pinned) {
+        const charCenterX = char.x + SpriteLibrary.W * (char.renderScale || 1) / 2;
+        // Cycle attention: Lyra, fire, random direction
+        const attentionCycle = 8000 + char.idleSeed * 3000;
+        const attentionPhase = ((t + char.idleSeed * 5000) % attentionCycle) / attentionCycle;
+        let lookAtX;
+        if (attentionPhase < 0.5) {
+          lookAtX = lyraX; // look at Lyra
+        } else if (attentionPhase < 0.8) {
+          lookAtX = 145; // look at fire
+        } else {
+          // Glance at a neighbor or random direction
+          lookAtX = charCenterX + Math.sin(t / 1000 + char.idleSeed * 7) * 60;
+        }
+        char.flipped = charCenterX > lookAtX;
+      }
+
       Renderer.drawCharacterWithOffset(char, animFrame, 0, idleBob);
 
       // Smoke if touching the bonfire (fire center ~145, 148)

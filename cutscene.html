@@ -2600,21 +2600,30 @@ const Renderer = (() => {
   function drawCharacterWithOffset(char, animFrame, ox, oy) {
     if (!char.visible) return;
     const scale = char.renderScale || 1;
-    if (scale === 1) {
-      SpriteLibrary.drawSprite(ctx, char.sprite, Math.round(char.x + ox), Math.round(char.y + oy), animFrame);
+    const flip = char.flipped || false;
+    const sw = SpriteLibrary.W;
+    const sh = SpriteLibrary.H;
+    const dx = Math.round(char.x + ox);
+    const dy = Math.round(char.y + oy);
+    const dw = Math.round(sw * scale);
+    const dh = Math.round(sh * scale);
+
+    // Render sprite to temp canvas
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = sw;
+    tmpCanvas.height = sh;
+    const tmpCtx = tmpCanvas.getContext('2d');
+    SpriteLibrary.drawSprite(tmpCtx, char.sprite, 0, 0, animFrame);
+
+    ctx.imageSmoothingEnabled = false;
+    if (flip) {
+      ctx.save();
+      ctx.translate(dx + dw, dy);
+      ctx.scale(-1, 1);
+      ctx.drawImage(tmpCanvas, 0, 0, dw, dh);
+      ctx.restore();
     } else {
-      // Draw scaled: render to temp canvas then scale up
-      const sw = SpriteLibrary.W;
-      const sh = SpriteLibrary.H;
-      const tmpCanvas = document.createElement('canvas');
-      tmpCanvas.width = sw;
-      tmpCanvas.height = sh;
-      const tmpCtx = tmpCanvas.getContext('2d');
-      SpriteLibrary.drawSprite(tmpCtx, char.sprite, 0, 0, animFrame);
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(tmpCanvas,
-        Math.round(char.x + ox), Math.round(char.y + oy),
-        Math.round(sw * scale), Math.round(sh * scale));
+      ctx.drawImage(tmpCanvas, dx, dy, dw, dh);
     }
   }
 
@@ -4623,8 +4632,31 @@ const CutsceneEngine = (() => {
       return aFeet - bFeet;
     });
 
+    // Find Lyra's position for facing direction
+    const lyraChar = characters['lyra'];
+    const lyraX = lyraChar ? lyraChar.x + SpriteLibrary.W / 2 : 210;
+
     for (const char of sortedChars) {
       const idleBob = (!char.dancing && !char.milling) ? Math.sin(t / 600 + char.idleSeed * 10) * 1.5 : 0;
+
+      // Face toward points of interest: Lyra, fire, or neighbors
+      if (!char.pinned) {
+        const charCenterX = char.x + SpriteLibrary.W * (char.renderScale || 1) / 2;
+        // Cycle attention: Lyra, fire, random direction
+        const attentionCycle = 8000 + char.idleSeed * 3000;
+        const attentionPhase = ((t + char.idleSeed * 5000) % attentionCycle) / attentionCycle;
+        let lookAtX;
+        if (attentionPhase < 0.5) {
+          lookAtX = lyraX; // look at Lyra
+        } else if (attentionPhase < 0.8) {
+          lookAtX = 145; // look at fire
+        } else {
+          // Glance at a neighbor or random direction
+          lookAtX = charCenterX + Math.sin(t / 1000 + char.idleSeed * 7) * 60;
+        }
+        char.flipped = charCenterX > lookAtX;
+      }
+
       Renderer.drawCharacterWithOffset(char, animFrame, 0, idleBob);
 
       // Smoke if touching the bonfire (fire center ~145, 148)
