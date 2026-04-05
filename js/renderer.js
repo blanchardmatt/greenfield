@@ -340,28 +340,28 @@ const Renderer = (() => {
       ctx.fillRect(0, L.horizon + 30, INTERNAL_W, 8);
       ctx.fillRect(0, L.horizon + 55, INTERNAL_W, 6);
 
-      // Translate for all structure elements (trailer, trees, deck)
+      // Left oak tree — drawn at layout position directly
+      ctx.fillStyle = p.trunk;
+      ctx.fillRect(L.leftTreeX, L.leftTreeY, 8, 55);
+      ctx.fillStyle = p.leafDark;
+      fillCircle(ctx, L.leftCanopyX, L.leftCanopyY, 22);
+      ctx.fillStyle = p.leaf;
+      fillCircle(ctx, L.leftCanopyX - 7, L.leftCanopyY - 5, 14);
+      fillCircle(ctx, L.leftCanopyX + 8, L.leftCanopyY - 7, 16);
+      fillCircle(ctx, L.leftCanopyX - 2, L.leftCanopyY - 13, 12);
+
+      // Right oak tree — drawn at layout position directly
+      ctx.fillStyle = p.trunk;
+      ctx.fillRect(L.rightTreeX, L.rightTreeY, 6, 42);
+      ctx.fillStyle = p.leafDark;
+      fillCircle(ctx, L.rightCanopyX, L.rightCanopyY, 16);
+      ctx.fillStyle = p.leaf;
+      fillCircle(ctx, L.rightCanopyX - 6, L.rightCanopyY - 4, 11);
+      fillCircle(ctx, L.rightCanopyX + 7, L.rightCanopyY - 6, 13);
+
+      // Translate for trailer and deck only
       ctx.save();
       ctx.translate(dx, dy);
-
-      // Left oak tree
-      ctx.fillStyle = p.trunk;
-      ctx.fillRect(28, 70, 8, 55);
-      ctx.fillStyle = p.leafDark;
-      fillCircle(ctx, 32, 55, 22);
-      ctx.fillStyle = p.leaf;
-      fillCircle(ctx, 25, 50, 14);
-      fillCircle(ctx, 40, 48, 16);
-      fillCircle(ctx, 30, 42, 12);
-
-      // Right oak tree
-      ctx.fillStyle = p.trunk;
-      ctx.fillRect(215, 80, 6, 42);
-      ctx.fillStyle = p.leafDark;
-      fillCircle(ctx, 218, 68, 16);
-      ctx.fillStyle = p.leaf;
-      fillCircle(ctx, 212, 64, 11);
-      fillCircle(ctx, 225, 62, 13);
 
       // Trailer body
       ctx.fillStyle = p.siding;

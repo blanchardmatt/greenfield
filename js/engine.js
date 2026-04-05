@@ -23,25 +23,23 @@ const CutsceneEngine = (() => {
     if (L.width === refW && L.height === refH) return { x, y };
 
     // X: proportional remap with center bias
-    // Map 0-256 → 0-144 but compress edges more than center
-    const xNorm = x / refW; // 0 to 1
-    const xCentered = (xNorm - 0.5) * 0.85 + 0.5; // compress toward center
-    const newX = Math.round(Math.max(0, Math.min(L.width - 1, xCentered * L.width)));
+    const xNorm = x / refW;
+    const xCentered = (xNorm - 0.5) * 0.8 + 0.5;
+    const newX = Math.round(Math.max(2, Math.min(L.width - 2, xCentered * L.width)));
 
-    // Y: shift to account for different ground plane
-    // Landscape ground starts ~120, portrait ~90
-    // Scale y proportionally within the usable area
-    const refGround = 120, refBottom = 200;
-    const newGround = L.horizon, newBottom = L.height - 30;
-    if (y < refGround) {
-      // Above ground: proportional
-      const t = y / refGround;
-      return { x: newX, y: Math.round(t * newGround) };
+    // Y: map relative to horizon, then stretch the ground area
+    // Landscape: horizon=120, bottom=224. Portrait: horizon=90, bottom=256.
+    const refHorizon = 120;
+    if (y < refHorizon) {
+      const t = y / refHorizon;
+      return { x: newX, y: Math.round(t * L.horizon) };
     } else {
-      // Ground area: remap from landscape ground range to portrait ground range
-      const t = (y - refGround) / (refBottom - refGround);
-      const newY = Math.round(newGround + t * (newBottom - newGround));
-      return { x: newX, y: newY };
+      // Ground area: proportionally spread across the taller portrait ground
+      const refGroundRange = refH - refHorizon; // 104
+      const newGroundRange = L.height - L.horizon; // 166
+      const t = (y - refHorizon) / refGroundRange;
+      const newY = Math.round(L.horizon + t * newGroundRange);
+      return { x: newX, y: Math.min(newY, L.height - 10) };
     }
   }
 

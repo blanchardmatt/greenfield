@@ -1988,28 +1988,28 @@ const Renderer = (() => {
       ctx.fillRect(0, L.horizon + 30, INTERNAL_W, 8);
       ctx.fillRect(0, L.horizon + 55, INTERNAL_W, 6);
 
-      // Translate for all structure elements (trailer, trees, deck)
+      // Left oak tree — drawn at layout position directly
+      ctx.fillStyle = p.trunk;
+      ctx.fillRect(L.leftTreeX, L.leftTreeY, 8, 55);
+      ctx.fillStyle = p.leafDark;
+      fillCircle(ctx, L.leftCanopyX, L.leftCanopyY, 22);
+      ctx.fillStyle = p.leaf;
+      fillCircle(ctx, L.leftCanopyX - 7, L.leftCanopyY - 5, 14);
+      fillCircle(ctx, L.leftCanopyX + 8, L.leftCanopyY - 7, 16);
+      fillCircle(ctx, L.leftCanopyX - 2, L.leftCanopyY - 13, 12);
+
+      // Right oak tree — drawn at layout position directly
+      ctx.fillStyle = p.trunk;
+      ctx.fillRect(L.rightTreeX, L.rightTreeY, 6, 42);
+      ctx.fillStyle = p.leafDark;
+      fillCircle(ctx, L.rightCanopyX, L.rightCanopyY, 16);
+      ctx.fillStyle = p.leaf;
+      fillCircle(ctx, L.rightCanopyX - 6, L.rightCanopyY - 4, 11);
+      fillCircle(ctx, L.rightCanopyX + 7, L.rightCanopyY - 6, 13);
+
+      // Translate for trailer and deck only
       ctx.save();
       ctx.translate(dx, dy);
-
-      // Left oak tree
-      ctx.fillStyle = p.trunk;
-      ctx.fillRect(28, 70, 8, 55);
-      ctx.fillStyle = p.leafDark;
-      fillCircle(ctx, 32, 55, 22);
-      ctx.fillStyle = p.leaf;
-      fillCircle(ctx, 25, 50, 14);
-      fillCircle(ctx, 40, 48, 16);
-      fillCircle(ctx, 30, 42, 12);
-
-      // Right oak tree
-      ctx.fillStyle = p.trunk;
-      ctx.fillRect(215, 80, 6, 42);
-      ctx.fillStyle = p.leafDark;
-      fillCircle(ctx, 218, 68, 16);
-      ctx.fillStyle = p.leaf;
-      fillCircle(ctx, 212, 64, 11);
-      fillCircle(ctx, 225, 62, 13);
 
       // Trailer body
       ctx.fillStyle = p.siding;
@@ -5302,25 +5302,23 @@ const CutsceneEngine = (() => {
     if (L.width === refW && L.height === refH) return { x, y };
 
     // X: proportional remap with center bias
-    // Map 0-256 → 0-144 but compress edges more than center
-    const xNorm = x / refW; // 0 to 1
-    const xCentered = (xNorm - 0.5) * 0.85 + 0.5; // compress toward center
-    const newX = Math.round(Math.max(0, Math.min(L.width - 1, xCentered * L.width)));
+    const xNorm = x / refW;
+    const xCentered = (xNorm - 0.5) * 0.8 + 0.5;
+    const newX = Math.round(Math.max(2, Math.min(L.width - 2, xCentered * L.width)));
 
-    // Y: shift to account for different ground plane
-    // Landscape ground starts ~120, portrait ~90
-    // Scale y proportionally within the usable area
-    const refGround = 120, refBottom = 200;
-    const newGround = L.horizon, newBottom = L.height - 30;
-    if (y < refGround) {
-      // Above ground: proportional
-      const t = y / refGround;
-      return { x: newX, y: Math.round(t * newGround) };
+    // Y: map relative to horizon, then stretch the ground area
+    // Landscape: horizon=120, bottom=224. Portrait: horizon=90, bottom=256.
+    const refHorizon = 120;
+    if (y < refHorizon) {
+      const t = y / refHorizon;
+      return { x: newX, y: Math.round(t * L.horizon) };
     } else {
-      // Ground area: remap from landscape ground range to portrait ground range
-      const t = (y - refGround) / (refBottom - refGround);
-      const newY = Math.round(newGround + t * (newBottom - newGround));
-      return { x: newX, y: newY };
+      // Ground area: proportionally spread across the taller portrait ground
+      const refGroundRange = refH - refHorizon; // 104
+      const newGroundRange = L.height - L.horizon; // 166
+      const t = (y - refHorizon) / refGroundRange;
+      const newY = Math.round(L.horizon + t * newGroundRange);
+      return { x: newX, y: Math.min(newY, L.height - 10) };
     }
   }
 
