@@ -1,0 +1,77 @@
+{
+  "title": "The Serenade",
+  "settings": {
+    "resolution": [256, 224],
+    "textSpeed": 35
+  },
+  "characters": {
+    "lyra": {
+      "sprite": "dark_elf_ranger",
+      "name": "Lyra",
+      "nameColor": "#aa66dd"
+    },
+    "elara": {
+      "sprite": "princess",
+      "name": "Princess Elara",
+      "nameColor": "#ff88cc"
+    }
+  },
+  "scenes": [
+    {
+      "id": "forest_meeting",
+      "background": "forest",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 1500 },
+        { "type": "enter", "character": "lyra", "from": "left", "to": { "x": 70, "y": 120 }, "duration": 1000 },
+        { "type": "wait", "duration": 600 },
+        { "type": "dialogue", "character": "lyra", "text": "These woods are peaceful tonight. A fine place to rest and play a song." },
+        { "type": "wait", "duration": 400 },
+        { "type": "enter", "character": "elara", "from": "right", "to": { "x": 180, "y": 120 }, "duration": 800 },
+        { "type": "emote", "character": "lyra", "emote": "surprise", "duration": 1200 },
+        { "type": "dialogue", "character": "lyra", "text": "A princess of the realm? What brings you to the wild woods?" },
+        { "type": "dialogue", "character": "elara", "text": "I heard music drifting through the trees. I had to find its source." },
+        { "type": "dialogue", "character": "lyra", "text": "You heard me playing? I thought I was alone out here." },
+        { "type": "dialogue", "character": "elara", "text": "Please, do not stop on my account. It was beautiful." },
+        { "type": "emote", "character": "lyra", "emote": "happy", "duration": 1000 },
+        { "type": "dialogue", "character": "lyra", "text": "Then allow me to play something special, Your Highness." },
+        { "type": "wait", "duration": 800 },
+        { "type": "transition", "effect": "fadeOut", "duration": 1200 }
+      ]
+    },
+    {
+      "id": "night_serenade",
+      "background": "night_sky",
+      "actions": [
+        { "type": "transition", "effect": "fadeIn", "duration": 2000 },
+        { "type": "enter", "character": "lyra", "from": "left", "to": { "x": 90, "y": 135 }, "duration": 600 },
+        { "type": "enter", "character": "elara", "from": "right", "to": { "x": 160, "y": 135 }, "duration": 600 },
+        { "type": "wait", "duration": 800 },
+        { "type": "dialogue", "character": "lyra", "text": "This one is called The Moonlit Wanderer. It is a song of my people." },
+        { "type": "wait", "duration": 500 },
+        { "type": "shake", "intensity": 1, "duration": 400 },
+        { "type": "wait", "duration": 300 },
+        { "type": "shake", "intensity": 1, "duration": 400 },
+        { "type": "wait", "duration": 300 },
+        { "type": "shake", "intensity": 1, "duration": 400 },
+        { "type": "dialogue", "character": "lyra", "text": "Through silver light and shadow deep, across the starlit sky..." },
+        { "type": "wait", "duration": 600 },
+        { "type": "shake", "intensity": 1, "duration": 400 },
+        { "type": "wait", "duration": 300 },
+        { "type": "shake", "intensity": 1, "duration": 400 },
+        { "type": "dialogue", "character": "lyra", "text": "A wanderer walks the ancient paths, where moonbeams never die." },
+        { "type": "wait", "duration": 800 },
+        { "type": "emote", "character": "elara", "emote": "happy", "duration": 1500 },
+        { "type": "dialogue", "character": "elara", "text": "That was... I have never heard anything so lovely." },
+        { "type": "move", "character": "elara", "to": { "x": 130, "y": 135 }, "duration": 800 },
+        { "type": "dialogue", "character": "elara", "text": "Will you walk with me back to the castle? The night feels less dark with music." },
+        { "type": "dialogue", "character": "lyra", "text": "It would be my honor, Princess." },
+        { "type": "emote", "character": "lyra", "emote": "happy", "duration": 1200 },
+        { "type": "wait", "duration": 600 },
+        { "type": "exit", "character": "lyra", "to": "right", "duration": 1000 },
+        { "type": "exit", "character": "elara", "to": "right", "duration": 1000 },
+        { "type": "wait", "duration": 1000 },
+        { "type": "transition", "effect": "fadeOut", "duration": 2500 }
+      ]
+    }
+  ]
+}
