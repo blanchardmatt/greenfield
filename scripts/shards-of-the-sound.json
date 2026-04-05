@@ -169,8 +169,8 @@
           "character": "elder",
           "from": "right",
           "to": {
-            "x": 160,
-            "y": 123
+            "x": 10,
+            "y": 130
           },
           "duration": 600
         },
@@ -184,7 +184,7 @@
           "character": "hero",
           "from": "left",
           "to": {
-            "x": 20,
+            "x": 45,
             "y": 125
           },
           "duration": 600
@@ -199,8 +199,8 @@
           "character": "gimli",
           "from": "left",
           "to": {
-            "x": 5,
-            "y": 127
+            "x": 75,
+            "y": 135
           },
           "duration": 600
         },
@@ -219,8 +219,8 @@
           "character": "swift",
           "from": "right",
           "to": {
-            "x": 140,
-            "y": 121
+            "x": 155,
+            "y": 128
           },
           "duration": 600
         },
@@ -229,8 +229,8 @@
           "character": "hank",
           "from": "left",
           "to": {
-            "x": 38,
-            "y": 127
+            "x": 110,
+            "y": 133
           },
           "duration": 600
         },
@@ -339,7 +339,7 @@
           "from": "left",
           "to": {
             "x": 10,
-            "y": 123
+            "y": 130
           },
           "duration": 600
         },
@@ -348,8 +348,8 @@
           "character": "hero",
           "from": "left",
           "to": {
-            "x": 40,
-            "y": 120
+            "x": 45,
+            "y": 125
           },
           "duration": 600
         },
@@ -371,8 +371,8 @@
           "character": "gimli",
           "from": "left",
           "to": {
-            "x": 25,
-            "y": 127
+            "x": 75,
+            "y": 135
           },
           "duration": 600
         },
@@ -391,8 +391,8 @@
           "character": "princess",
           "from": "right",
           "to": {
-            "x": 150,
-            "y": 115
+            "x": 165,
+            "y": 125
           },
           "duration": 600
         },
@@ -401,8 +401,8 @@
           "character": "swift",
           "from": "right",
           "to": {
-            "x": 130,
-            "y": 121
+            "x": 155,
+            "y": 128
           },
           "duration": 600
         },
@@ -422,8 +422,8 @@
           "character": "brother_sol",
           "from": "left",
           "to": {
-            "x": 5,
-            "y": 123
+            "x": 25,
+            "y": 133
           },
           "duration": 600
         },
@@ -432,8 +432,8 @@
           "character": "shade",
           "from": "right",
           "to": {
-            "x": 165,
-            "y": 123
+            "x": 130,
+            "y": 130
           },
           "duration": 600
         },
@@ -452,8 +452,8 @@
           "character": "wizard",
           "from": "left",
           "to": {
-            "x": 55,
-            "y": 123
+            "x": 60,
+            "y": 128
           },
           "duration": 600
         },
@@ -462,8 +462,8 @@
           "character": "lily",
           "from": "right",
           "to": {
-            "x": 120,
-            "y": 127
+            "x": 95,
+            "y": 135
           },
           "duration": 600
         },
@@ -472,8 +472,8 @@
           "character": "pip",
           "from": "left",
           "to": {
-            "x": 70,
-            "y": 120
+            "x": 140,
+            "y": 132
           },
           "duration": 600
         },
@@ -482,8 +482,8 @@
           "character": "hank",
           "from": "left",
           "to": {
-            "x": 85,
-            "y": 125
+            "x": 110,
+            "y": 133
           },
           "duration": 600
         },
@@ -567,8 +567,8 @@
           "character": "elder",
           "from": "left",
           "to": {
-            "x": 5,
-            "y": 123
+            "x": 10,
+            "y": 130
           },
           "duration": 600
         },
@@ -577,8 +577,8 @@
           "character": "hero",
           "from": "left",
           "to": {
-            "x": 35,
-            "y": 120
+            "x": 45,
+            "y": 125
           },
           "duration": 600
         },
@@ -587,8 +587,8 @@
           "character": "princess",
           "from": "right",
           "to": {
-            "x": 160,
-            "y": 115
+            "x": 165,
+            "y": 125
           },
           "duration": 600
         },
@@ -597,8 +597,8 @@
           "character": "wizard",
           "from": "right",
           "to": {
-            "x": 140,
-            "y": 123
+            "x": 60,
+            "y": 128
           },
           "duration": 600
         },
@@ -607,8 +607,8 @@
           "character": "gimli",
           "from": "left",
           "to": {
-            "x": 50,
-            "y": 127
+            "x": 75,
+            "y": 135
           },
           "duration": 600
         },
@@ -617,8 +617,8 @@
           "character": "swift",
           "from": "right",
           "to": {
-            "x": 120,
-            "y": 121
+            "x": 155,
+            "y": 128
           },
           "duration": 600
         },
@@ -627,8 +627,8 @@
           "character": "hank",
           "from": "left",
           "to": {
-            "x": 20,
-            "y": 127
+            "x": 110,
+            "y": 133
           },
           "duration": 600
         },
@@ -637,8 +637,8 @@
           "character": "brother_sol",
           "from": "left",
           "to": {
-            "x": 65,
-            "y": 125
+            "x": 25,
+            "y": 133
           },
           "duration": 600
         },
@@ -647,8 +647,8 @@
           "character": "shade",
           "from": "right",
           "to": {
-            "x": 105,
-            "y": 125
+            "x": 130,
+            "y": 130
           },
           "duration": 600
         },
@@ -657,8 +657,8 @@
           "character": "lily",
           "from": "right",
           "to": {
-            "x": 80,
-            "y": 130
+            "x": 95,
+            "y": 135
           },
           "duration": 600
         },
@@ -667,8 +667,8 @@
           "character": "pip",
           "from": "left",
           "to": {
-            "x": 90,
-            "y": 123
+            "x": 140,
+            "y": 132
           },
           "duration": 600
         },
@@ -690,8 +690,8 @@
           "character": "ser_valen",
           "from": "left",
           "to": {
-            "x": 10,
-            "y": 125
+            "x": 5,
+            "y": 128
           },
           "duration": 600
         },
@@ -700,8 +700,8 @@
           "character": "morgana",
           "from": "right",
           "to": {
-            "x": 155,
-            "y": 123
+            "x": 170,
+            "y": 130
           },
           "duration": 600
         },
@@ -721,8 +721,8 @@
           "character": "dark_lord",
           "from": "right",
           "to": {
-            "x": 170,
-            "y": 120
+            "x": 150,
+            "y": 125
           },
           "duration": 600
         },
@@ -731,8 +731,8 @@
           "character": "duke",
           "from": "left",
           "to": {
-            "x": 45,
-            "y": 122
+            "x": 35,
+            "y": 132
           },
           "duration": 600
         },
@@ -859,8 +859,8 @@
           "character": "hero",
           "from": "left",
           "to": {
-            "x": 60,
-            "y": 123
+            "x": 45,
+            "y": 125
           },
           "duration": 600
         },
@@ -870,7 +870,7 @@
           "from": "right",
           "to": {
             "x": 165,
-            "y": 120
+            "y": 125
           },
           "duration": 600
         },
@@ -879,8 +879,8 @@
           "character": "elder",
           "from": "left",
           "to": {
-            "x": 15,
-            "y": 125
+            "x": 10,
+            "y": 130
           },
           "duration": 600
         },
@@ -889,8 +889,8 @@
           "character": "wizard",
           "from": "right",
           "to": {
-            "x": 200,
-            "y": 125
+            "x": 60,
+            "y": 128
           },
           "duration": 600
         },
@@ -899,8 +899,8 @@
           "character": "dark_lord",
           "from": "right",
           "to": {
-            "x": 145,
-            "y": 130
+            "x": 150,
+            "y": 125
           },
           "duration": 600
         },
@@ -909,8 +909,8 @@
           "character": "gimli",
           "from": "left",
           "to": {
-            "x": 30,
-            "y": 127
+            "x": 75,
+            "y": 135
           },
           "duration": 600
         },
@@ -919,8 +919,8 @@
           "character": "swift",
           "from": "right",
           "to": {
-            "x": 180,
-            "y": 123
+            "x": 155,
+            "y": 128
           },
           "duration": 600
         },
@@ -929,8 +929,8 @@
           "character": "brother_sol",
           "from": "left",
           "to": {
-            "x": 75,
-            "y": 125
+            "x": 25,
+            "y": 133
           },
           "duration": 600
         },
@@ -940,7 +940,7 @@
           "from": "right",
           "to": {
             "x": 130,
-            "y": 127
+            "y": 130
           },
           "duration": 600
         },
@@ -949,8 +949,8 @@
           "character": "pip",
           "from": "left",
           "to": {
-            "x": 45,
-            "y": 121
+            "x": 140,
+            "y": 132
           },
           "duration": 600
         },
@@ -959,8 +959,8 @@
           "character": "lily",
           "from": "right",
           "to": {
-            "x": 210,
-            "y": 128
+            "x": 95,
+            "y": 135
           },
           "duration": 600
         },

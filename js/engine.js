@@ -498,9 +498,10 @@ const CutsceneEngine = (() => {
       Renderer.drawProp(prop.name, Math.round(prop.x), Math.round(prop.y));
     }
 
-    // Characters — with idle bob
+    // Characters — sorted by Y (back to front) with idle bob
     const t = Date.now();
-    for (const char of Object.values(characters)) {
+    const sortedChars = Object.values(characters).filter(c => c.visible).sort((a, b) => a.y - b.y);
+    for (const char of sortedChars) {
       const idleBob = (!char.dancing && !char.milling) ? Math.sin(t / 600 + char.idleSeed * 10) * 1.5 : 0;
       Renderer.drawCharacterWithOffset(char, animFrame, 0, idleBob);
 
