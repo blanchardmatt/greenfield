@@ -4810,8 +4810,8 @@ const CutsceneEngine = (() => {
     const visibleChars = Object.values(characters).filter(c => c.visible);
     for (const char of visibleChars) {
       if (!char.pinned) {
-        const minY = 120, maxY = 190;
-        const minScale = 0.6, maxScale = 1.15;
+        const minY = 115, maxY = 195;
+        const minScale = 0.45, maxScale = 1.3;
         const depthT = Math.max(0, Math.min(1, (char.y - minY) / (maxY - minY)));
         char.renderScale = minScale + depthT * (maxScale - minScale);
       }
