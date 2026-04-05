@@ -3236,6 +3236,56 @@ const SHARDS_SCRIPT = {
       "sprite": "noble",
       "name": "Duke Ashford",
       "nameColor": "#cc88cc"
+    },
+    "townsfolk1": {
+      "sprite": "farmer",
+      "name": "Farmer Bob",
+      "nameColor": "#88aa44"
+    },
+    "townsfolk2": {
+      "sprite": "child",
+      "name": "Little Finn",
+      "nameColor": "#ff8888"
+    },
+    "townsfolk3": {
+      "sprite": "noble",
+      "name": "Lady Wren",
+      "nameColor": "#cc88cc"
+    },
+    "townsfolk4": {
+      "sprite": "archer",
+      "name": "Robin",
+      "nameColor": "#66cc66"
+    },
+    "townsfolk5": {
+      "sprite": "monk",
+      "name": "Brother Ash",
+      "nameColor": "#ddaa44"
+    },
+    "townsfolk6": {
+      "sprite": "bard",
+      "name": "Melody",
+      "nameColor": "#44cccc"
+    },
+    "townsfolk7": {
+      "sprite": "witch",
+      "name": "Old Nettie",
+      "nameColor": "#cc66cc"
+    },
+    "townsfolk8": {
+      "sprite": "knight",
+      "name": "Ser Bryn",
+      "nameColor": "#cccc66"
+    },
+    "townsfolk9": {
+      "sprite": "thief",
+      "name": "Whisper",
+      "nameColor": "#888899"
+    },
+    "townsfolk10": {
+      "sprite": "dwarf",
+      "name": "Stout",
+      "nameColor": "#cc8844"
     }
   },
   "scenes": [
@@ -3330,6 +3380,16 @@ const SHARDS_SCRIPT = {
         },
         {
           "type": "enter",
+          "character": "townsfolk1",
+          "from": "left",
+          "to": {
+            "x": 15,
+            "y": 170
+          },
+          "duration": 600
+        },
+        {
+          "type": "enter",
           "character": "hero",
           "from": "left",
           "to": {
@@ -3357,6 +3417,16 @@ const SHARDS_SCRIPT = {
           "type": "dialogue",
           "character": "lyra",
           "text": "Popcorn ceiling's a frown. Nerve endings barnacled."
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk2",
+          "from": "right",
+          "to": {
+            "x": 180,
+            "y": 148
+          },
+          "duration": 600
         },
         {
           "type": "shake",
@@ -3403,6 +3473,16 @@ const SHARDS_SCRIPT = {
           "text": "Why so loud..."
         },
         {
+          "type": "enter",
+          "character": "townsfolk3",
+          "from": "left",
+          "to": {
+            "x": 60,
+            "y": 178
+          },
+          "duration": 600
+        },
+        {
           "type": "shake",
           "intensity": 4,
           "duration": 600
@@ -3422,6 +3502,16 @@ const SHARDS_SCRIPT = {
           "type": "dialogue",
           "character": "lyra",
           "text": "A plastic click of a pen and..."
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk4",
+          "from": "right",
+          "to": {
+            "x": 168,
+            "y": 168
+          },
+          "duration": 600
         },
         {
           "type": "shake",
@@ -3490,6 +3580,16 @@ const SHARDS_SCRIPT = {
           "type": "dialogue",
           "character": "lyra",
           "text": "Sedge wren warbles... melody to paper untorn."
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk5",
+          "from": "left",
+          "to": {
+            "x": 35,
+            "y": 158
+          },
+          "duration": 600
         },
         {
           "type": "emote",
@@ -3573,6 +3673,16 @@ const SHARDS_SCRIPT = {
           "text": "Seismic waves inbound..."
         },
         {
+          "type": "enter",
+          "character": "townsfolk6",
+          "from": "right",
+          "to": {
+            "x": 115,
+            "y": 175
+          },
+          "duration": 600
+        },
+        {
           "type": "emote",
           "character": "wizard",
           "emote": "surprise",
@@ -3586,6 +3696,16 @@ const SHARDS_SCRIPT = {
         {
           "type": "wait",
           "duration": 1000
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk7",
+          "from": "left",
+          "to": {
+            "x": 80,
+            "y": 155
+          },
+          "duration": 600
         },
         {
           "type": "transition",
@@ -3673,6 +3793,16 @@ const SHARDS_SCRIPT = {
           "text": "Resonance..."
         },
         {
+          "type": "enter",
+          "character": "townsfolk8",
+          "from": "right",
+          "to": {
+            "x": 185,
+            "y": 170
+          },
+          "duration": 600
+        },
+        {
           "type": "shake",
           "intensity": 3,
           "duration": 500
@@ -3715,6 +3845,16 @@ const SHARDS_SCRIPT = {
           "text": "Splinters in front of the sound."
         },
         {
+          "type": "enter",
+          "character": "townsfolk9",
+          "from": "left",
+          "to": {
+            "x": 48,
+            "y": 165
+          },
+          "duration": 600
+        },
+        {
           "type": "emote",
           "character": "princess",
           "emote": "happy",
@@ -3739,6 +3879,16 @@ const SHARDS_SCRIPT = {
         {
           "type": "wait",
           "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk10",
+          "from": "right",
+          "to": {
+            "x": 95,
+            "y": 178
+          },
+          "duration": 600
         },
         {
           "type": "transition",
@@ -3916,6 +4066,16 @@ const SHARDS_SCRIPT = {
             "Nathan . . . . . . .  Farmer",
             "Leo . . . . . . . . .  Child",
             "Duke Ashford . . . .  Noble",
+            "Farmer Bob . . . . . Farmer",
+            "Little Finn . . . . .  Child",
+            "Lady Wren . . . . . . Noble",
+            "Robin . . . . . . .  Archer",
+            "Brother Ash . . . . .  Monk",
+            "Melody . . . . . . . .  Bard",
+            "Old Nettie . . . . . . Witch",
+            "Ser Bryn . . . . . .  Knight",
+            "Whisper . . . . . . .  Thief",
+            "Stout . . . . . . . .  Dwarf",
             "",
             "",
             "#Created with",
