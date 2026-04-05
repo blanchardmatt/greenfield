@@ -1761,13 +1761,18 @@ const Renderer = (() => {
     const ty = Math.floor(INTERNAL_H / 2 - titleSize.height - 8);
     PixelFont.drawText(ctx, text, tx, ty, color, titleScale);
 
-    // Subtitle — smaller, below
+    // Subtitle — smaller, below, word-wrapped if needed
     if (subtitle) {
       const subScale = 1;
-      const subSize = PixelFont.measureText(subtitle, subScale);
-      const sx = Math.floor((INTERNAL_W - subSize.width) / 2);
+      const maxW = INTERNAL_W - 8;
+      const subLines = PixelFont.wrapText(subtitle, maxW, subScale);
+      const lineH = (PixelFont.CHAR_H + 2) * subScale;
       const sy = ty + titleSize.height + 10;
-      PixelFont.drawText(ctx, subtitle, sx, sy, subtitleColor, subScale);
+      for (let i = 0; i < subLines.length; i++) {
+        const lineSize = PixelFont.measureText(subLines[i], subScale);
+        const sx = Math.floor((INTERNAL_W - lineSize.width) / 2);
+        PixelFont.drawText(ctx, subLines[i], sx, sy + i * lineH, subtitleColor, subScale);
+      }
     }
 
     // Decorative line under title
