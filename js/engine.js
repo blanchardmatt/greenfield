@@ -362,9 +362,9 @@ const CutsceneEngine = (() => {
         char.x = centerX + Math.cos(angle) * radiusX;
         char.y = centerY + Math.sin(angle) * radiusY;
       } else if (char.milling) {
-        // Energetic wandering near base position with bounce
-        const wx = Math.sin(t / 1500 + seed) * 12 + Math.sin(t / 2500 + seed * 2) * 6;
-        const wy = Math.sin(t / 1800 + seed * 1.5) * 5 + Math.abs(Math.sin(t / 400 + seed * 3)) * -2;
+        // Wandering near base position — mostly horizontal, grounded
+        const wx = Math.sin(t / 2000 + seed) * 10 + Math.sin(t / 3000 + seed * 2) * 5;
+        const wy = Math.sin(t / 2500 + seed * 1.5) * 1.5;
         char.x = char.baseX + wx;
         char.y = char.baseY + wy;
       } else {
