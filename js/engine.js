@@ -455,6 +455,7 @@ const CutsceneEngine = (() => {
       name: action.prop || 'amplifier',
       x: action.x || 0,
       y: action.y || 0,
+      scale: action.scale || 1,
     });
     return { done: true };
   }
@@ -625,14 +626,10 @@ const CutsceneEngine = (() => {
     const camera = AnimationSystem.getCamera();
     Renderer.applyCamera(camera);
 
-    // Props (behind characters)
-    for (const prop of activeProps) {
-      Renderer.drawProp(prop.name, Math.round(prop.x), Math.round(prop.y));
-    }
-
-    // Characters — sorted by Y (back to front) with idle bob
+    // Characters + props — all depth-sorted together
     const t = Date.now();
-    // Compute perspective scale for all visible characters first
+
+    // Compute perspective scale for all visible characters
     const visibleChars = Object.values(characters).filter(c => c.visible);
     for (const char of visibleChars) {
       if (!char.pinned) {
@@ -643,18 +640,36 @@ const CutsceneEngine = (() => {
       }
     }
 
-    // Sort by feet (bottom of sprite) — characters with lower feet drawn in front
-    const sortedChars = visibleChars.sort((a, b) => {
-      const aFeet = a.y + SpriteLibrary.H * (a.renderScale || 1);
-      const bFeet = b.y + SpriteLibrary.H * (b.renderScale || 1);
-      return aFeet - bFeet;
-    });
+    // Build sorted render list: characters + props together
+    const renderList = [];
+    for (const char of visibleChars) {
+      const feet = char.y + SpriteLibrary.H * (char.renderScale || 1);
+      renderList.push({ type: 'char', obj: char, feet: feet });
+    }
+    for (const prop of activeProps) {
+      // Props sort by their bottom edge (y + height estimate)
+      const propH = prop.name === 'bonfire' ? 20 : 18;
+      renderList.push({ type: 'prop', obj: prop, feet: prop.y + propH });
+    }
+    renderList.sort((a, b) => a.feet - b.feet);
 
-    // Find Lyra's position for facing direction
+    // Lyra's position for facing direction
     const lyraChar = characters['lyra'];
     const lyraX = lyraChar ? lyraChar.x + SpriteLibrary.W / 2 : 210;
 
-    for (const char of sortedChars) {
+    // Render sorted list
+    for (const item of renderList) {
+      if (item.type === 'prop') {
+        const prop = item.obj;
+        if (prop.name === 'bonfire') {
+          Renderer.drawBonfire(prop.x, prop.y, t, prop.scale || 1);
+        } else {
+          Renderer.drawProp(prop.name, Math.round(prop.x), Math.round(prop.y));
+        }
+        continue;
+      }
+
+      const char = item.obj;
       const idleBob = (!char.dancing && !char.milling) ? Math.sin(t / 600 + char.idleSeed * 10) * 1.5 : 0;
 
       // Face direction based on state
@@ -664,7 +679,7 @@ const CutsceneEngine = (() => {
         if (char.dancing) {
           // Dancing: face direction of movement (tangent to orbit)
           // If moving right (cos component positive), face right (not flipped)
-          const dancingChars = sortedChars.filter(c => c.dancing);
+          const dancingChars = visibleChars.filter(c => c.dancing);
           const di = dancingChars.indexOf(char);
           const totalDancers = dancingChars.length || 1;
           const angle = (t / 2500 + (di / totalDancers) * Math.PI * 2) % (Math.PI * 2);
@@ -681,8 +696,8 @@ const CutsceneEngine = (() => {
             lookAtX = 115; // look at fire
           } else if (attentionPhase < 0.85) {
             // Look at a nearby character
-            const nearIdx = Math.floor(char.idleSeed * sortedChars.length) % sortedChars.length;
-            lookAtX = sortedChars[nearIdx].x + 16;
+            const nearIdx = Math.floor(char.idleSeed * visibleChars.length) % visibleChars.length;
+            lookAtX = visibleChars[nearIdx].x + 16;
           } else {
             // Glance around randomly
             lookAtX = charCenterX + Math.sin(t / 800 + char.idleSeed * 7) * 80;

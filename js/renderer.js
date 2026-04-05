@@ -292,21 +292,7 @@ const Renderer = (() => {
       ctx.fillRect(220, 132, 14, 4);
       ctx.fillRect(222, 136, 10, 4);
 
-      // Bonfire pit
-      const fs = p.fireScale || 1;
-      ctx.fillStyle = '#777766';
-      fillCircle(ctx, 115, 148, Math.round(8 * fs));
-      ctx.fillStyle = p.grass;
-      fillCircle(ctx, 115, 148, Math.round(5 * fs));
-      ctx.fillStyle = '#664422';
-      ctx.fillRect(115 - Math.round(6 * fs), 146, Math.round(12 * fs), 3);
-      ctx.fillRect(113, 144, 3, Math.round(8 * fs));
-      ctx.fillStyle = '#cc5522';
-      ctx.fillRect(115 - Math.round(4 * fs), 140 - Math.round(2 * (fs - 1)), Math.round(8 * fs), Math.round(6 * fs));
-      ctx.fillStyle = '#ff8833';
-      ctx.fillRect(115 - Math.round(3 * fs), 138 - Math.round(3 * (fs - 1)), Math.round(6 * fs), Math.round(5 * fs));
-      ctx.fillStyle = '#ffcc44';
-      ctx.fillRect(115 - Math.round(2 * fs), 136 - Math.round(4 * (fs - 1)), Math.round(4 * fs), Math.round(4 * fs));
+      // (bonfire removed — now rendered as depth-sorted prop)
 
       // Grass tufts
       ctx.fillStyle = p.leaf;
@@ -963,12 +949,10 @@ const Renderer = (() => {
     },
 
     biltroy(ctx, t) {
-      bgAnimations._drawFire(ctx, t, 1);
       bgAnimations._drawBiltoyLife(ctx, t);
     },
 
     biltroy_dawn(ctx, t) {
-      bgAnimations._drawFire(ctx, t, 1);
       bgAnimations._drawBiltoyLife(ctx, t);
       // Chickens pecking around the yard
       for (let i = 0; i < 3; i++) {
@@ -1002,7 +986,6 @@ const Renderer = (() => {
     },
 
     biltroy_day(ctx, t) {
-      bgAnimations._drawFire(ctx, t, 1.2);
       bgAnimations._drawBiltoyLife(ctx, t);
       // Chickens (same as dawn but different positions)
       for (let i = 0; i < 4; i++) {
@@ -1029,7 +1012,6 @@ const Renderer = (() => {
     },
 
     biltroy_sunset(ctx, t) {
-      bgAnimations._drawFire(ctx, t, 1.6);
       bgAnimations._drawBiltoyLife(ctx, t);
       // Howling wolf silhouette on the left hill
       const wolfX = 8;
@@ -1082,7 +1064,6 @@ const Renderer = (() => {
 
     biltroy_night(ctx, t) {
       // Big bonfire at night
-      bgAnimations._drawFire(ctx, t, 2);
 
       // Twinkling stars
       let seed = 54321;
@@ -1278,6 +1259,47 @@ const Renderer = (() => {
         ctx.fillRect(ux + 6 + i * 5, uy + 12, 2, 1);
       }
     }
+    ctx.globalAlpha = 1;
+  }
+
+  // --- Bonfire rendering (depth-sorted with characters) ---
+
+  function drawBonfire(x, y, time, scale) {
+    const s = scale || 1;
+    // Stone ring
+    ctx.fillStyle = '#777766';
+    fillCircle(ctx, x, y, Math.round(8 * s));
+    ctx.fillStyle = '#554422';
+    fillCircle(ctx, x, y, Math.round(5 * s));
+    // Logs
+    ctx.fillStyle = '#664422';
+    ctx.fillRect(x - Math.round(6 * s), y - 2, Math.round(12 * s), 3);
+    ctx.fillRect(x - 2, y - 4, 3, Math.round(8 * s));
+    // Animated flames
+    const numFlames = Math.round(8 * s);
+    for (let i = 0; i < numFlames; i++) {
+      const fx = x - 3 * s + Math.sin(time / 80 + i * 1.3) * 3 * s;
+      const fy = y - 6 * s - i * 2 * s + Math.sin(time / 120 + i * 1.8) * 2 * s;
+      const colors = ['#ff4411', '#ff5511', '#ff6622', '#ff8833', '#ffaa44', '#ffcc55', '#ffdd66', '#ffee88'];
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.globalAlpha = 0.85 - i * 0.05;
+      const w = (8 - i * 0.4) * s;
+      ctx.fillRect(Math.floor(fx), Math.floor(fy), Math.ceil(w), Math.ceil(3 * s));
+    }
+    // Sparks
+    ctx.fillStyle = '#ffcc44';
+    const numSparks = Math.round(6 * s);
+    for (let i = 0; i < numSparks; i++) {
+      const age = ((time / 18 + i * 22) % (90 * s));
+      const sx = x + Math.sin(time / 250 + i * 3) * (4 * s + age * 0.12);
+      const sy = y - 8 * s - age;
+      ctx.globalAlpha = Math.max(0, 0.7 - age * 0.007);
+      ctx.fillRect(Math.floor(sx), Math.floor(sy), 1, 1);
+    }
+    // Glow
+    ctx.globalAlpha = (0.12 + Math.sin(time / 180) * 0.05) * s;
+    ctx.fillStyle = '#ff6633';
+    fillCircle(ctx, x, y + 3, Math.round(16 * s));
     ctx.globalAlpha = 1;
   }
 
@@ -1557,7 +1579,7 @@ const Renderer = (() => {
 
   return {
     init, beginFrame, applyCamera, restoreCamera, present,
-    drawBackground, drawProp, drawUfo, drawCharacter, drawCharacterWithOffset, drawEmoteBubble, drawMusicNotes, drawSmoke,
+    drawBackground, drawProp, drawBonfire, drawUfo, drawCharacter, drawCharacterWithOffset, drawEmoteBubble, drawMusicNotes, drawSmoke,
     drawDialogueBox, drawDialogueText, drawFadeOverlay,
     drawTitleOverlay, drawCreditsOverlay,
     getTextMaxWidth, getTextScale, getInternalSize,
