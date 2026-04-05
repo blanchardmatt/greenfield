@@ -1146,6 +1146,21 @@ const Renderer = (() => {
     ctx.globalAlpha = 1;
   }
 
+  // --- Smoke rendering (character touching fire) ---
+
+  function drawSmoke(x, y, time, seed) {
+    for (let i = 0; i < 6; i++) {
+      const age = ((time / 25 + i * 18 + seed * 100) % 70);
+      const sx = x + Math.sin(time / 400 + i * 2 + seed) * (3 + age * 0.08);
+      const sy = y - age * 0.8;
+      const size = 1 + Math.floor(age / 25);
+      ctx.fillStyle = '#888888';
+      ctx.globalAlpha = Math.max(0, 0.5 - age * 0.007);
+      ctx.fillRect(Math.floor(sx), Math.floor(sy), size, size);
+    }
+    ctx.globalAlpha = 1;
+  }
+
   // --- Emote rendering ---
 
   function drawEmoteBubble(char, emoteName, bobOffset) {
@@ -1345,7 +1360,7 @@ const Renderer = (() => {
 
   return {
     init, beginFrame, applyCamera, restoreCamera, present,
-    drawBackground, drawProp, drawCharacter, drawCharacterWithOffset, drawEmoteBubble, drawMusicNotes,
+    drawBackground, drawProp, drawCharacter, drawCharacterWithOffset, drawEmoteBubble, drawMusicNotes, drawSmoke,
     drawDialogueBox, drawDialogueText, drawFadeOverlay,
     drawTitleOverlay, drawCreditsOverlay,
     getTextMaxWidth, getTextScale, getInternalSize,

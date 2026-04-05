@@ -503,6 +503,17 @@ const CutsceneEngine = (() => {
     for (const char of Object.values(characters)) {
       const idleBob = (!char.dancing && !char.milling) ? Math.sin(t / 600 + char.idleSeed * 10) * 1.5 : 0;
       Renderer.drawCharacterWithOffset(char, animFrame, 0, idleBob);
+
+      // Smoke if touching the bonfire (fire center ~145, 148)
+      if (char.visible && !char.pinned) {
+        const charCenterX = char.x + SpriteLibrary.W / 2;
+        const charBottom = char.y + SpriteLibrary.H;
+        const distX = Math.abs(charCenterX - 145);
+        const distY = Math.abs(charBottom - 148);
+        if (distX < 20 && distY < 20) {
+          Renderer.drawSmoke(charCenterX, char.y, t, char.idleSeed);
+        }
+      }
     }
 
     // Music notes
