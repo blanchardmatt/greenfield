@@ -164,8 +164,9 @@ const CutsceneEngine = (() => {
     AnimationSystem.addTween(char, 'x', char.x, targetX, duration, 'easeIn');
     AnimationSystem.addTween(char, 'y', char.y, targetY, duration, 'easeIn');
 
-    waitTimer = duration;
-    return { done: false, type: 'timed', onDone: () => { char.visible = false; } };
+    // Non-blocking: tween runs in background, hide after duration
+    setTimeout(() => { char.visible = false; }, duration);
+    return { done: true };
   }
 
   function beginDialogue(action) {

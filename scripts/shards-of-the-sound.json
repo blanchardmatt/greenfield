@@ -232,11 +232,21 @@
         },
         {
           "type": "enter",
-          "character": "townsfolk2",
+          "character": "elder",
           "from": "left",
           "to": {
-            "x": 130,
-            "y": 180
+            "x": 50,
+            "y": 138
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "hero",
+          "from": "left",
+          "to": {
+            "x": 85,
+            "y": 150
           },
           "duration": 1500
         },
@@ -252,11 +262,31 @@
         },
         {
           "type": "enter",
-          "character": "townsfolk8",
+          "character": "gimli",
           "from": "right",
           "to": {
-            "x": 131,
-            "y": 174
+            "x": 120,
+            "y": 145
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "hank",
+          "from": "left",
+          "to": {
+            "x": 158,
+            "y": 148
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk3",
+          "from": "right",
+          "to": {
+            "x": 25,
+            "y": 135
           },
           "duration": 1500
         },
@@ -267,11 +297,31 @@
         },
         {
           "type": "enter",
-          "character": "morgana",
+          "character": "townsfolk2",
+          "from": "left",
+          "to": {
+            "x": 130,
+            "y": 180
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk4",
+          "from": "left",
+          "to": {
+            "x": 75,
+            "y": 168
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "swift",
           "from": "right",
           "to": {
-            "x": 89,
-            "y": 141
+            "x": 170,
+            "y": 140
           },
           "duration": 1500
         },
@@ -282,11 +332,21 @@
         },
         {
           "type": "enter",
-          "character": "hank",
+          "character": "wizard",
+          "from": "right",
+          "to": {
+            "x": 62,
+            "y": 142
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "brother_sol",
           "from": "left",
           "to": {
-            "x": 158,
-            "y": 148
+            "x": 135,
+            "y": 152
           },
           "duration": 1500
         },
@@ -304,16 +364,6 @@
           "text": "Full stalled spinning out... unkempt and overgrown."
         },
         {
-          "type": "enter",
-          "character": "elder",
-          "from": "left",
-          "to": {
-            "x": 50,
-            "y": 138
-          },
-          "duration": 1500
-        },
-        {
           "type": "emote",
           "character": "lyra",
           "emote": "anger",
@@ -323,16 +373,6 @@
           "type": "dialogue",
           "character": "lyra",
           "text": "Why so loud..."
-        },
-        {
-          "type": "enter",
-          "character": "dark_lord",
-          "from": "left",
-          "to": {
-            "x": 126,
-            "y": 154
-          },
-          "duration": 1500
         },
         {
           "type": "shake",
@@ -351,29 +391,9 @@
           "text": "Run it sideways and return."
         },
         {
-          "type": "enter",
-          "character": "duke",
-          "from": "right",
-          "to": {
-            "x": 163,
-            "y": 167
-          },
-          "duration": 1500
-        },
-        {
           "type": "dialogue",
           "character": "lyra",
           "text": "A plastic click of a pen and..."
-        },
-        {
-          "type": "enter",
-          "character": "gimli",
-          "from": "left",
-          "to": {
-            "x": 120,
-            "y": 145
-          },
-          "duration": 1500
         },
         {
           "type": "shake",
@@ -423,11 +443,41 @@
         },
         {
           "type": "enter",
-          "character": "wizard",
+          "character": "shade",
           "from": "right",
           "to": {
-            "x": 47,
-            "y": 153
+            "x": 48,
+            "y": 175
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "lily",
+          "from": "right",
+          "to": {
+            "x": 110,
+            "y": 178
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "pip",
+          "from": "right",
+          "to": {
+            "x": 160,
+            "y": 174
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk1",
+          "from": "left",
+          "to": {
+            "x": 140,
+            "y": 162
           },
           "duration": 1500
         },
@@ -452,11 +502,31 @@
         },
         {
           "type": "enter",
-          "character": "townsfolk5",
+          "character": "ser_valen",
           "from": "left",
           "to": {
-            "x": 20,
-            "y": 180
+            "x": 15,
+            "y": 158
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "morgana",
+          "from": "right",
+          "to": {
+            "x": 180,
+            "y": 145
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "dark_lord",
+          "from": "left",
+          "to": {
+            "x": 30,
+            "y": 172
           },
           "duration": 1500
         },
@@ -465,27 +535,37 @@
           "character": "gimli"
         },
         {
-          "type": "enter",
-          "character": "ser_valen",
-          "from": "left",
-          "to": {
-            "x": 52,
-            "y": 173
-          },
-          "duration": 1500
-        },
-        {
           "type": "dialogue",
           "character": "lyra",
           "text": "Sedge wren warbles... melody to paper untorn."
         },
         {
           "type": "enter",
-          "character": "shade",
+          "character": "duke",
           "from": "right",
           "to": {
-            "x": 121,
-            "y": 179
+            "x": 92,
+            "y": 155
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk5",
+          "from": "left",
+          "to": {
+            "x": 148,
+            "y": 135
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk6",
+          "from": "right",
+          "to": {
+            "x": 185,
+            "y": 158
           },
           "duration": 1500
         },
@@ -500,47 +580,27 @@
           "duration": 1200
         },
         {
-          "type": "enter",
-          "character": "brother_sol",
-          "from": "left",
-          "to": {
-            "x": 84,
-            "y": 166
-          },
-          "duration": 1500
-        },
-        {
           "type": "dialogue",
           "character": "lyra",
           "text": "I'm spun out..."
         },
         {
           "type": "enter",
-          "character": "townsfolk4",
-          "from": "left",
+          "character": "townsfolk7",
+          "from": "right",
           "to": {
-            "x": 75,
-            "y": 168
+            "x": 65,
+            "y": 162
           },
           "duration": 1500
         },
         {
           "type": "enter",
-          "character": "pip",
+          "character": "townsfolk8",
           "from": "right",
           "to": {
-            "x": 15,
-            "y": 160
-          },
-          "duration": 1500
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk6",
-          "from": "right",
-          "to": {
-            "x": 57,
-            "y": 148
+            "x": 175,
+            "y": 170
           },
           "duration": 1500
         },
@@ -563,16 +623,6 @@
           "duration": 3000
         },
         {
-          "type": "enter",
-          "character": "swift",
-          "from": "right",
-          "to": {
-            "x": 170,
-            "y": 140
-          },
-          "duration": 1500
-        },
-        {
           "type": "ufoArrive",
           "character": "quee",
           "to": {
@@ -580,26 +630,6 @@
             "y": 150
           },
           "duration": 3000
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk7",
-          "from": "left",
-          "to": {
-            "x": 94,
-            "y": 161
-          },
-          "duration": 1500
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk3",
-          "from": "left",
-          "to": {
-            "x": 25,
-            "y": 135
-          },
-          "duration": 1500
         },
         {
           "type": "joinDance",
@@ -617,11 +647,31 @@
         },
         {
           "type": "enter",
-          "character": "lily",
-          "from": "left",
+          "character": "townsfolk9",
+          "from": "right",
           "to": {
-            "x": 158,
-            "y": 147
+            "x": 8,
+            "y": 165
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "townsfolk10",
+          "from": "right",
+          "to": {
+            "x": 42,
+            "y": 148
+          },
+          "duration": 1500
+        },
+        {
+          "type": "enter",
+          "character": "princess",
+          "from": "right",
+          "to": {
+            "x": 100,
+            "y": 148
           },
           "duration": 1500
         },
@@ -635,43 +685,13 @@
           "duration": 800
         },
         {
-          "type": "enter",
-          "character": "hero",
-          "from": "left",
-          "to": {
-            "x": 85,
-            "y": 150
-          },
-          "duration": 1500
-        },
-        {
           "type": "dialogue",
           "character": "lyra",
           "text": "Seismic waves inbound..."
         },
         {
-          "type": "enter",
-          "character": "townsfolk9",
-          "from": "left",
-          "to": {
-            "x": 168,
-            "y": 142
-          },
-          "duration": 1500
-        },
-        {
           "type": "joinDance",
           "character": "townsfolk4"
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk10",
-          "from": "right",
-          "to": {
-            "x": 25,
-            "y": 155
-          },
-          "duration": 1500
         },
         {
           "type": "emote",
@@ -683,26 +703,6 @@
           "type": "dialogue",
           "character": "lyra",
           "text": "Slice through the layers unpeeled."
-        },
-        {
-          "type": "enter",
-          "character": "townsfolk1",
-          "from": "right",
-          "to": {
-            "x": 140,
-            "y": 162
-          },
-          "duration": 1500
-        },
-        {
-          "type": "enter",
-          "character": "princess",
-          "from": "left",
-          "to": {
-            "x": 10,
-            "y": 140
-          },
-          "duration": 1500
         },
         {
           "type": "wait",
@@ -1133,45 +1133,190 @@
           "duration": 1500
         },
         {
-          "type": "emote",
-          "character": "zorp",
-          "emote": "happy",
-          "duration": 1500
+          "type": "exit",
+          "character": "townsfolk9",
+          "to": "left",
+          "duration": 800
         },
         {
-          "type": "emote",
-          "character": "blix",
-          "emote": "happy",
-          "duration": 1500
+          "type": "exit",
+          "character": "townsfolk10",
+          "to": "left",
+          "duration": 800
         },
         {
-          "type": "emote",
-          "character": "quee",
-          "emote": "happy",
-          "duration": 1500
-        },
-        {
-          "type": "wait",
-          "duration": 2000
-        },
-        {
-          "type": "ufoDepart",
-          "character": "zorp",
-          "duration": 3500
-        },
-        {
-          "type": "ufoDepart",
-          "character": "blix",
-          "duration": 3500
-        },
-        {
-          "type": "ufoDepart",
-          "character": "quee",
-          "duration": 3500
+          "type": "exit",
+          "character": "princess",
+          "to": "left",
+          "duration": 800
         },
         {
           "type": "wait",
-          "duration": 1000
+          "duration": 400
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk7",
+          "to": "right",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk8",
+          "to": "right",
+          "duration": 800
+        },
+        {
+          "type": "wait",
+          "duration": 400
+        },
+        {
+          "type": "exit",
+          "character": "duke",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk5",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk6",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "wait",
+          "duration": 400
+        },
+        {
+          "type": "exit",
+          "character": "ser_valen",
+          "to": "right",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "morgana",
+          "to": "right",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "dark_lord",
+          "to": "right",
+          "duration": 800
+        },
+        {
+          "type": "wait",
+          "duration": 400
+        },
+        {
+          "type": "exit",
+          "character": "shade",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "lily",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "pip",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk1",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "wait",
+          "duration": 400
+        },
+        {
+          "type": "exit",
+          "character": "wizard",
+          "to": "right",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "brother_sol",
+          "to": "right",
+          "duration": 800
+        },
+        {
+          "type": "wait",
+          "duration": 400
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk2",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk4",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "swift",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "wait",
+          "duration": 400
+        },
+        {
+          "type": "exit",
+          "character": "gimli",
+          "to": "right",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "hank",
+          "to": "right",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "townsfolk3",
+          "to": "right",
+          "duration": 800
+        },
+        {
+          "type": "wait",
+          "duration": 400
+        },
+        {
+          "type": "exit",
+          "character": "elder",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "exit",
+          "character": "hero",
+          "to": "left",
+          "duration": 800
+        },
+        {
+          "type": "wait",
+          "duration": 400
         },
         {
           "type": "credits",
@@ -1238,9 +1383,87 @@
           "highlightColor": "#ffffff"
         },
         {
+          "type": "wait",
+          "duration": 500
+        },
+        {
+          "type": "emote",
+          "character": "zorp",
+          "emote": "happy",
+          "duration": 1500
+        },
+        {
+          "type": "emote",
+          "character": "blix",
+          "emote": "happy",
+          "duration": 1500
+        },
+        {
+          "type": "emote",
+          "character": "quee",
+          "emote": "happy",
+          "duration": 1500
+        },
+        {
+          "type": "wait",
+          "duration": 1500
+        },
+        {
+          "type": "move",
+          "character": "blix",
+          "to": {
+            "x": 115,
+            "y": 150
+          },
+          "duration": 800
+        },
+        {
+          "type": "move",
+          "character": "quee",
+          "to": {
+            "x": 130,
+            "y": 150
+          },
+          "duration": 800
+        },
+        {
+          "type": "move",
+          "character": "zorp",
+          "to": {
+            "x": 100,
+            "y": 150
+          },
+          "duration": 800
+        },
+        {
+          "type": "wait",
+          "duration": 500
+        },
+        {
+          "type": "ufoDepart",
+          "character": "zorp",
+          "duration": 4000
+        },
+        {
+          "type": "exit",
+          "character": "blix",
+          "to": "top",
+          "duration": 1500
+        },
+        {
+          "type": "exit",
+          "character": "quee",
+          "to": "top",
+          "duration": 1500
+        },
+        {
+          "type": "wait",
+          "duration": 3000
+        },
+        {
           "type": "transition",
           "effect": "fadeOut",
-          "duration": 2000
+          "duration": 3000
         }
       ]
     }
