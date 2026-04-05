@@ -98,11 +98,11 @@
     },
     {
       "id": "verse1_noise",
-      "background": "village",
+      "background": "biltroy",
       "actions": [
         { "type": "transition", "effect": "fadeIn", "duration": 2000 },
-        { "type": "showProp", "prop": "amplifier", "x": 75, "y": 120 },
-        { "type": "enter", "character": "lyra", "from": "left", "to": { "x": 100, "y": 80 }, "duration": 1200 },
+        { "type": "showProp", "prop": "amplifier", "x": 190, "y": 96 },
+        { "type": "enter", "character": "lyra", "from": "right", "to": { "x": 200, "y": 60 }, "duration": 1200 },
         { "type": "setScale", "character": "lyra", "scale": 1.5 },
         { "type": "showNotes", "character": "lyra" },
         { "type": "wait", "duration": 800 },

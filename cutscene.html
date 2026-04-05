@@ -1668,6 +1668,142 @@ const Renderer = (() => {
         ctx.fillRect(hx + 5, 100, 7, 7);
       }
     },
+
+    biltroy(ctx) {
+      // Sky
+      ctx.fillStyle = '#6699cc';
+      ctx.fillRect(0, 0, INTERNAL_W, 120);
+
+      // Wispy clouds
+      ctx.fillStyle = '#aaccee';
+      fillCircle(ctx, 50, 25, 12);
+      fillCircle(ctx, 65, 22, 15);
+      fillCircle(ctx, 80, 26, 11);
+      fillCircle(ctx, 190, 35, 10);
+      fillCircle(ctx, 205, 32, 13);
+
+      // Green field
+      ctx.fillStyle = '#5a9a3a';
+      ctx.fillRect(0, 120, INTERNAL_W, INTERNAL_H - 120);
+      // Darker grass stripe
+      ctx.fillStyle = '#4a8a2a';
+      ctx.fillRect(0, 150, INTERNAL_W, 8);
+      ctx.fillRect(0, 175, INTERNAL_W, 6);
+
+      // Left oak tree
+      ctx.fillStyle = '#554422';
+      ctx.fillRect(28, 70, 8, 55); // trunk
+      ctx.fillStyle = '#336622';
+      fillCircle(ctx, 32, 55, 22);
+      ctx.fillStyle = '#448833';
+      fillCircle(ctx, 25, 50, 14);
+      fillCircle(ctx, 40, 48, 16);
+      fillCircle(ctx, 30, 42, 12);
+
+      // Right oak tree (further back, smaller)
+      ctx.fillStyle = '#554422';
+      ctx.fillRect(215, 80, 6, 42); // trunk
+      ctx.fillStyle = '#336622';
+      fillCircle(ctx, 218, 68, 16);
+      ctx.fillStyle = '#448833';
+      fillCircle(ctx, 212, 64, 11);
+      fillCircle(ctx, 225, 62, 13);
+
+      // The Biltroy — double-wide trailer
+      // Main body
+      ctx.fillStyle = '#ccbbaa'; // beige siding
+      ctx.fillRect(70, 88, 120, 40);
+      // Darker bottom half
+      ctx.fillStyle = '#bbaa99';
+      ctx.fillRect(70, 108, 120, 20);
+      // Roof
+      ctx.fillStyle = '#777777';
+      ctx.fillRect(68, 84, 124, 6);
+      ctx.fillStyle = '#666666';
+      ctx.fillRect(68, 83, 124, 2);
+      // Outline
+      ctx.fillStyle = '#444444';
+      ctx.fillRect(70, 88, 120, 1); // top edge
+      ctx.fillRect(70, 127, 120, 1); // bottom edge
+      ctx.fillRect(70, 88, 1, 40); // left edge
+      ctx.fillRect(189, 88, 1, 40); // right edge
+
+      // Windows
+      ctx.fillStyle = '#88bbdd';
+      ctx.fillRect(80, 95, 14, 10);
+      ctx.fillRect(100, 95, 14, 10);
+      ctx.fillRect(140, 95, 14, 10);
+      ctx.fillRect(160, 95, 14, 10);
+      // Window frames
+      ctx.fillStyle = '#eeeeee';
+      ctx.fillRect(86, 95, 2, 10); // mullion
+      ctx.fillRect(106, 95, 2, 10);
+      ctx.fillRect(146, 95, 2, 10);
+      ctx.fillRect(166, 95, 2, 10);
+
+      // Door
+      ctx.fillStyle = '#886644';
+      ctx.fillRect(120, 96, 12, 32);
+      ctx.fillStyle = '#775533';
+      ctx.fillRect(120, 96, 12, 1);
+      // Doorknob
+      ctx.fillStyle = '#ccaa44';
+      ctx.fillRect(129, 112, 2, 2);
+
+      // Skirt (under trailer)
+      ctx.fillStyle = '#999988';
+      ctx.fillRect(70, 128, 120, 4);
+
+      // Cinder block supports
+      ctx.fillStyle = '#888888';
+      ctx.fillRect(78, 128, 6, 6);
+      ctx.fillRect(128, 128, 6, 6);
+      ctx.fillRect(178, 128, 6, 6);
+
+      // Wooden deck on right side
+      ctx.fillStyle = '#aa8855';
+      ctx.fillRect(190, 108, 44, 26);
+      // Deck planks
+      ctx.fillStyle = '#997744';
+      ctx.fillRect(190, 114, 44, 1);
+      ctx.fillRect(190, 120, 44, 1);
+      ctx.fillRect(190, 126, 44, 1);
+      // Deck railing posts
+      ctx.fillStyle = '#886633';
+      ctx.fillRect(190, 102, 3, 8);
+      ctx.fillRect(210, 102, 3, 8);
+      ctx.fillRect(231, 102, 3, 8);
+      // Railing bar
+      ctx.fillRect(190, 104, 44, 2);
+      // Deck steps
+      ctx.fillStyle = '#997744';
+      ctx.fillRect(220, 132, 14, 4);
+      ctx.fillRect(222, 136, 10, 4);
+
+      // Bonfire pit (in front yard)
+      // Stone ring
+      ctx.fillStyle = '#777766';
+      fillCircle(ctx, 145, 148, 8);
+      ctx.fillStyle = '#5a9a3a'; // green center to match grass
+      fillCircle(ctx, 145, 148, 5);
+      // Logs
+      ctx.fillStyle = '#664422';
+      ctx.fillRect(140, 146, 12, 3);
+      ctx.fillRect(143, 144, 3, 8);
+      // Static fire base
+      ctx.fillStyle = '#cc5522';
+      ctx.fillRect(142, 140, 8, 6);
+      ctx.fillStyle = '#ff8833';
+      ctx.fillRect(143, 138, 6, 5);
+      ctx.fillStyle = '#ffcc44';
+      ctx.fillRect(144, 136, 4, 4);
+
+      // Small grass tufts
+      ctx.fillStyle = '#6aaa4a';
+      ctx.fillRect(55, 132, 3, 2);
+      ctx.fillRect(245, 128, 2, 3);
+      ctx.fillRect(10, 140, 3, 2);
+    },
   };
 
   function fillCircle(ctx, cx, cy, r) {
@@ -1858,6 +1994,81 @@ const Renderer = (() => {
       fillCircle(ctx, Math.floor(cX), 35, 10);
       fillCircle(ctx, Math.floor(cX) + 12, 32, 13);
       fillCircle(ctx, Math.floor(cX) + 25, 36, 9);
+      ctx.globalAlpha = 1;
+    },
+
+    biltroy(ctx, t) {
+      // Bonfire — animated flames
+      const fireX = 145;
+      const fireY = 140;
+      // Flickering flames
+      for (let i = 0; i < 6; i++) {
+        const fx = fireX - 3 + Math.sin(t / 100 + i * 1.5) * 3;
+        const fy = fireY - 4 - i * 2 + Math.sin(t / 150 + i * 2) * 2;
+        const colors = ['#ff4411', '#ff6622', '#ff8833', '#ffaa44', '#ffcc55', '#ffee88'];
+        ctx.fillStyle = colors[i];
+        ctx.globalAlpha = 0.8 - i * 0.08;
+        const w = 6 - i * 0.5;
+        ctx.fillRect(Math.floor(fx), Math.floor(fy), Math.ceil(w), 3);
+      }
+      // Sparks rising
+      ctx.fillStyle = '#ffcc44';
+      for (let i = 0; i < 5; i++) {
+        const age = ((t / 20 + i * 25) % 80);
+        const sx = fireX + Math.sin(t / 300 + i * 3) * (4 + age * 0.1);
+        const sy = fireY - 8 - age;
+        ctx.globalAlpha = Math.max(0, 0.7 - age * 0.01);
+        ctx.fillRect(Math.floor(sx), Math.floor(sy), 1, 1);
+      }
+      // Fire glow on ground
+      ctx.globalAlpha = 0.1 + Math.sin(t / 200) * 0.05;
+      ctx.fillStyle = '#ff6633';
+      fillCircle(ctx, fireX, fireY + 4, 14);
+      ctx.globalAlpha = 1;
+
+      // Rustling leaves on oak trees
+      ctx.fillStyle = '#448833';
+      for (let i = 0; i < 8; i++) {
+        const seed = i * 37;
+        const lx = (i < 4 ? 15 : 205) + Math.sin(t / 600 + seed) * 6;
+        const ly = (i < 4 ? 40 : 55) + Math.sin(t / 800 + seed * 1.3) * 4 + (i % 4) * 8;
+        ctx.globalAlpha = 0.5 + Math.sin(t / 500 + seed) * 0.2;
+        ctx.fillRect(Math.floor(lx), Math.floor(ly), 2, 1);
+      }
+      // Falling leaf
+      const leafCycle = 6000;
+      const leafPhase = (t % leafCycle) / leafCycle;
+      const leafX = 35 + leafPhase * 30 + Math.sin(leafPhase * 12) * 8;
+      const leafY = 50 + leafPhase * 90;
+      if (leafY < 140) {
+        ctx.globalAlpha = 0.7;
+        ctx.fillStyle = '#88aa33';
+        ctx.fillRect(Math.floor(leafX), Math.floor(leafY), 2, 1);
+      }
+      // Bird flying past
+      const birdCycle = 10000;
+      const birdX = ((t % birdCycle) / birdCycle) * (INTERNAL_W + 40) - 20;
+      const birdY = 18 + Math.sin(t / 250) * 2;
+      const wingUp = Math.sin(t / 100) > 0;
+      ctx.fillStyle = '#333333';
+      ctx.globalAlpha = 0.8;
+      ctx.fillRect(Math.floor(birdX), Math.floor(birdY), 3, 1);
+      if (wingUp) {
+        ctx.fillRect(Math.floor(birdX) - 2, Math.floor(birdY) - 1, 2, 1);
+        ctx.fillRect(Math.floor(birdX) + 3, Math.floor(birdY) - 1, 2, 1);
+      } else {
+        ctx.fillRect(Math.floor(birdX) - 2, Math.floor(birdY) + 1, 2, 1);
+        ctx.fillRect(Math.floor(birdX) + 3, Math.floor(birdY) + 1, 2, 1);
+      }
+      // Grass swaying
+      ctx.fillStyle = '#6aaa4a';
+      for (let i = 0; i < 6; i++) {
+        const gx = 10 + i * 45;
+        const sway = Math.sin(t / 700 + i * 2) * 2;
+        ctx.globalAlpha = 0.6;
+        ctx.fillRect(Math.floor(gx + sway), 133, 1, 3);
+        ctx.fillRect(Math.floor(gx + sway + 2), 132, 1, 4);
+      }
       ctx.globalAlpha = 1;
     },
   };
@@ -2510,11 +2721,11 @@ const SHARDS_SCRIPT = {
     },
     {
       "id": "verse1_noise",
-      "background": "village",
+      "background": "biltroy",
       "actions": [
         { "type": "transition", "effect": "fadeIn", "duration": 2000 },
-        { "type": "showProp", "prop": "amplifier", "x": 75, "y": 120 },
-        { "type": "enter", "character": "lyra", "from": "left", "to": { "x": 100, "y": 80 }, "duration": 1200 },
+        { "type": "showProp", "prop": "amplifier", "x": 190, "y": 96 },
+        { "type": "enter", "character": "lyra", "from": "right", "to": { "x": 200, "y": 60 }, "duration": 1200 },
         { "type": "setScale", "character": "lyra", "scale": 1.5 },
         { "type": "showNotes", "character": "lyra" },
         { "type": "wait", "duration": 800 },
