@@ -30,7 +30,7 @@ const Renderer = (() => {
       fireX: 115, fireY: 148,
       // Dance
       danceCenterX: 115, danceCenterY: 148,
-      danceRadiusX: 65, danceRadiusY: 25,
+      danceRadiusX: 78, danceRadiusY: 34,
       // Perspective
       perspMinY: 115, perspMaxY: 195,
       perspMinScale: 0.45, perspMaxScale: 1.3,
@@ -38,7 +38,7 @@ const Renderer = (() => {
       lyraX: 195, lyraY: 58, lyraScale: 1.5,
       ampX: 190, ampY: 96,
       // Grill area
-      grillX: 38, grillY: 122,
+      grillX: 62, grillY: 138,
       // Sky features
       moonX: 200, moonY: 30,
       sunDawnX: 200, sunDawnY: 118,
@@ -71,7 +71,7 @@ const Renderer = (() => {
       fireX: 72, fireY: 175,
       // Dance: centered on fire
       danceCenterX: 72, danceCenterY: 175,
-      danceRadiusX: 42, danceRadiusY: 22,
+      danceRadiusX: 55, danceRadiusY: 30,
       // Perspective: extended for taller screen
       perspMinY: 100, perspMaxY: 230,
       perspMinScale: 0.4, perspMaxScale: 1.3,
@@ -80,7 +80,7 @@ const Renderer = (() => {
       lyraScale: 0.8,
       ampX: 68, ampY: 92,
       // Grill
-      grillX: 15, grillY: 120,
+      grillX: 42, grillY: 122,
       // Sky
       moonX: 110, moonY: 25,
       sunDawnX: 110, sunDawnY: 88,
@@ -1170,9 +1170,9 @@ const Renderer = (() => {
 
     biltroy_sunset(ctx, t) {
       bgAnimations._drawBiltoyLife(ctx, t);
-      // Howling wolf silhouette on the left hill
-      const wolfX = 8;
-      const wolfY = 118;
+      // Howling wolf silhouette in front of the sun
+      const wolfX = layout.sunSetX - 5;
+      const wolfY = layout.sunSetY + 6;
       ctx.fillStyle = '#221100';
       ctx.globalAlpha = 0.9;
       // Body

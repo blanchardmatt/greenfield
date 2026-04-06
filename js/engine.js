@@ -766,7 +766,12 @@ const CutsceneEngine = (() => {
       if (item.type === 'prop') {
         const prop = item.obj;
         if (prop.name === 'bonfire') {
-          Renderer.drawBonfire(prop.x, prop.y, t, prop.scale || 1);
+          // Fire grows by time of day: dawn=1, day=1.2, sunset=1.5, night=2
+          let fireScale = prop.scale || 1;
+          if (currentBackground === 'biltroy_night') fireScale *= 2;
+          else if (currentBackground === 'biltroy_sunset') fireScale *= 1.5;
+          else if (currentBackground === 'biltroy_day') fireScale *= 1.2;
+          Renderer.drawBonfire(prop.x, prop.y, t, fireScale);
         } else {
           Renderer.drawProp(prop.name, Math.round(prop.x), Math.round(prop.y), prop.scale || 1);
         }
