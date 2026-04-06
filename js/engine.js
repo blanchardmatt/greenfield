@@ -790,11 +790,14 @@ const CutsceneEngine = (() => {
     if (waitingForInput) {
       const charId = script.scenes[sceneIndex]?.actions[actionIndex]?.character;
       const charDef = charId ? script.characters[charId] : null;
+      const twState = AnimationSystem.getTypewriterState();
+      const lineCount = twState.lines ? twState.lines.length : 1;
       Renderer.drawDialogueBox(
         charDef ? charDef.name : '',
-        charDef ? charDef.nameColor : '#ffffff'
+        charDef ? charDef.nameColor : '#ffffff',
+        lineCount
       );
-      Renderer.drawDialogueText(AnimationSystem.getTypewriterState());
+      Renderer.drawDialogueText(twState, lineCount);
     }
 
     // Title overlay

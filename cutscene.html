@@ -2008,9 +2008,13 @@ const Renderer = (() => {
       fillCircle(ctx, L.rightCanopyX - 6, L.rightCanopyY - 4, 11);
       fillCircle(ctx, L.rightCanopyX + 7, L.rightCanopyY - 6, 13);
 
-      // Translate for trailer and deck only
+      // Transform for trailer: translate + scale to fit portrait
+      const trailerScale = L.trailerW / 120; // landscape trailer is 120px
       ctx.save();
-      ctx.translate(dx, dy);
+      ctx.translate(L.trailerX, L.trailerY);
+      ctx.scale(trailerScale, trailerScale);
+      // Draw in landscape-local coords (trailer at 0,0 instead of 70,88)
+      ctx.translate(-70, -88);
 
       // Trailer body
       ctx.fillStyle = p.siding;
@@ -3324,11 +3328,15 @@ const Renderer = (() => {
 
   // --- Dialogue box ---
 
-  function drawDialogueBox(characterName, nameColor) {
+  function drawDialogueBox(characterName, nameColor, lineCount) {
     const x = DIALOG_MARGIN;
-    const y = DIALOG_Y;
     const w = INTERNAL_W - DIALOG_MARGIN * 2;
-    const h = DIALOG_HEIGHT;
+    // Auto-size height: name line + text lines + padding
+    const nameH = (PixelFont.CHAR_H + 3) * TEXT_SCALE;
+    const lineH = (PixelFont.CHAR_H + 2) * TEXT_SCALE;
+    const numLines = Math.max(1, lineCount || 2);
+    const h = TEXT_PADDING * 2 + nameH + numLines * lineH + 2;
+    const y = INTERNAL_H - h - DIALOG_MARGIN;
 
     // Box background
     ctx.fillStyle = 'rgba(0, 0, 20, 0.85)';
@@ -3349,10 +3357,14 @@ const Renderer = (() => {
     }
   }
 
-  function drawDialogueText(twState, nameColor) {
+  function drawDialogueText(twState, lineCount) {
     const x = DIALOG_MARGIN + TEXT_PADDING;
-    const startY = DIALOG_Y + TEXT_PADDING + (PixelFont.CHAR_H + 3) * TEXT_SCALE; // below name
+    const nameH = (PixelFont.CHAR_H + 3) * TEXT_SCALE;
     const lineHeight = (PixelFont.CHAR_H + 2) * TEXT_SCALE;
+    const numLines = Math.max(1, lineCount || 2);
+    const h = TEXT_PADDING * 2 + nameH + numLines * lineHeight + 2;
+    const boxY = INTERNAL_H - h - DIALOG_MARGIN;
+    const startY = boxY + TEXT_PADDING + nameH;
 
     let charsRemaining = twState.revealedCount;
     for (let i = 0; i < twState.lines.length; i++) {
@@ -6078,11 +6090,14 @@ const CutsceneEngine = (() => {
     if (waitingForInput) {
       const charId = script.scenes[sceneIndex]?.actions[actionIndex]?.character;
       const charDef = charId ? script.characters[charId] : null;
+      const twState = AnimationSystem.getTypewriterState();
+      const lineCount = twState.lines ? twState.lines.length : 1;
       Renderer.drawDialogueBox(
         charDef ? charDef.name : '',
-        charDef ? charDef.nameColor : '#ffffff'
+        charDef ? charDef.nameColor : '#ffffff',
+        lineCount
       );
-      Renderer.drawDialogueText(AnimationSystem.getTypewriterState());
+      Renderer.drawDialogueText(twState, lineCount);
     }
 
     // Title overlay
