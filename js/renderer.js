@@ -1605,8 +1605,18 @@ const Renderer = (() => {
 
   // --- Prop rendering ---
 
-  function drawProp(propName, x, y) {
-    SpriteLibrary.drawProp(ctx, propName, x, y);
+  function drawProp(propName, x, y, scale) {
+    if (!scale || scale === 1) {
+      SpriteLibrary.drawProp(ctx, propName, x, y);
+    } else {
+      // Draw scaled via temp canvas
+      const tmp = document.createElement('canvas');
+      tmp.width = 18; tmp.height = 18;
+      const tc = tmp.getContext('2d');
+      SpriteLibrary.drawProp(tc, propName, 0, 0);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(tmp, x, y, Math.round(18 * scale), Math.round(18 * scale));
+    }
   }
 
   // --- Character rendering ---

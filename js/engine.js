@@ -531,11 +531,16 @@ const CutsceneEngine = (() => {
     } else {
       pos = remapPosition(action.x || 0, action.y || 0);
     }
+    // Amp scales with Lyra
+    let propScale = action.scale || 1;
+    if (propName === 'amplifier') {
+      propScale = L.lyraScale || 1;
+    }
     activeProps.push({
       name: propName,
       x: pos.x,
       y: pos.y,
-      scale: action.scale || 1,
+      scale: propScale,
     });
     return { done: true };
   }
@@ -763,7 +768,7 @@ const CutsceneEngine = (() => {
         if (prop.name === 'bonfire') {
           Renderer.drawBonfire(prop.x, prop.y, t, prop.scale || 1);
         } else {
-          Renderer.drawProp(prop.name, Math.round(prop.x), Math.round(prop.y));
+          Renderer.drawProp(prop.name, Math.round(prop.x), Math.round(prop.y), prop.scale || 1);
         }
         continue;
       }
@@ -1027,7 +1032,8 @@ const CutsceneEngine = (() => {
             if (pn === 'bonfire') pp = { x: LL.fireX, y: LL.fireY };
             else if (pn === 'amplifier') pp = { x: LL.ampX, y: LL.ampY };
             else pp = remapPosition(action.x || 0, action.y || 0);
-            activeProps.push({ name: pn, x: pp.x, y: pp.y, scale: action.scale || 1 });
+            const pScale = (pn === 'amplifier') ? (LL.lyraScale || 1) : (action.scale || 1);
+            activeProps.push({ name: pn, x: pp.x, y: pp.y, scale: pScale });
           } else if (action.type === 'setScale') {
             const char = getOrCreateCharacter(action.character);
             if (action.character === 'lyra') {
