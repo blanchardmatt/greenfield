@@ -5480,6 +5480,15 @@ const CutsceneEngine = (() => {
     const from = getOffscreenPos(action.from || 'left');
     const rawTo = action.to || { x: 128, y: 120 };
     const to = remapPosition(rawTo.x, rawTo.y);
+    // Push base position away from fire if too close
+    const fL = Renderer.getLayout();
+    const tdx = to.x + SpriteLibrary.W / 2 - fL.fireX;
+    const tdy = to.y + SpriteLibrary.H * 0.7 - fL.fireY;
+    const tdist = Math.sqrt(tdx * tdx + tdy * tdy);
+    if (tdist < 40 && tdist > 0) {
+      to.x = fL.fireX + (tdx / tdist) * 40 - SpriteLibrary.W / 2;
+      to.y = fL.fireY + (tdy / tdist) * 40 - SpriteLibrary.H * 0.7;
+    }
     const duration = action.duration || 800;
 
     char.x = from.x !== null ? from.x : to.x;
@@ -5867,15 +5876,18 @@ const CutsceneEngine = (() => {
         const wy = Math.sin(t / 3000 + seed * 1.5) * 4;
         let nx = char.baseX + wx;
         let ny = char.baseY + wy;
-        // Push away from fire if too close
+        // Hard push away from fire — characters must stay outside fire zone
         const fL = Renderer.getLayout();
-        const dxF = nx + SpriteLibrary.W / 2 - fL.fireX;
-        const dyF = ny + SpriteLibrary.H / 2 - fL.fireY;
+        const charCX = nx + SpriteLibrary.W / 2;
+        const charCY = ny + SpriteLibrary.H * 0.7; // feet area
+        const dxF = charCX - fL.fireX;
+        const dyF = charCY - fL.fireY;
         const distF = Math.sqrt(dxF * dxF + dyF * dyF);
-        if (distF < 25) {
-          const push = (25 - distF) / 25;
-          nx += (dxF / distF) * push * 15;
-          ny += (dyF / distF) * push * 10;
+        const minDist = 35; // minimum distance from fire center
+        if (distF < minDist && distF > 0) {
+          // Hard push — force them outside the radius
+          nx = fL.fireX + (dxF / distF) * minDist - SpriteLibrary.W / 2;
+          ny = fL.fireY + (dyF / distF) * minDist - SpriteLibrary.H * 0.7;
         }
         char.x = nx;
         char.y = ny;
@@ -6286,6 +6298,14 @@ const CutsceneEngine = (() => {
             const char = getOrCreateCharacter(action.character);
             const rawTo = action.to || { x: 128, y: 120 };
             const to = remapPosition(rawTo.x, rawTo.y);
+            const jL = Renderer.getLayout();
+            const jdx = to.x + SpriteLibrary.W / 2 - jL.fireX;
+            const jdy = to.y + SpriteLibrary.H * 0.7 - jL.fireY;
+            const jdist = Math.sqrt(jdx * jdx + jdy * jdy);
+            if (jdist < 40 && jdist > 0) {
+              to.x = jL.fireX + (jdx / jdist) * 40 - SpriteLibrary.W / 2;
+              to.y = jL.fireY + (jdy / jdist) * 40 - SpriteLibrary.H * 0.7;
+            }
             char.x = to.x; char.y = to.y;
             char.baseX = to.x; char.baseY = to.y;
             char.visible = true;
