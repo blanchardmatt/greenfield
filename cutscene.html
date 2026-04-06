@@ -3461,6 +3461,10 @@ const Renderer = (() => {
     const lineHeight = 14;
     const startY = INTERNAL_H - scrollOffset;
 
+    // Dark background so text is readable over the scene
+    ctx.fillStyle = 'rgba(0, 0, 10, 0.8)';
+    ctx.fillRect(0, 0, INTERNAL_W, INTERNAL_H);
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const y = Math.floor(startY + i * lineHeight);
