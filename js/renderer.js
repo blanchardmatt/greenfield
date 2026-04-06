@@ -436,6 +436,17 @@ const Renderer = (() => {
       ctx.fillRect(dkX + dkW - 14, dkY + dkH, 14, 4);
       ctx.fillRect(dkX + dkW - 12, dkY + dkH + 4, 10, 4);
 
+      // DEBUG: Show deck bounds (red), lyra target (green), amp target (blue)
+      if (verticalMode) {
+        ctx.strokeStyle = '#ff0000';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(dkX, dkY, dkW, dkH);
+        ctx.strokeStyle = '#00ff00';
+        ctx.strokeRect(L.lyraX, L.lyraY, 48, 72); // 1.5x sprite
+        ctx.strokeStyle = '#0000ff';
+        ctx.strokeRect(L.ampX, L.ampY, 18, 18);
+      }
+
       // Grass tufts
       ctx.fillStyle = p.leaf;
       ctx.fillRect(INTERNAL_W * 0.2, L.horizon + 12, 3, 2);
