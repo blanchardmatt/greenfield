@@ -984,8 +984,15 @@ const CutsceneEngine = (() => {
           // Execute instantly without animation
           if (action.type === 'enter' || action.type === 'ufoArrive') {
             const char = getOrCreateCharacter(action.character);
-            const rawTo = action.to || { x: 128, y: 120 };
-            const to = remapPosition(rawTo.x, rawTo.y);
+            let to;
+            // Lyra uses layout position directly
+            if (action.character === 'lyra') {
+              const lyraL = Renderer.getLayout();
+              to = { x: lyraL.lyraX, y: lyraL.lyraY };
+            } else {
+              const rawTo = action.to || { x: 128, y: 120 };
+              to = remapPosition(rawTo.x, rawTo.y);
+            }
             const jL = Renderer.getLayout();
             const jdx = to.x + SpriteLibrary.W / 2 - jL.fireX;
             const jdy = to.y + SpriteLibrary.H * 0.7 - jL.fireY;
