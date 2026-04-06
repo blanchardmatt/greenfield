@@ -935,7 +935,7 @@ const Renderer = (() => {
       }
 
       // Grill
-      const grX = L.grillX, grY = L.grillY;
+      const grX = layout.grillX, grY = layout.grillY;
       ctx.fillStyle = '#444444';
       ctx.globalAlpha = 0.9;
       ctx.fillRect(grX, grY, 10, 6);
@@ -993,8 +993,8 @@ const Renderer = (() => {
 
       // Door people — inside trailer transform
       ctx.save();
-      ctx.translate(L.trailerX, L.trailerY);
-      ctx.scale(L.trailerW / 120, L.trailerW / 120);
+      ctx.translate(layout.trailerX, layout.trailerY);
+      ctx.scale(layout.trailerW / 120, layout.trailerW / 120);
       ctx.translate(-70, -88);
 
       // Person going in/out of door
