@@ -60,7 +60,7 @@ const Renderer = (() => {
       trailerX: 30, trailerY: 68, trailerW: 72, trailerH: 36,
       roofY: 63,
       // Deck: front of Biltroy, right-aligned
-      deckX: 72, deckY: 96, deckW: 30, deckH: 16,
+      deckX: 68, deckY: 96, deckW: 38, deckH: 16,
       doorX: 55, doorY: 76,
       // Trees: left visible, right visible
       leftTreeX: 2, leftTreeY: 55,

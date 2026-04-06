@@ -452,14 +452,17 @@ const CutsceneEngine = (() => {
         ufoState.y = 10;
         ufoState.beamOn = true;
         const beamP = (progress - 0.3) / 0.5;
-        if (beamP > 0.5 && ufoState.character) {
+        if (beamP > 0.2 && ufoState.character) {
           const char = characters[ufoState.character];
-          if (char && !char.visible) {
-            char.x = ufoState.targetX;
-            char.y = ufoState.targetY;
-            char.baseX = ufoState.targetX;
-            char.baseY = ufoState.targetY;
-            char.visible = true;
+          if (char) {
+          char.visible = true;
+          // Slide down from UFO to target position
+          const slideP = Math.min(1, (beamP - 0.2) / 0.7);
+          const ufoBottom = 25; // just below UFO body
+          char.x = ufoState.targetX;
+          char.y = ufoBottom + (ufoState.targetY - ufoBottom) * slideP;
+          char.baseX = ufoState.targetX;
+          char.baseY = ufoState.targetY;
           }
         }
       } else {
@@ -480,9 +483,16 @@ const CutsceneEngine = (() => {
         ufoState.y = 10;
         ufoState.beamOn = true;
         const beamP = (progress - 0.25) / 0.5;
-        if (beamP > 0.6 && ufoState.character) {
+        if (ufoState.character) {
           const char = characters[ufoState.character];
-          if (char) char.visible = false;
+          if (char) {
+            // Slide up from target position to UFO
+            const slideP = Math.min(1, beamP / 0.8);
+            const ufoBottom = 25;
+            char.x = ufoState.targetX;
+            char.y = ufoState.targetY + (ufoBottom - ufoState.targetY) * slideP;
+            if (slideP >= 1) char.visible = false;
+          }
         }
       } else {
         const p = (progress - 0.75) / 0.25;
