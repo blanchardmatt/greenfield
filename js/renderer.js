@@ -80,7 +80,7 @@ const Renderer = (() => {
       lyraScale: 0.8,
       ampX: 68, ampY: 92,
       // Grill
-      grillX: 5, grillY: 105,
+      grillX: 15, grillY: 120,
       // Sky
       moonX: 110, moonY: 25,
       sunDawnX: 110, sunDawnY: 88,
@@ -934,55 +934,53 @@ const Renderer = (() => {
         ctx.fillRect(Math.floor(gx + sway + 2), 132, 1, 4);
       }
 
-      // Guys grilling and door people — offset by trailer position
-      const dx = layout.trailerX - 70;
-      const dy = layout.trailerY - 88;
-      const sc = layout.trailerW / 120;
-      ctx.save();
-      ctx.translate(layout.trailerX, layout.trailerY);
-      ctx.scale(sc, sc);
-      ctx.translate(-70, -88);
-
-      // Guys grilling under left tree
       // Grill
+      const grX = L.grillX, grY = L.grillY;
       ctx.fillStyle = '#444444';
       ctx.globalAlpha = 0.9;
-      ctx.fillRect(38, 122, 10, 6); // grill body
+      ctx.fillRect(grX, grY, 10, 6);
       ctx.fillStyle = '#666666';
-      ctx.fillRect(38, 121, 10, 2); // grill top
-      ctx.fillRect(41, 128, 2, 4); // left leg
-      ctx.fillRect(45, 128, 2, 4); // right leg
+      ctx.fillRect(grX, grY - 1, 10, 2);
+      ctx.fillRect(grX + 3, grY + 6, 2, 4);
+      ctx.fillRect(grX + 7, grY + 6, 2, 4);
       // Smoke from grill
       ctx.fillStyle = '#aaaaaa';
       for (let i = 0; i < 4; i++) {
         const age = ((t / 35 + i * 20) % 50);
-        const sx = 42 + Math.sin(t / 400 + i * 2) * (2 + age * 0.05);
-        const sy = 118 - age;
+        const sx = grX + 4 + Math.sin(t / 400 + i * 2) * (2 + age * 0.05);
+        const sy = grY - 4 - age;
         ctx.globalAlpha = Math.max(0, 0.35 - age * 0.007);
         const sz = 1 + Math.floor(age / 18);
         ctx.fillRect(Math.floor(sx), Math.floor(sy), sz, sz);
       }
-      // Guy 1 — standing by grill with tongs
+      // Guy 1
       ctx.globalAlpha = 0.9;
-      ctx.fillStyle = '#cc8844'; // tan skin
-      ctx.fillRect(32, 120, 4, 3); // head
-      ctx.fillStyle = '#111111';
-      ctx.fillRect(32, 120, 1, 1); // eye
-      ctx.fillRect(35, 120, 1, 1); // eye
-      ctx.fillStyle = '#dd4444'; // red shirt
-      ctx.fillRect(31, 123, 6, 6);
       ctx.fillStyle = '#cc8844';
-      ctx.fillRect(37, 124, 3, 1); // arm reaching to grill
-      ctx.fillStyle = '#445566'; // pants
-      ctx.fillRect(32, 129, 5, 4);
-      // Guy 2 — sitting nearby with a plate
-      ctx.fillStyle = '#8b5e3c'; // dark skin
-      ctx.fillRect(22, 124, 4, 3); // head
+      ctx.fillRect(grX - 6, grY - 2, 4, 3);
       ctx.fillStyle = '#111111';
-      ctx.fillRect(22, 124, 1, 1);
-      ctx.fillRect(25, 124, 1, 1);
-      ctx.fillStyle = '#4488cc'; // blue shirt
-      ctx.fillRect(21, 127, 6, 5);
+      ctx.fillRect(grX - 6, grY - 2, 1, 1);
+      ctx.fillRect(grX - 3, grY - 2, 1, 1);
+      ctx.fillStyle = '#dd4444';
+      ctx.fillRect(grX - 7, grY + 1, 6, 6);
+      ctx.fillStyle = '#cc8844';
+      ctx.fillRect(grX - 1, grY + 2, 3, 1);
+      ctx.fillStyle = '#445566';
+      ctx.fillRect(grX - 6, grY + 7, 5, 4);
+      // Guy 2
+      ctx.fillStyle = '#8b5e3c';
+      ctx.fillRect(grX - 16, grY + 2, 4, 3);
+      ctx.fillStyle = '#111111';
+      ctx.fillRect(grX - 16, grY + 2, 1, 1);
+      ctx.fillRect(grX - 13, grY + 2, 1, 1);
+      ctx.fillStyle = '#4488cc';
+      ctx.fillRect(grX - 17, grY + 5, 6, 5);
+      ctx.fillStyle = '#445566';
+      ctx.fillRect(grX - 16, grY + 10, 5, 3);
+      ctx.fillStyle = '#dddddd';
+      ctx.fillRect(grX - 20, grY + 8, 4, 2);
+      ctx.fillStyle = '#cc6633';
+      ctx.fillRect(grX - 19, grY + 7, 2, 1);
+      ctx.globalAlpha = 1;
       ctx.fillStyle = '#445566';
       ctx.fillRect(22, 132, 5, 3);
       // Plate
@@ -992,6 +990,12 @@ const Renderer = (() => {
       ctx.fillRect(19, 129, 2, 1);
 
       ctx.globalAlpha = 1;
+
+      // Door people — inside trailer transform
+      ctx.save();
+      ctx.translate(L.trailerX, L.trailerY);
+      ctx.scale(L.trailerW / 120, L.trailerW / 120);
+      ctx.translate(-70, -88);
 
       // Person going in/out of door
       const doorCycle = 15000;

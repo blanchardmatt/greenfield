@@ -1728,7 +1728,7 @@ const Renderer = (() => {
       lyraScale: 0.8,
       ampX: 68, ampY: 92,
       // Grill
-      grillX: 5, grillY: 105,
+      grillX: 15, grillY: 120,
       // Sky
       moonX: 110, moonY: 25,
       sunDawnX: 110, sunDawnY: 88,
@@ -2582,55 +2582,53 @@ const Renderer = (() => {
         ctx.fillRect(Math.floor(gx + sway + 2), 132, 1, 4);
       }
 
-      // Guys grilling and door people — offset by trailer position
-      const dx = layout.trailerX - 70;
-      const dy = layout.trailerY - 88;
-      const sc = layout.trailerW / 120;
-      ctx.save();
-      ctx.translate(layout.trailerX, layout.trailerY);
-      ctx.scale(sc, sc);
-      ctx.translate(-70, -88);
-
-      // Guys grilling under left tree
       // Grill
+      const grX = L.grillX, grY = L.grillY;
       ctx.fillStyle = '#444444';
       ctx.globalAlpha = 0.9;
-      ctx.fillRect(38, 122, 10, 6); // grill body
+      ctx.fillRect(grX, grY, 10, 6);
       ctx.fillStyle = '#666666';
-      ctx.fillRect(38, 121, 10, 2); // grill top
-      ctx.fillRect(41, 128, 2, 4); // left leg
-      ctx.fillRect(45, 128, 2, 4); // right leg
+      ctx.fillRect(grX, grY - 1, 10, 2);
+      ctx.fillRect(grX + 3, grY + 6, 2, 4);
+      ctx.fillRect(grX + 7, grY + 6, 2, 4);
       // Smoke from grill
       ctx.fillStyle = '#aaaaaa';
       for (let i = 0; i < 4; i++) {
         const age = ((t / 35 + i * 20) % 50);
-        const sx = 42 + Math.sin(t / 400 + i * 2) * (2 + age * 0.05);
-        const sy = 118 - age;
+        const sx = grX + 4 + Math.sin(t / 400 + i * 2) * (2 + age * 0.05);
+        const sy = grY - 4 - age;
         ctx.globalAlpha = Math.max(0, 0.35 - age * 0.007);
         const sz = 1 + Math.floor(age / 18);
         ctx.fillRect(Math.floor(sx), Math.floor(sy), sz, sz);
       }
-      // Guy 1 — standing by grill with tongs
+      // Guy 1
       ctx.globalAlpha = 0.9;
-      ctx.fillStyle = '#cc8844'; // tan skin
-      ctx.fillRect(32, 120, 4, 3); // head
-      ctx.fillStyle = '#111111';
-      ctx.fillRect(32, 120, 1, 1); // eye
-      ctx.fillRect(35, 120, 1, 1); // eye
-      ctx.fillStyle = '#dd4444'; // red shirt
-      ctx.fillRect(31, 123, 6, 6);
       ctx.fillStyle = '#cc8844';
-      ctx.fillRect(37, 124, 3, 1); // arm reaching to grill
-      ctx.fillStyle = '#445566'; // pants
-      ctx.fillRect(32, 129, 5, 4);
-      // Guy 2 — sitting nearby with a plate
-      ctx.fillStyle = '#8b5e3c'; // dark skin
-      ctx.fillRect(22, 124, 4, 3); // head
+      ctx.fillRect(grX - 6, grY - 2, 4, 3);
       ctx.fillStyle = '#111111';
-      ctx.fillRect(22, 124, 1, 1);
-      ctx.fillRect(25, 124, 1, 1);
-      ctx.fillStyle = '#4488cc'; // blue shirt
-      ctx.fillRect(21, 127, 6, 5);
+      ctx.fillRect(grX - 6, grY - 2, 1, 1);
+      ctx.fillRect(grX - 3, grY - 2, 1, 1);
+      ctx.fillStyle = '#dd4444';
+      ctx.fillRect(grX - 7, grY + 1, 6, 6);
+      ctx.fillStyle = '#cc8844';
+      ctx.fillRect(grX - 1, grY + 2, 3, 1);
+      ctx.fillStyle = '#445566';
+      ctx.fillRect(grX - 6, grY + 7, 5, 4);
+      // Guy 2
+      ctx.fillStyle = '#8b5e3c';
+      ctx.fillRect(grX - 16, grY + 2, 4, 3);
+      ctx.fillStyle = '#111111';
+      ctx.fillRect(grX - 16, grY + 2, 1, 1);
+      ctx.fillRect(grX - 13, grY + 2, 1, 1);
+      ctx.fillStyle = '#4488cc';
+      ctx.fillRect(grX - 17, grY + 5, 6, 5);
+      ctx.fillStyle = '#445566';
+      ctx.fillRect(grX - 16, grY + 10, 5, 3);
+      ctx.fillStyle = '#dddddd';
+      ctx.fillRect(grX - 20, grY + 8, 4, 2);
+      ctx.fillStyle = '#cc6633';
+      ctx.fillRect(grX - 19, grY + 7, 2, 1);
+      ctx.globalAlpha = 1;
       ctx.fillStyle = '#445566';
       ctx.fillRect(22, 132, 5, 3);
       // Plate
@@ -2640,6 +2638,12 @@ const Renderer = (() => {
       ctx.fillRect(19, 129, 2, 1);
 
       ctx.globalAlpha = 1;
+
+      // Door people — inside trailer transform
+      ctx.save();
+      ctx.translate(L.trailerX, L.trailerY);
+      ctx.scale(L.trailerW / 120, L.trailerW / 120);
+      ctx.translate(-70, -88);
 
       // Person going in/out of door
       const doorCycle = 15000;
@@ -4091,8 +4095,8 @@ const SHARDS_SCRIPT = {
           "character": "elder",
           "from": "left",
           "to": {
-            "x": 50,
-            "y": 138
+            "x": 8,
+            "y": 115
           },
           "duration": 1500
         },
@@ -4101,8 +4105,8 @@ const SHARDS_SCRIPT = {
           "character": "hero",
           "from": "left",
           "to": {
-            "x": 85,
-            "y": 150
+            "x": 5,
+            "y": 140
           },
           "duration": 1500
         },
@@ -4121,8 +4125,8 @@ const SHARDS_SCRIPT = {
           "character": "gimli",
           "from": "right",
           "to": {
-            "x": 120,
-            "y": 145
+            "x": 30,
+            "y": 170
           },
           "duration": 1500
         },
@@ -4131,8 +4135,8 @@ const SHARDS_SCRIPT = {
           "character": "hank",
           "from": "left",
           "to": {
-            "x": 158,
-            "y": 148
+            "x": 130,
+            "y": 162
           },
           "duration": 1500
         },
@@ -4141,8 +4145,8 @@ const SHARDS_SCRIPT = {
           "character": "townsfolk3",
           "from": "right",
           "to": {
-            "x": 25,
-            "y": 135
+            "x": 30,
+            "y": 118
           },
           "duration": 1500
         },
@@ -4156,8 +4160,8 @@ const SHARDS_SCRIPT = {
           "character": "townsfolk2",
           "from": "left",
           "to": {
-            "x": 130,
-            "y": 180
+            "x": 70,
+            "y": 225
           },
           "duration": 1500
         },
@@ -4166,8 +4170,8 @@ const SHARDS_SCRIPT = {
           "character": "townsfolk4",
           "from": "left",
           "to": {
-            "x": 75,
-            "y": 168
+            "x": 125,
+            "y": 218
           },
           "duration": 1500
         },
@@ -4176,8 +4180,8 @@ const SHARDS_SCRIPT = {
           "character": "swift",
           "from": "right",
           "to": {
-            "x": 170,
-            "y": 140
+            "x": 115,
+            "y": 120
           },
           "duration": 1500
         },
@@ -4191,8 +4195,8 @@ const SHARDS_SCRIPT = {
           "character": "wizard",
           "from": "right",
           "to": {
-            "x": 62,
-            "y": 142
+            "x": 25,
+            "y": 148
           },
           "duration": 1500
         },
@@ -4201,8 +4205,8 @@ const SHARDS_SCRIPT = {
           "character": "brother_sol",
           "from": "left",
           "to": {
-            "x": 135,
-            "y": 152
+            "x": 105,
+            "y": 168
           },
           "duration": 1500
         },
@@ -4302,8 +4306,8 @@ const SHARDS_SCRIPT = {
           "character": "shade",
           "from": "right",
           "to": {
-            "x": 48,
-            "y": 175
+            "x": 95,
+            "y": 192
           },
           "duration": 1500
         },
@@ -4312,8 +4316,8 @@ const SHARDS_SCRIPT = {
           "character": "lily",
           "from": "right",
           "to": {
-            "x": 110,
-            "y": 178
+            "x": 55,
+            "y": 210
           },
           "duration": 1500
         },
@@ -4322,8 +4326,8 @@ const SHARDS_SCRIPT = {
           "character": "pip",
           "from": "right",
           "to": {
-            "x": 160,
-            "y": 174
+            "x": 110,
+            "y": 205
           },
           "duration": 1500
         },
@@ -4332,8 +4336,8 @@ const SHARDS_SCRIPT = {
           "character": "townsfolk1",
           "from": "left",
           "to": {
-            "x": 140,
-            "y": 162
+            "x": 45,
+            "y": 195
           },
           "duration": 1500
         },
@@ -4361,8 +4365,8 @@ const SHARDS_SCRIPT = {
           "character": "ser_valen",
           "from": "left",
           "to": {
-            "x": 15,
-            "y": 158
+            "x": 20,
+            "y": 215
           },
           "duration": 1500
         },
@@ -4371,8 +4375,8 @@ const SHARDS_SCRIPT = {
           "character": "morgana",
           "from": "right",
           "to": {
-            "x": 180,
-            "y": 145
+            "x": 110,
+            "y": 155
           },
           "duration": 1500
         },
@@ -4381,8 +4385,8 @@ const SHARDS_SCRIPT = {
           "character": "dark_lord",
           "from": "left",
           "to": {
-            "x": 30,
-            "y": 172
+            "x": 5,
+            "y": 200
           },
           "duration": 1500
         },
@@ -4400,8 +4404,8 @@ const SHARDS_SCRIPT = {
           "character": "duke",
           "from": "right",
           "to": {
-            "x": 92,
-            "y": 155
+            "x": 42,
+            "y": 235
           },
           "duration": 1500
         },
@@ -4410,8 +4414,8 @@ const SHARDS_SCRIPT = {
           "character": "townsfolk5",
           "from": "left",
           "to": {
-            "x": 148,
-            "y": 135
+            "x": 130,
+            "y": 125
           },
           "duration": 1500
         },
@@ -4420,8 +4424,8 @@ const SHARDS_SCRIPT = {
           "character": "townsfolk6",
           "from": "right",
           "to": {
-            "x": 185,
-            "y": 158
+            "x": 100,
+            "y": 232
           },
           "duration": 1500
         },
@@ -4445,8 +4449,8 @@ const SHARDS_SCRIPT = {
           "character": "townsfolk7",
           "from": "right",
           "to": {
-            "x": 65,
-            "y": 162
+            "x": 8,
+            "y": 230
           },
           "duration": 1500
         },
@@ -4455,8 +4459,8 @@ const SHARDS_SCRIPT = {
           "character": "townsfolk8",
           "from": "right",
           "to": {
-            "x": 175,
-            "y": 170
+            "x": 60,
+            "y": 135
           },
           "duration": 1500
         },
@@ -4506,8 +4510,8 @@ const SHARDS_SCRIPT = {
           "character": "townsfolk9",
           "from": "right",
           "to": {
-            "x": 8,
-            "y": 165
+            "x": 85,
+            "y": 145
           },
           "duration": 1500
         },
@@ -4516,8 +4520,8 @@ const SHARDS_SCRIPT = {
           "character": "townsfolk10",
           "from": "right",
           "to": {
-            "x": 42,
-            "y": 148
+            "x": 15,
+            "y": 158
           },
           "duration": 1500
         },
@@ -4526,8 +4530,8 @@ const SHARDS_SCRIPT = {
           "character": "princess",
           "from": "right",
           "to": {
-            "x": 100,
-            "y": 148
+            "x": 120,
+            "y": 142
           },
           "duration": 1500
         },
