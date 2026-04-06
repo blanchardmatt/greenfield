@@ -75,8 +75,8 @@ const Renderer = (() => {
       // Perspective: extended for taller screen
       perspMinY: 100, perspMaxY: 230,
       perspMinScale: 0.4, perspMaxScale: 1.3,
-      // Stage — Lyra on the deck (feet at deckY, sprite drawn above)
-      lyraX: 93, lyraY: 28,
+      // Stage — Lyra on the deck (visible feet at ~row 33 of 48, scaled 1.5x = 50px)
+      lyraX: 93, lyraY: 50,
       ampX: 85, ampY: 88,
       // Grill
       grillX: 5, grillY: 105,

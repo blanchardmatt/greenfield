@@ -1723,8 +1723,8 @@ const Renderer = (() => {
       // Perspective: extended for taller screen
       perspMinY: 100, perspMaxY: 230,
       perspMinScale: 0.4, perspMaxScale: 1.3,
-      // Stage — Lyra on the deck (feet at deckY, sprite drawn above)
-      lyraX: 93, lyraY: 28,
+      // Stage — Lyra on the deck (visible feet at ~row 33 of 48, scaled 1.5x = 50px)
+      lyraX: 93, lyraY: 50,
       ampX: 85, ampY: 88,
       // Grill
       grillX: 5, grillY: 105,
@@ -5848,11 +5848,23 @@ const CutsceneEngine = (() => {
         char.x = centerX + Math.cos(angle) * radiusX;
         char.y = centerY + Math.sin(angle) * radiusY;
       } else if (char.milling) {
-        // Wandering near base position — orbit loosely around fire
+        // Wandering near base position — avoid the fire
         const wx = Math.sin(t / 2500 + seed) * 10 + Math.sin(t / 4000 + seed * 2) * 5;
         const wy = Math.sin(t / 3000 + seed * 1.5) * 4;
-        char.x = char.baseX + wx;
-        char.y = char.baseY + wy;
+        let nx = char.baseX + wx;
+        let ny = char.baseY + wy;
+        // Push away from fire if too close
+        const fL = Renderer.getLayout();
+        const dxF = nx + SpriteLibrary.W / 2 - fL.fireX;
+        const dyF = ny + SpriteLibrary.H / 2 - fL.fireY;
+        const distF = Math.sqrt(dxF * dxF + dyF * dyF);
+        if (distF < 25) {
+          const push = (25 - distF) / 25;
+          nx += (dxF / distF) * push * 15;
+          ny += (dyF / distF) * push * 10;
+        }
+        char.x = nx;
+        char.y = ny;
       } else {
         // Subtle idle bob — slight vertical bounce
         // Don't override if a tween is actively moving the character

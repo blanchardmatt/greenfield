@@ -548,11 +548,23 @@ const CutsceneEngine = (() => {
         char.x = centerX + Math.cos(angle) * radiusX;
         char.y = centerY + Math.sin(angle) * radiusY;
       } else if (char.milling) {
-        // Wandering near base position — orbit loosely around fire
+        // Wandering near base position — avoid the fire
         const wx = Math.sin(t / 2500 + seed) * 10 + Math.sin(t / 4000 + seed * 2) * 5;
         const wy = Math.sin(t / 3000 + seed * 1.5) * 4;
-        char.x = char.baseX + wx;
-        char.y = char.baseY + wy;
+        let nx = char.baseX + wx;
+        let ny = char.baseY + wy;
+        // Push away from fire if too close
+        const fL = Renderer.getLayout();
+        const dxF = nx + SpriteLibrary.W / 2 - fL.fireX;
+        const dyF = ny + SpriteLibrary.H / 2 - fL.fireY;
+        const distF = Math.sqrt(dxF * dxF + dyF * dyF);
+        if (distF < 25) {
+          const push = (25 - distF) / 25;
+          nx += (dxF / distF) * push * 15;
+          ny += (dyF / distF) * push * 10;
+        }
+        char.x = nx;
+        char.y = ny;
       } else {
         // Subtle idle bob — slight vertical bounce
         // Don't override if a tween is actively moving the character
