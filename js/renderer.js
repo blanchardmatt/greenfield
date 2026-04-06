@@ -56,17 +56,17 @@ const Renderer = (() => {
     portrait: {
       width: 144, height: 256,
       horizon: 90, groundStart: 105, groundMid: 145,
-      // Trailer: narrower to fit, centered
-      trailerX: 20, trailerY: 68, trailerW: 104, trailerH: 36,
+      // Trailer: ~half width, centered
+      trailerX: 30, trailerY: 68, trailerW: 72, trailerH: 36,
       roofY: 63,
-      // Deck: positioned where Lyra's feet land (~y=116)
-      deckX: 30, deckY: 105, deckW: 70, deckH: 24,
-      doorX: 62, doorY: 76,
-      // Trees: left partially offscreen, right shifted to not overlap deck
-      leftTreeX: -10, leftTreeY: 55,
-      rightTreeX: 130, rightTreeY: 65,
-      leftCanopyX: -6, leftCanopyY: 40,
-      rightCanopyX: 135, rightCanopyY: 53,
+      // Deck: in front of trailer
+      deckX: 30, deckY: 102, deckW: 55, deckH: 22,
+      doorX: 55, doorY: 76,
+      // Trees: left visible, right visible
+      leftTreeX: 2, leftTreeY: 55,
+      rightTreeX: 115, rightTreeY: 65,
+      leftCanopyX: 8, leftCanopyY: 40,
+      rightCanopyX: 120, rightCanopyY: 53,
       // Fire: centered below trailer
       fireX: 72, fireY: 158,
       // Dance: tighter orbit
@@ -75,10 +75,10 @@ const Renderer = (() => {
       // Perspective: extended for taller screen
       perspMinY: 100, perspMaxY: 230,
       perspMinScale: 0.4, perspMaxScale: 1.3,
-      // Stage — Lyra and amp on deck (Lyra at 1.2x in portrait)
-      lyraX: 50, lyraY: 68,
+      // Stage — Lyra and amp on deck
+      lyraX: 38, lyraY: 62,
       lyraScale: 1.2,
-      ampX: 36, ampY: 100,
+      ampX: 28, ampY: 86,
       // Grill
       grillX: 5, grillY: 105,
       // Sky
@@ -88,12 +88,12 @@ const Renderer = (() => {
       sunSetX: 30, sunSetY: 82,
       // Disco balls
       treeDiscoBallX: -4, treeDiscoBallY: 35,
-      deckDiscoBallX: 118, deckDiscoBallY: 68,
+      deckDiscoBallX: 55, deckDiscoBallY: 58,
       // Ladder
       ladderTopX: -5, ladderTopY: 48,
       ladderBotX: 20, ladderBotY: 102,
       // Wheelchair
-      wheelchairY: 62, wheelchairLeft: 22, wheelchairRight: 120,
+      wheelchairY: 62, wheelchairLeft: 32, wheelchairRight: 98,
     },
   };
 
