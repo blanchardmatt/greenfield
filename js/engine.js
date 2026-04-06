@@ -364,14 +364,21 @@ const CutsceneEngine = (() => {
 
   function beginUfoArrive(action) {
     const char = getOrCreateCharacter(action.character);
-    const rawX = action.to ? action.to.x : 195;
-    const rawY = action.to ? action.to.y : 58;
-    const pos = remapPosition(rawX, rawY);
-    const targetX = pos.x;
-    const targetY = pos.y;
+    const L = Renderer.getLayout();
+    let targetX, targetY;
+    // Lyra uses layout position directly (she's on the deck)
+    if (action.character === 'lyra') {
+      targetX = L.lyraX;
+      targetY = L.lyraY;
+    } else {
+      const rawX = action.to ? action.to.x : 128;
+      const rawY = action.to ? action.to.y : 120;
+      const pos = remapPosition(rawX, rawY);
+      targetX = pos.x;
+      targetY = pos.y;
+    }
     const duration = action.duration || 5000;
     char.visible = false;
-    const L = Renderer.getLayout();
     ufoState = {
       x: -60, y: 15,
       targetX: targetX, targetY: targetY,
@@ -488,9 +495,19 @@ const CutsceneEngine = (() => {
   }
 
   function beginShowProp(action) {
-    const pos = remapPosition(action.x || 0, action.y || 0);
+    const propName = action.prop || 'amplifier';
+    let pos;
+    // Bonfire and amp use layout positions directly for accurate placement
+    const L = Renderer.getLayout();
+    if (propName === 'bonfire') {
+      pos = { x: L.fireX, y: L.fireY };
+    } else if (propName === 'amplifier') {
+      pos = { x: L.ampX, y: L.ampY };
+    } else {
+      pos = remapPosition(action.x || 0, action.y || 0);
+    }
     activeProps.push({
-      name: action.prop || 'amplifier',
+      name: propName,
       x: pos.x,
       y: pos.y,
       scale: action.scale || 1,
@@ -947,8 +964,13 @@ const CutsceneEngine = (() => {
             char.baseX = to.x; char.baseY = to.y;
             char.visible = true;
           } else if (action.type === 'showProp') {
-            const pp = remapPosition(action.x || 0, action.y || 0);
-            activeProps.push({ name: action.prop || 'amplifier', x: pp.x, y: pp.y, scale: action.scale || 1 });
+            const pn = action.prop || 'amplifier';
+            const LL = Renderer.getLayout();
+            let pp;
+            if (pn === 'bonfire') pp = { x: LL.fireX, y: LL.fireY };
+            else if (pn === 'amplifier') pp = { x: LL.ampX, y: LL.ampY };
+            else pp = remapPosition(action.x || 0, action.y || 0);
+            activeProps.push({ name: pn, x: pp.x, y: pp.y, scale: action.scale || 1 });
           } else if (action.type === 'setScale') {
             const char = getOrCreateCharacter(action.character);
             char.renderScale = action.scale || 1;

@@ -75,9 +75,9 @@ const Renderer = (() => {
       // Perspective: extended for taller screen
       perspMinY: 100, perspMaxY: 230,
       perspMinScale: 0.4, perspMaxScale: 1.3,
-      // Stage — Lyra on the deck (remap puts her at ~102,44)
-      lyraX: 102, lyraY: 44,
-      ampX: 95, ampY: 88,
+      // Stage — Lyra on the deck (feet at deckY, sprite drawn above)
+      lyraX: 93, lyraY: 28,
+      ampX: 85, ampY: 88,
       // Grill
       grillX: 5, grillY: 105,
       // Sky
