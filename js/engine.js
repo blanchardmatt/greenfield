@@ -545,8 +545,10 @@ const CutsceneEngine = (() => {
         const centerY = L.danceCenterY;
         const radiusX = L.danceRadiusX + Math.sin(t / 2000) * 8;
         const radiusY = L.danceRadiusY + Math.sin(t / 2500) * 5;
-        char.x = centerX + Math.cos(angle) * radiusX;
-        char.y = centerY + Math.sin(angle) * radiusY;
+        // Center sprite on orbit position (not top-left corner)
+        const s = char.renderScale || 1;
+        char.x = centerX + Math.cos(angle) * radiusX - (SpriteLibrary.W * s) / 2;
+        char.y = centerY + Math.sin(angle) * radiusY - (SpriteLibrary.H * s) / 2;
       } else if (char.milling) {
         // Wandering near base position — avoid the fire
         const wx = Math.sin(t / 2500 + seed) * 10 + Math.sin(t / 4000 + seed * 2) * 5;

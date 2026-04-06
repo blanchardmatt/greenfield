@@ -92,7 +92,7 @@ const Renderer = (() => {
       ladderTopX: -5, ladderTopY: 48,
       ladderBotX: 20, ladderBotY: 102,
       // Wheelchair
-      wheelchairY: 68, wheelchairLeft: 14, wheelchairRight: 130,
+      wheelchairY: 62, wheelchairLeft: 22, wheelchairRight: 120,
     },
   };
 
@@ -932,6 +932,15 @@ const Renderer = (() => {
         ctx.fillRect(Math.floor(gx + sway + 2), 132, 1, 4);
       }
 
+      // Guys grilling and door people — offset by trailer position
+      const dx = layout.trailerX - 70;
+      const dy = layout.trailerY - 88;
+      const sc = layout.trailerW / 120;
+      ctx.save();
+      ctx.translate(layout.trailerX, layout.trailerY);
+      ctx.scale(sc, sc);
+      ctx.translate(-70, -88);
+
       // Guys grilling under left tree
       // Grill
       ctx.fillStyle = '#444444';
@@ -1076,18 +1085,17 @@ const Renderer = (() => {
       const lightCycle = 25000;
       const lightPhase = (t % lightCycle) / lightCycle;
       if (lightPhase > 0.3 && lightPhase < 0.7) {
-        // Second window glows warm
         ctx.fillStyle = '#ffdd88';
         ctx.globalAlpha = 0.4;
         ctx.fillRect(100, 95, 14, 10);
       }
       if (lightPhase > 0.1 && lightPhase < 0.5) {
-        // Fourth window glows warm
         ctx.fillStyle = '#ffdd88';
         ctx.globalAlpha = 0.35;
         ctx.fillRect(160, 95, 14, 10);
       }
 
+      ctx.restore(); // end grill/door/window translate
       ctx.globalAlpha = 1;
     },
 
@@ -1817,16 +1825,20 @@ const Renderer = (() => {
         const headerText = line.substring(1).trim();
         const scale = 1;
         const size = PixelFont.measureText(headerText, scale);
-        const x = Math.floor((INTERNAL_W - size.width) / 2);
+        const x = Math.max(2, Math.floor((INTERNAL_W - size.width) / 2));
         PixelFont.drawText(ctx, headerText, x, y, highlightColor, scale);
       } else if (line.trim() === '') {
         // Empty line — just spacing
       } else {
-        // Normal credit line — centered
+        // Normal credit line — centered, wrapped if too wide
         const scale = 1;
-        const size = PixelFont.measureText(line, scale);
-        const x = Math.floor((INTERNAL_W - size.width) / 2);
-        PixelFont.drawText(ctx, line, x, y, color, scale);
+        const maxW = INTERNAL_W - 4;
+        const wrappedLines = PixelFont.wrapText(line, maxW, scale);
+        for (let j = 0; j < wrappedLines.length; j++) {
+          const wSize = PixelFont.measureText(wrappedLines[j], scale);
+          const x = Math.max(2, Math.floor((INTERNAL_W - wSize.width) / 2));
+          PixelFont.drawText(ctx, wrappedLines[j], x, y + j * lineHeight, color, scale);
+        }
       }
     }
   }
