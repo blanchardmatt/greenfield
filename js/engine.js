@@ -361,7 +361,13 @@ const CutsceneEngine = (() => {
   // Scale a character
   function beginSetScale(action) {
     const char = getOrCreateCharacter(action.character);
-    char.renderScale = action.scale || 1;
+    // Use layout scale for Lyra, script scale for others
+    if (action.character === 'lyra') {
+      const L = Renderer.getLayout();
+      char.renderScale = L.lyraScale || action.scale || 1;
+    } else {
+      char.renderScale = action.scale || 1;
+    }
     return { done: true };
   }
 
@@ -1014,7 +1020,12 @@ const CutsceneEngine = (() => {
             activeProps.push({ name: pn, x: pp.x, y: pp.y, scale: action.scale || 1 });
           } else if (action.type === 'setScale') {
             const char = getOrCreateCharacter(action.character);
-            char.renderScale = action.scale || 1;
+            if (action.character === 'lyra') {
+              const sL = Renderer.getLayout();
+              char.renderScale = sL.lyraScale || action.scale || 1;
+            } else {
+              char.renderScale = action.scale || 1;
+            }
           } else if (action.type === 'pin') {
             const char = getOrCreateCharacter(action.character);
             char.pinned = true;

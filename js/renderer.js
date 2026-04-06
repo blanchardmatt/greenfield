@@ -59,8 +59,8 @@ const Renderer = (() => {
       // Trailer: ~half width, centered
       trailerX: 30, trailerY: 68, trailerW: 72, trailerH: 36,
       roofY: 63,
-      // Deck: attached to trailer right edge (30+72=102)
-      deckX: 98, deckY: 84, deckW: 30, deckH: 16,
+      // Deck: front of Biltroy, right-aligned
+      deckX: 72, deckY: 96, deckW: 30, deckH: 16,
       doorX: 55, doorY: 76,
       // Trees: left visible, right visible
       leftTreeX: 2, leftTreeY: 55,
@@ -75,10 +75,10 @@ const Renderer = (() => {
       // Perspective: extended for taller screen
       perspMinY: 100, perspMaxY: 230,
       perspMinScale: 0.4, perspMaxScale: 1.3,
-      // Stage — Lyra on deck at trailer right edge
-      lyraX: 100, lyraY: 58,
+      // Stage — Lyra on deck, front-right of trailer
+      lyraX: 76, lyraY: 70,
       lyraScale: 0.8,
-      ampX: 98, ampY: 82,
+      ampX: 74, ampY: 90,
       // Grill
       grillX: 5, grillY: 105,
       // Sky
