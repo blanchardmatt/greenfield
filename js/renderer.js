@@ -75,10 +75,10 @@ const Renderer = (() => {
       // Perspective: extended for taller screen
       perspMinY: 100, perspMaxY: 230,
       perspMinScale: 0.4, perspMaxScale: 1.3,
-      // Stage — Lyra on deck, front-right of trailer
-      lyraX: 76, lyraY: 70,
+      // Stage — Lyra right, amp left, side by side on deck
+      lyraX: 82, lyraY: 76,
       lyraScale: 0.8,
-      ampX: 74, ampY: 90,
+      ampX: 68, ampY: 92,
       // Grill
       grillX: 5, grillY: 105,
       // Sky
