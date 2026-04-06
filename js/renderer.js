@@ -60,7 +60,7 @@ const Renderer = (() => {
       trailerX: 20, trailerY: 68, trailerW: 104, trailerH: 36,
       roofY: 63,
       // Deck: positioned where Lyra's feet land (~y=116)
-      deckX: 75, deckY: 98, deckW: 50, deckH: 22,
+      deckX: 50, deckY: 110, deckW: 76, deckH: 24,
       doorX: 62, doorY: 76,
       // Trees: left partially offscreen, right shifted to not overlap deck
       leftTreeX: -10, leftTreeY: 55,
@@ -75,9 +75,9 @@ const Renderer = (() => {
       // Perspective: extended for taller screen
       perspMinY: 100, perspMaxY: 230,
       perspMinScale: 0.4, perspMaxScale: 1.3,
-      // Stage — Lyra on deck (48px wide at 1.5x, must fit in 144px)
-      lyraX: 80, lyraY: 75,
-      ampX: 75, ampY: 100,
+      // Stage — Lyra on deck, amp right next to her, bottoms aligned
+      lyraX: 72, lyraY: 82,
+      ampX: 56, ampY: 114,
       // Grill
       grillX: 5, grillY: 105,
       // Sky
