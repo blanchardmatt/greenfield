@@ -35,7 +35,7 @@ const Renderer = (() => {
       perspMinY: 115, perspMaxY: 195,
       perspMinScale: 0.45, perspMaxScale: 1.3,
       // Stage/performance
-      lyraX: 195, lyraY: 58,
+      lyraX: 195, lyraY: 58, lyraScale: 1.5,
       ampX: 190, ampY: 96,
       // Grill area
       grillX: 38, grillY: 122,
@@ -75,9 +75,10 @@ const Renderer = (() => {
       // Perspective: extended for taller screen
       perspMinY: 100, perspMaxY: 230,
       perspMinScale: 0.4, perspMaxScale: 1.3,
-      // Stage — Lyra and amp centered on deck
-      lyraX: 48, lyraY: 78,
-      ampX: 35, ampY: 110,
+      // Stage — Lyra and amp on deck (Lyra at 1.2x in portrait)
+      lyraX: 50, lyraY: 68,
+      lyraScale: 1.2,
+      ampX: 36, ampY: 100,
       // Grill
       grillX: 5, grillY: 105,
       // Sky
@@ -436,16 +437,6 @@ const Renderer = (() => {
       ctx.fillRect(dkX + dkW - 14, dkY + dkH, 14, 4);
       ctx.fillRect(dkX + dkW - 12, dkY + dkH + 4, 10, 4);
 
-      // DEBUG: Show deck bounds (red), lyra target (green), amp target (blue)
-      if (verticalMode) {
-        ctx.strokeStyle = '#ff0000';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(dkX, dkY, dkW, dkH);
-        ctx.strokeStyle = '#00ff00';
-        ctx.strokeRect(L.lyraX, L.lyraY, 48, 72); // 1.5x sprite
-        ctx.strokeStyle = '#0000ff';
-        ctx.strokeRect(L.ampX, L.ampY, 18, 18);
-      }
 
       // Grass tufts
       ctx.fillStyle = p.leaf;
