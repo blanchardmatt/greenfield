@@ -59,8 +59,8 @@ const Renderer = (() => {
       // Trailer: ~half width, centered
       trailerX: 30, trailerY: 68, trailerW: 72, trailerH: 36,
       roofY: 63,
-      // Deck: right side of trailer
-      deckX: 75, deckY: 102, deckW: 55, deckH: 22,
+      // Deck: right side of trailer, scaled to match
+      deckX: 85, deckY: 95, deckW: 30, deckH: 14,
       doorX: 55, doorY: 76,
       // Trees: left visible, right visible
       leftTreeX: 2, leftTreeY: 55,
@@ -75,10 +75,10 @@ const Renderer = (() => {
       // Perspective: extended for taller screen
       perspMinY: 100, perspMaxY: 230,
       perspMinScale: 0.4, perspMaxScale: 1.3,
-      // Stage — Lyra and amp on deck (right side)
-      lyraX: 80, lyraY: 62,
-      lyraScale: 1.2,
-      ampX: 70, ampY: 86,
+      // Stage — Lyra on deck, smaller to fit
+      lyraX: 88, lyraY: 68,
+      lyraScale: 0.8,
+      ampX: 85, ampY: 90,
       // Grill
       grillX: 5, grillY: 105,
       // Sky
