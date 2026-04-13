@@ -47,8 +47,8 @@ function hsl(h: number, s: number, l: number): [number, number, number] {
 export class OrganicVines {
   readonly descriptor = DESCRIPTOR;
   private gl: WebGL2RenderingContext | null = null;
-  private canvas2d: OffscreenCanvas | null = null;
-  private ctx2d: OffscreenCanvasRenderingContext2D | null = null;
+  private canvas2d: OffscreenCanvas | HTMLCanvasElement | null = null;
+  private ctx2d: OffscreenCanvasRenderingContext2D | CanvasRenderingContext2D | null = null;
   private texture: WebGLTexture | null = null;
   private outputTexture: WebGLTexture | null = null;
   private w = 0;
@@ -72,9 +72,16 @@ export class OrganicVines {
     this.w = width;
     this.h = height;
 
-    // Create 2D canvas for drawing vines
-    this.canvas2d = new OffscreenCanvas(width, height);
-    this.ctx2d = this.canvas2d.getContext('2d')!;
+    // Create 2D canvas for drawing vines (OffscreenCanvas with fallback)
+    if (typeof OffscreenCanvas !== 'undefined') {
+      this.canvas2d = new OffscreenCanvas(width, height);
+    } else {
+      const el = document.createElement('canvas');
+      el.width = width;
+      el.height = height;
+      this.canvas2d = el;
+    }
+    this.ctx2d = this.canvas2d.getContext('2d')! as CanvasRenderingContext2D;
 
     // Clear to background
     this.resetCanvas();

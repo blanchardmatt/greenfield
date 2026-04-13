@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import type { RenderPipeline } from '../core/RenderPipeline';
 
 interface InputDebugOverlayProps {
@@ -7,9 +7,11 @@ interface InputDebugOverlayProps {
 
 export function InputDebugOverlay({ pipeline }: InputDebugOverlayProps) {
   const [fps, setFps] = useState(0);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [visible, setVisible] = useState(true);
   const frameTimesRef = useRef<number[]>([]);
   const lastTimeRef = useRef(performance.now());
+
+  const toggle = useCallback(() => setVisible((v) => !v), []);
 
   useEffect(() => {
     if (!pipeline) return;
@@ -27,9 +29,6 @@ export function InputDebugOverlay({ pipeline }: InputDebugOverlayProps) {
       const avgDt = frameTimes.reduce((a, b) => a + b, 0) / frameTimes.length;
       setFps(Math.round(1000 / avgDt));
 
-      const input = pipeline.inputManager.poll();
-      setMousePos({ x: input.mouse.x, y: input.mouse.y });
-
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
@@ -40,8 +39,8 @@ export function InputDebugOverlay({ pipeline }: InputDebugOverlayProps) {
   if (!pipeline) return null;
 
   return (
-    <div className="debug-overlay">
-      FPS: {fps} | Mouse: {mousePos.x.toFixed(2)}, {mousePos.y.toFixed(2)}
+    <div className="debug-overlay" onClick={toggle}>
+      {visible ? `FPS: ${fps}` : '\u2022'}
     </div>
   );
 }

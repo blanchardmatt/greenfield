@@ -6,21 +6,34 @@ interface EffectSelectorProps {
   onChange: (effectIds: string[]) => void;
 }
 
-const EFFECT_LABELS: Record<string, string> = {
-  'noise-flow-field': 'Noise Flow Field',
-  'fractal-explorer': 'Fractal Explorer',
-  'particle-system': 'Particle System',
-  'feedback-echo': 'Feedback Echo',
-  'kaleidoscope': 'Kaleidoscope',
-  'audio-waveform': 'Audio Waveform',
-  'voronoi-liquid': 'Voronoi Liquid',
-  'raymarched-metaballs': 'Raymarched Metaballs',
-  'domain-warp-tunnel': 'Domain Warp',
-  'organic-vines': 'Ornamental Flourish',
+interface EffectInfo {
+  label: string;
+  category: string;
+}
+
+const EFFECTS: Record<string, EffectInfo> = {
+  'noise-flow-field': { label: 'Noise Flow Field', category: 'Generative' },
+  'voronoi-liquid': { label: 'Voronoi Liquid', category: 'Generative' },
+  'domain-warp-tunnel': { label: 'Domain Warp', category: 'Generative' },
+  'kaleidoscope': { label: 'Kaleidoscope', category: 'Generative' },
+  'fractal-explorer': { label: 'Fractal Explorer', category: '3D / Math' },
+  'raymarched-metaballs': { label: 'Raymarched Metaballs', category: '3D / Math' },
+  'particle-system': { label: 'Particle System', category: 'Simulation' },
+  'organic-vines': { label: 'Ornamental Flourish', category: 'Simulation' },
+  'feedback-echo': { label: 'Feedback Echo', category: 'Post-FX' },
+  'audio-waveform': { label: 'Audio Waveform', category: 'Reactive' },
 };
 
 export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps) {
   const allIds = getEffectIds();
+
+  // Group by category
+  const categories = new Map<string, string[]>();
+  for (const id of allIds) {
+    const cat = EFFECTS[id]?.category ?? 'Other';
+    if (!categories.has(cat)) categories.set(cat, []);
+    categories.get(cat)!.push(id);
+  }
 
   const handlePrimaryChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -50,14 +63,20 @@ export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps)
     [activeEffects, onChange],
   );
 
+  const getLabel = (id: string) => EFFECTS[id]?.label ?? id;
+
   return (
     <div className="effect-selector">
       <label>Active Effect</label>
       <select value={activeEffects[0] ?? ''} onChange={handlePrimaryChange}>
-        {allIds.map((id) => (
-          <option key={id} value={id}>
-            {EFFECT_LABELS[id] ?? id}
-          </option>
+        {Array.from(categories.entries()).map(([cat, ids]) => (
+          <optgroup key={cat} label={cat}>
+            {ids.map((id) => (
+              <option key={id} value={id}>
+                {getLabel(id)}
+              </option>
+            ))}
+          </optgroup>
         ))}
       </select>
 
@@ -67,7 +86,7 @@ export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps)
           {activeEffects.map((id, i) => (
             <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
               <span style={{ fontSize: 12, color: '#aaa', flex: 1 }}>
-                {i + 1}. {EFFECT_LABELS[id] ?? id}
+                {i + 1}. {getLabel(id)}
               </span>
               {activeEffects.length > 1 && (
                 <button className="btn btn-danger" onClick={() => handleRemoveEffect(id)} style={{ padding: '2px 6px', fontSize: 11 }}>
@@ -82,13 +101,19 @@ export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps)
       <div style={{ marginTop: 8 }}>
         <select onChange={handleAddEffect} defaultValue="">
           <option value="" disabled>+ Add to chain...</option>
-          {allIds
-            .filter((id) => !activeEffects.includes(id))
-            .map((id) => (
-              <option key={id} value={id}>
-                {EFFECT_LABELS[id] ?? id}
-              </option>
-            ))}
+          {Array.from(categories.entries()).map(([cat, ids]) => {
+            const available = ids.filter((id) => !activeEffects.includes(id));
+            if (available.length === 0) return null;
+            return (
+              <optgroup key={cat} label={cat}>
+                {available.map((id) => (
+                  <option key={id} value={id}>
+                    {getLabel(id)}
+                  </option>
+                ))}
+              </optgroup>
+            );
+          })}
         </select>
       </div>
     </div>
