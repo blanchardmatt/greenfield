@@ -20,13 +20,18 @@ const DESCRIPTOR: EffectNodeDescriptor = {
 interface Vine {
   x: number;
   y: number;
+  prevX: number;
+  prevY: number;
   angle: number;
   curvature: number;
   curvatureAccel: number;
   thickness: number;
   life: number;
+  maxLife: number;
   seed: number;
   stepsSinceLastDot: number;
+  stepsSinceLastLeaf: number;
+  totalSteps: number;
 }
 
 // HSL to RGB
@@ -133,14 +138,17 @@ export class OrganicVines {
           angle = Math.PI + (Math.random() - 0.5) * 0.8;
           break;
       }
+      const life = 80 + Math.random() * 120;
       this.vines.push({
-        x, y, angle,
+        x, y, prevX: x, prevY: y, angle,
         curvature: 0,
-        curvatureAccel: (Math.random() > 0.5 ? 1 : -1) * (0.02 + Math.random() * 0.04),
-        thickness: 2.5 + Math.random() * 2,
-        life: 60 + Math.random() * 100,
+        curvatureAccel: (Math.random() > 0.5 ? 1 : -1) * (0.015 + Math.random() * 0.03),
+        thickness: 3 + Math.random() * 2.5,
+        life, maxLife: life,
         seed: Math.random() * 1000,
         stepsSinceLastDot: 0,
+        stepsSinceLastLeaf: 0,
+        totalSteps: 0,
       });
     }
   }
@@ -182,8 +190,10 @@ export class OrganicVines {
     // Steps per frame based on grow speed
     const steps = Math.floor(growSpeed);
 
+    const mx = ctx.input.mouse.x * this.w;
+    const my = (1 - ctx.input.mouse.y) * this.h;
+
     for (let s = 0; s < steps; s++) {
-      // Grow each vine
       const newVines: Vine[] = [];
 
       for (let vi = this.vines.length - 1; vi >= 0; vi--) {
@@ -193,85 +203,136 @@ export class OrganicVines {
           continue;
         }
 
-        // Curvature acceleration → spiral at tips
-        v.curvature += v.curvatureAccel * curliness;
-        // Slight random wander
-        v.curvature += (Math.sin(v.seed + v.life * 0.1) * 0.005);
+        v.totalSteps++;
+
+        // Curvature: accelerates → tighter spiral toward end of life
+        const lifeRatio = v.life / v.maxLife;
+        v.curvature += v.curvatureAccel * curliness * (1.0 + (1 - lifeRatio) * 2.0);
+        v.curvature += Math.sin(v.seed + v.totalSteps * 0.08) * 0.003;
         v.angle += v.curvature;
 
         // Mouse influence
-        const mx = ctx.input.mouse.x * this.w;
-        const my = (1 - ctx.input.mouse.y) * this.h;
         const dmx = mx - v.x;
         const dmy = my - v.y;
         const mDist = Math.sqrt(dmx * dmx + dmy * dmy);
         if (mDist > 1 && mouseInf > 0) {
-          const pull = mouseInf * 0.15 * Math.exp(-mDist / (this.w * 0.15));
-          const targetAngle = Math.atan2(dmy, dmx);
-          let diff = targetAngle - v.angle;
+          const pull = mouseInf * 0.12 * Math.exp(-mDist / (this.w * 0.2));
+          const ta = Math.atan2(dmy, dmx);
+          let diff = ta - v.angle;
           diff = ((diff + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
           v.angle += diff * pull;
         }
 
-        const segLen = 4 + v.thickness * 0.5;
+        // Segment length shrinks as vine dies (tighter spirals at tips)
+        const segLen = (5 + v.thickness * 0.4) * (0.5 + lifeRatio * 0.5);
         const nx = v.x + Math.cos(v.angle) * segLen;
         const ny = v.y + Math.sin(v.angle) * segLen;
 
-        // Draw segment
-        const taperedThick = v.thickness * baseThickness * (v.life / (v.life + 30));
+        // Tapered stroke
+        const taperedThick = v.thickness * baseThickness * Math.pow(lifeRatio, 0.4);
         c.strokeStyle = this.currentColor;
-        c.lineWidth = Math.max(taperedThick, 0.5);
+        c.lineWidth = Math.max(taperedThick, 0.3);
         c.lineCap = 'round';
+        c.lineJoin = 'round';
+
+        // Draw smooth curve using quadratic bezier through prev → current → next
+        const cpx = v.x;
+        const cpy = v.y;
         c.beginPath();
-        c.moveTo(v.x, v.y);
-        c.lineTo(nx, ny);
+        c.moveTo(v.prevX, v.prevY);
+        c.quadraticCurveTo(cpx, cpy, nx, ny);
         c.stroke();
 
-        // Decorative dots
+        // Decorative dots on outside of curve
         v.stepsSinceLastDot++;
-        if (dotSize > 0 && v.stepsSinceLastDot > 8 && v.life > 20) {
+        if (dotSize > 0 && v.stepsSinceLastDot > 10 && lifeRatio > 0.2 && lifeRatio < 0.85) {
           v.stepsSinceLastDot = 0;
-          const dotAngle = v.angle + Math.sign(v.curvature) * Math.PI / 2;
-          const dotDist = taperedThick * 2.5 + dotSize;
+          const side = Math.sign(v.curvature) || 1;
+          const dotAngle = v.angle + side * Math.PI * 0.5;
+          const dotDist = taperedThick * 2 + dotSize * 1.5;
           const dx = v.x + Math.cos(dotAngle) * dotDist;
           const dy = v.y + Math.sin(dotAngle) * dotDist;
           c.fillStyle = this.currentColor;
           c.beginPath();
-          c.arc(dx, dy, dotSize * 0.6, 0, Math.PI * 2);
+          c.arc(dx, dy, dotSize * 0.5 * lifeRatio, 0, Math.PI * 2);
           c.fill();
 
-          // Trailing smaller dots
-          if (Math.random() < 0.4) {
+          // Trailing dots
+          if (Math.random() < 0.35) {
             for (let j = 1; j <= 2; j++) {
-              const tdx = dx + Math.cos(dotAngle) * j * dotSize * 1.8;
-              const tdy = dy + Math.sin(dotAngle) * j * dotSize * 1.8;
+              const r = dotSize * (0.3 - j * 0.08) * lifeRatio;
+              if (r < 0.3) break;
+              const tdx = dx + Math.cos(dotAngle) * j * dotSize * 1.5;
+              const tdy = dy + Math.sin(dotAngle) * j * dotSize * 1.5;
               c.beginPath();
-              c.arc(tdx, tdy, dotSize * (0.4 - j * 0.1), 0, Math.PI * 2);
+              c.arc(tdx, tdy, r, 0, Math.PI * 2);
               c.fill();
             }
           }
         }
 
+        // Ornamental leaves
+        v.stepsSinceLastLeaf++;
+        if (dotSize > 0.5 && v.stepsSinceLastLeaf > 15 && lifeRatio > 0.3 && lifeRatio < 0.9 && v.thickness > 1.5) {
+          v.stepsSinceLastLeaf = 0;
+          const side = v.totalSteps % 2 === 0 ? 1 : -1;
+          const leafAngle = v.angle + side * (0.6 + Math.random() * 0.6);
+          const leafLen = (8 + dotSize * 3) * lifeRatio;
+          const leafBase = { x: v.x, y: v.y };
+          const leafTip = {
+            x: v.x + Math.cos(leafAngle) * leafLen,
+            y: v.y + Math.sin(leafAngle) * leafLen,
+          };
+          // Draw leaf as a filled bezier shape
+          const perpAngle = leafAngle + Math.PI * 0.5;
+          const leafWidth = leafLen * 0.25;
+          const midX = (leafBase.x + leafTip.x) * 0.5;
+          const midY = (leafBase.y + leafTip.y) * 0.5;
+          const cp1x = midX + Math.cos(perpAngle) * leafWidth;
+          const cp1y = midY + Math.sin(perpAngle) * leafWidth;
+          const cp2x = midX - Math.cos(perpAngle) * leafWidth;
+          const cp2y = midY - Math.sin(perpAngle) * leafWidth;
+
+          c.fillStyle = this.currentColor;
+          c.beginPath();
+          c.moveTo(leafBase.x, leafBase.y);
+          c.quadraticCurveTo(cp1x, cp1y, leafTip.x, leafTip.y);
+          c.quadraticCurveTo(cp2x, cp2y, leafBase.x, leafBase.y);
+          c.fill();
+
+          // Leaf vein (center line)
+          c.strokeStyle = this.bgColor;
+          c.lineWidth = 0.5;
+          c.beginPath();
+          c.moveTo(leafBase.x, leafBase.y);
+          c.lineTo(leafTip.x, leafTip.y);
+          c.stroke();
+        }
+
         // Branch
-        if (Math.random() < branchChance && v.life > 30 && v.thickness > 1) {
+        if (Math.random() < branchChance && v.life > 40 && v.thickness > 1.2) {
           const branchDir = Math.random() > 0.5 ? 1 : -1;
+          const branchLife = v.life * (0.25 + Math.random() * 0.3);
           newVines.push({
-            x: v.x,
-            y: v.y,
-            angle: v.angle + branchDir * (0.5 + Math.random() * 1.0),
+            x: v.x, y: v.y, prevX: v.prevX, prevY: v.prevY,
+            angle: v.angle + branchDir * (0.4 + Math.random() * 0.8),
             curvature: 0,
-            curvatureAccel: -v.curvatureAccel * (0.5 + Math.random() * 0.5),
-            thickness: v.thickness * (0.4 + Math.random() * 0.3),
-            life: v.life * (0.3 + Math.random() * 0.3),
+            curvatureAccel: -v.curvatureAccel * (0.4 + Math.random() * 0.6),
+            thickness: v.thickness * (0.35 + Math.random() * 0.3),
+            life: branchLife, maxLife: branchLife,
             seed: Math.random() * 1000,
             stepsSinceLastDot: 0,
+            stepsSinceLastLeaf: 0,
+            totalSteps: 0,
           });
         }
 
+        v.prevX = v.x;
+        v.prevY = v.y;
         v.x = nx;
         v.y = ny;
         v.life -= 1;
-        v.thickness *= 0.997;
+        v.thickness *= 0.998;
         this.pixelsCovered += segLen * taperedThick;
       }
 
