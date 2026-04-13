@@ -1,9 +1,9 @@
 #version 300 es
 
-in vec2 a_position;
-in vec2 a_velocity;
-in float a_life;
-in float a_size;
+layout(location = 0) in vec2 a_position;
+layout(location = 1) in vec2 a_velocity;
+layout(location = 2) in float a_life;
+layout(location = 3) in float a_size;
 
 out vec2 v_position;
 out vec2 v_velocity;

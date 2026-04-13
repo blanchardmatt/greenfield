@@ -1,8 +1,8 @@
 #version 300 es
 
-in vec2 a_position;
-in float a_life;
-in float a_size;
+layout(location = 0) in vec2 a_position;
+layout(location = 1) in float a_life;
+layout(location = 2) in float a_size;
 
 out float v_life;
 

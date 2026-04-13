@@ -10,6 +10,7 @@ export function App() {
   const pipelineRef = useRef<RenderPipeline | null>(null);
   const [activeEffects, setActiveEffects] = useState<string[]>(['noise-flow-field']);
   const [, setTick] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const onPipelineReady = useCallback((pipeline: RenderPipeline) => {
     pipelineRef.current = pipeline;
@@ -23,6 +24,10 @@ export function App() {
     setTick((t) => t + 1);
   }, []);
 
+  const toggleSidebar = useCallback(() => {
+    setSidebarOpen((v) => !v);
+  }, []);
+
   const pipeline = pipelineRef.current;
 
   return (
@@ -30,8 +35,12 @@ export function App() {
       <div className="canvas-area">
         <Canvas onPipelineReady={onPipelineReady} />
         <InputDebugOverlay pipeline={pipeline} />
+        <button className="menu-toggle" onClick={toggleSidebar} aria-label="Toggle menu">
+          {sidebarOpen ? '\u2715' : '\u2630'}
+        </button>
       </div>
-      <div className="sidebar">
+      {sidebarOpen && <div className="sidebar-backdrop" onClick={toggleSidebar} />}
+      <div className={`sidebar ${sidebarOpen ? 'sidebar--open' : ''}`}>
         <div className="sidebar-header">
           <h1>Procedural Art</h1>
         </div>

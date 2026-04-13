@@ -11,7 +11,8 @@ out vec4 fragColor;
 void main() { fragColor = vec4(0.0); }
 `;
 
-const PARTICLE_COUNT = 50000;
+const IS_MOBILE = typeof navigator !== 'undefined' && /Mobi|Android/i.test(navigator.userAgent);
+const PARTICLE_COUNT = IS_MOBILE ? 15000 : 50000;
 const FLOATS_PER_PARTICLE = 6; // posX, posY, velX, velY, life, size
 
 const DESCRIPTOR: EffectNodeDescriptor = {
