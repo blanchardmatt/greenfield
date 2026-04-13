@@ -3,6 +3,7 @@ import { Canvas } from './ui/Canvas';
 import { ParameterPanel } from './ui/ParameterPanel';
 import { EffectSelector } from './ui/EffectSelector';
 import { PresetBar } from './ui/PresetBar';
+import { Toolbar } from './ui/Toolbar';
 import { InputDebugOverlay } from './ui/InputDebugOverlay';
 import type { RenderPipeline } from './core/RenderPipeline';
 
@@ -50,6 +51,9 @@ export function App() {
         />
         {pipeline && (
           <ParameterPanel parameterStore={pipeline.parameterStore} />
+        )}
+        {pipeline && (
+          <Toolbar pipeline={pipeline} />
         )}
         {pipeline && (
           <PresetBar

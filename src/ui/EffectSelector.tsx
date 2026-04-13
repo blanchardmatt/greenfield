@@ -11,6 +11,8 @@ const EFFECT_LABELS: Record<string, string> = {
   'fractal-explorer': 'Fractal Explorer',
   'particle-system': 'Particle System',
   'feedback-echo': 'Feedback Echo',
+  'kaleidoscope': 'Kaleidoscope',
+  'audio-waveform': 'Audio Waveform',
 };
 
 export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps) {

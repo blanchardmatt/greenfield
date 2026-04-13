@@ -12,6 +12,18 @@ export class InputManager {
   private bound = false;
   private handlers: Array<[string, EventListener, EventTarget]> = [];
 
+  // Audio
+  private audioContext: AudioContext | null = null;
+  private analyser: AnalyserNode | null = null;
+  private fftData: Float32Array | null = null;
+  private audioSource: MediaStreamAudioSourceNode | null = null;
+  audioEnabled = false;
+
+  // MIDI
+  private midiAccess: MIDIAccess | null = null;
+  private midiValues = new Map<number, number>();
+  midiEnabled = false;
+
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
   }
@@ -84,7 +96,6 @@ export class InputManager {
       x: (t.clientX - rect.left) / rect.width,
       y: 1 - (t.clientY - rect.top) / rect.height,
     }));
-    // Map first touch to mouse for unified input
     if (e.touches.length > 0) {
       const t = e.touches[0]!;
       this.state.mouse.px = t.clientX - rect.left;
@@ -97,12 +108,101 @@ export class InputManager {
     }
   }
 
-  /** Call once per frame to compute deltas */
+  // ─── Audio ─────────────────────────────────
+
+  async enableAudio(): Promise<void> {
+    if (this.audioEnabled) return;
+    try {
+      this.audioContext = new AudioContext();
+      this.analyser = this.audioContext.createAnalyser();
+      this.analyser.fftSize = 256;
+      this.analyser.smoothingTimeConstant = 0.8;
+      this.fftData = new Float32Array(this.analyser.frequencyBinCount);
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.audioSource = this.audioContext.createMediaStreamSource(stream);
+      this.audioSource.connect(this.analyser);
+      this.audioEnabled = true;
+    } catch (err) {
+      console.warn('Audio input not available:', err);
+    }
+  }
+
+  disableAudio(): void {
+    if (this.audioSource) {
+      this.audioSource.disconnect();
+      this.audioSource.mediaStream.getTracks().forEach((t) => t.stop());
+      this.audioSource = null;
+    }
+    if (this.audioContext) {
+      this.audioContext.close();
+      this.audioContext = null;
+    }
+    this.analyser = null;
+    this.fftData = null;
+    this.audioEnabled = false;
+    delete this.state.audioFFT;
+  }
+
+  // ─── MIDI ──────────────────────────────────
+
+  async enableMIDI(): Promise<void> {
+    if (this.midiEnabled) return;
+    try {
+      this.midiAccess = await navigator.requestMIDIAccess();
+      this.midiAccess.inputs.forEach((input) => {
+        input.onmidimessage = this.handleMIDIMessage;
+      });
+      this.midiAccess.onstatechange = () => {
+        this.midiAccess?.inputs.forEach((input) => {
+          input.onmidimessage = this.handleMIDIMessage;
+        });
+      };
+      this.midiEnabled = true;
+      this.state.midiCC = this.midiValues;
+    } catch (err) {
+      console.warn('MIDI not available:', err);
+    }
+  }
+
+  private handleMIDIMessage = (event: MIDIMessageEvent): void => {
+    const data = event.data;
+    if (!data || data.length < 3) return;
+    const status = data[0]! & 0xf0;
+    // CC message
+    if (status === 0xb0) {
+      const cc = data[1]!;
+      const value = data[2]! / 127; // normalize 0-1
+      this.midiValues.set(cc, value);
+    }
+  };
+
+  disableMIDI(): void {
+    if (this.midiAccess) {
+      this.midiAccess.inputs.forEach((input) => {
+        input.onmidimessage = null;
+      });
+    }
+    this.midiAccess = null;
+    this.midiValues.clear();
+    this.midiEnabled = false;
+    delete this.state.midiCC;
+  }
+
+  // ─── Poll ──────────────────────────────────
+
   poll(): InputState {
     this.state.mouse.dx = this.state.mouse.x - this.prevMx;
     this.state.mouse.dy = this.state.mouse.y - this.prevMy;
     this.prevMx = this.state.mouse.x;
     this.prevMy = this.state.mouse.y;
+
+    // Update audio FFT data
+    if (this.analyser && this.fftData) {
+      this.analyser.getFloatFrequencyData(this.fftData);
+      this.state.audioFFT = this.fftData;
+    }
+
     return this.state;
   }
 
@@ -112,5 +212,7 @@ export class InputManager {
     }
     this.handlers = [];
     this.bound = false;
+    this.disableAudio();
+    this.disableMIDI();
   }
 }

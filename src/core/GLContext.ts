@@ -7,7 +7,7 @@ export class GLContext {
     const gl = canvas.getContext('webgl2', {
       alpha: false,
       antialias: false,
-      preserveDrawingBuffer: false,
+      preserveDrawingBuffer: true,
       powerPreference: 'high-performance',
     });
     if (!gl) {
