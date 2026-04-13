@@ -8,6 +8,7 @@ import { AudioWaveform } from './AudioWaveform';
 import { VoronoiLiquid } from './VoronoiLiquid';
 import { RaymarchedMetaballs } from './RaymarchedMetaballs';
 import { DomainWarpTunnel } from './DomainWarpTunnel';
+import { OrganicVines } from './OrganicVines';
 
 type EffectFactory = () => EffectNode;
 
@@ -21,6 +22,7 @@ export const effectRegistry = new Map<string, EffectFactory>([
   ['voronoi-liquid', () => new VoronoiLiquid()],
   ['raymarched-metaballs', () => new RaymarchedMetaballs()],
   ['domain-warp-tunnel', () => new DomainWarpTunnel()],
+  ['organic-vines', () => new OrganicVines()],
 ]);
 
 export function getEffectDescriptors(): EffectNodeDescriptor[] {
