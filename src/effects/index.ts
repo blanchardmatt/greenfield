@@ -5,6 +5,9 @@ import { ParticleSystem } from './ParticleSystem';
 import { FeedbackEcho } from './FeedbackEcho';
 import { Kaleidoscope } from './Kaleidoscope';
 import { AudioWaveform } from './AudioWaveform';
+import { VoronoiLiquid } from './VoronoiLiquid';
+import { RaymarchedMetaballs } from './RaymarchedMetaballs';
+import { DomainWarpTunnel } from './DomainWarpTunnel';
 
 type EffectFactory = () => EffectNode;
 
@@ -15,6 +18,9 @@ export const effectRegistry = new Map<string, EffectFactory>([
   ['feedback-echo', () => new FeedbackEcho()],
   ['kaleidoscope', () => new Kaleidoscope()],
   ['audio-waveform', () => new AudioWaveform()],
+  ['voronoi-liquid', () => new VoronoiLiquid()],
+  ['raymarched-metaballs', () => new RaymarchedMetaballs()],
+  ['domain-warp-tunnel', () => new DomainWarpTunnel()],
 ]);
 
 export function getEffectDescriptors(): EffectNodeDescriptor[] {

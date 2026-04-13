@@ -13,6 +13,9 @@ const EFFECT_LABELS: Record<string, string> = {
   'feedback-echo': 'Feedback Echo',
   'kaleidoscope': 'Kaleidoscope',
   'audio-waveform': 'Audio Waveform',
+  'voronoi-liquid': 'Voronoi Liquid',
+  'raymarched-metaballs': 'Raymarched Metaballs',
+  'domain-warp-tunnel': 'Domain Warp',
 };
 
 export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps) {

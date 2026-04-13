@@ -96,6 +96,20 @@ html, body, #root {
   padding: 4px 0;
 }
 
+.param-actions {
+  display: flex;
+  gap: 6px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #222233;
+}
+
+.param-action-btn {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  padding: 5px 8px;
+}
+
 .param-group {
   padding: 8px 16px;
   overflow: hidden;
@@ -277,12 +291,18 @@ html, body, #root {
   border: 1px solid #3a3a4a;
   border-radius: 4px;
   font-size: 12px;
+  transition: all 0.15s;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: all 0.15s;
 }
 
 .btn:hover {
   background: #3a3a4a;
+  border-color: #4a4a5a;
+}
+
+.btn:active {
+  transform: scale(0.97);
 }
 
 .btn-primary {
@@ -426,6 +446,15 @@ html, body, #root {
 
   .toolbar-buttons {
     flex-wrap: wrap;
+  }
+
+  .param-control input[type="range"]::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  .toolbar-btn {
+    min-height: 40px;
   }
 }
 

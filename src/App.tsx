@@ -5,6 +5,7 @@ import { EffectSelector } from './ui/EffectSelector';
 import { PresetBar } from './ui/PresetBar';
 import { Toolbar } from './ui/Toolbar';
 import { InputDebugOverlay } from './ui/InputDebugOverlay';
+import { ErrorBoundary } from './ui/ErrorBoundary';
 import type { RenderPipeline } from './core/RenderPipeline';
 
 export function App() {
@@ -34,7 +35,9 @@ export function App() {
   return (
     <div className="app">
       <div className="canvas-area">
-        <Canvas onPipelineReady={onPipelineReady} />
+        <ErrorBoundary>
+          <Canvas onPipelineReady={onPipelineReady} />
+        </ErrorBoundary>
         <InputDebugOverlay pipeline={pipeline} />
         <button className="menu-toggle" onClick={toggleSidebar} aria-label="Toggle menu">
           {sidebarOpen ? '\u2715' : '\u2630'}
