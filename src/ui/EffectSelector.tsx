@@ -16,7 +16,7 @@ const EFFECT_LABELS: Record<string, string> = {
   'voronoi-liquid': 'Voronoi Liquid',
   'raymarched-metaballs': 'Raymarched Metaballs',
   'domain-warp-tunnel': 'Domain Warp',
-  'organic-vines': 'Organic Vines',
+  'organic-vines': 'Ornamental Flourish',
 };
 
 export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps) {
