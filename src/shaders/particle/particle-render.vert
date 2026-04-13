@@ -1,0 +1,18 @@
+#version 300 es
+
+in vec2 a_position;
+in float a_life;
+in float a_size;
+
+out float v_life;
+
+uniform vec2 u_resolution;
+uniform float u_pointScale;
+
+void main() {
+    // Map from 0-1 to clip space -1 to 1
+    vec2 clipPos = a_position * 2.0 - 1.0;
+    gl_Position = vec4(clipPos, 0.0, 1.0);
+    gl_PointSize = a_size * u_pointScale * (0.3 + a_life * 0.7);
+    v_life = a_life;
+}
