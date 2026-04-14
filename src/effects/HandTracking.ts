@@ -24,6 +24,7 @@ const DESCRIPTOR: EffectNodeDescriptor = {
   name: 'Hand Tracking',
   description: 'Neon skeleton with inter-hand beams and glowing orb',
   parameters: [
+    { id: 'showSkeleton', type: 'bool', label: 'Show Skeleton', default: true, group: 'Skeleton' },
     { id: 'lineWidth', type: 'float', label: 'Line Width', min: 1, max: 12, step: 0.5, default: 4, group: 'Skeleton' },
     { id: 'glowStrength', type: 'float', label: 'Glow', min: 0, max: 30, step: 0.5, default: 12, group: 'Skeleton' },
     { id: 'jointSize', type: 'float', label: 'Joint Size', min: 0, max: 15, step: 0.5, default: 5, group: 'Skeleton' },
@@ -35,6 +36,9 @@ const DESCRIPTOR: EffectNodeDescriptor = {
     ], default: '2', group: 'Beams' },
     { id: 'beamWidth', type: 'float', label: 'Beam Width', min: 0.5, max: 10, step: 0.5, default: 3, group: 'Beams' },
     { id: 'beamGlow', type: 'float', label: 'Beam Glow', min: 0, max: 50, step: 1, default: 20, group: 'Beams' },
+    { id: 'energyFlow', type: 'float', label: 'Energy Flow', min: 0, max: 2, step: 0.01, default: 1.0, group: 'Beams' },
+    { id: 'energySpeed', type: 'float', label: 'Flow Speed', min: 0, max: 5, step: 0.05, default: 1.5, group: 'Beams' },
+    { id: 'energyPulses', type: 'int', label: 'Pulse Count', min: 0, max: 8, default: 3, group: 'Beams' },
     { id: 'orbSize', type: 'float', label: 'Orb Size', min: 0, max: 80, step: 1, default: 25, group: 'Orb' },
     { id: 'orbGlow', type: 'float', label: 'Orb Glow', min: 0, max: 80, step: 1, default: 40, group: 'Orb' },
     { id: 'orbPulse', type: 'float', label: 'Orb Pulse', min: 0, max: 1, step: 0.01, default: 0.4, group: 'Orb' },
@@ -140,12 +144,16 @@ export class HandTracking {
     const c = this.ctx2d;
     if (!c || !this.canvas2d) return;
 
+    const showSkeleton = params.showSkeleton as boolean;
     const lineWidth = params.lineWidth as number;
     const glowStrength = params.glowStrength as number;
     const jointSize = params.jointSize as number;
     const beamMode = parseInt(params.beamMode as string, 10);
     const beamWidth = params.beamWidth as number;
     const beamGlow = params.beamGlow as number;
+    const energyFlow = params.energyFlow as number;
+    const energySpeed = params.energySpeed as number;
+    const energyPulses = params.energyPulses as number;
     const orbSize = params.orbSize as number;
     const orbGlow = params.orbGlow as number;
     const orbPulse = params.orbPulse as number;
@@ -227,62 +235,64 @@ export class HandTracking {
     c.lineCap = 'round';
     c.lineJoin = 'round';
 
-    // Draw skeletons
-    for (let hi = 0; hi < allHands.length; hi++) {
-      const pts = allHands[hi]!;
+    // Draw skeletons (optional)
+    if (showSkeleton) {
+      for (let hi = 0; hi < allHands.length; hi++) {
+        const pts = allHands[hi]!;
 
-      // Connections with glow
-      for (let i = 0; i < HAND_CONNECTIONS.length; i++) {
-        const [a, b] = HAND_CONNECTIONS[i]!;
-        const p1 = pts[a]!;
-        const p2 = pts[b]!;
+        // Connections with glow
+        for (let i = 0; i < HAND_CONNECTIONS.length; i++) {
+          const [a, b] = HAND_CONNECTIONS[i]!;
+          const p1 = pts[a]!;
+          const p2 = pts[b]!;
 
-        const hue = ((i / HAND_CONNECTIONS.length) + hi * 0.3 + t * 0.1) % 1;
-        const color = this.hsla(hue * 360, saturation, 0.6, 1);
-        const glowColor = this.hsla(hue * 360, saturation, 0.5, 0.6);
+          const hue = ((i / HAND_CONNECTIONS.length) + hi * 0.3 + t * 0.1) % 1;
+          const color = this.hsla(hue * 360, saturation, 0.6, 1);
+          const glowColor = this.hsla(hue * 360, saturation, 0.5, 0.6);
 
-        if (glowStrength > 0) {
-          c.strokeStyle = glowColor;
-          c.lineWidth = lineWidth + glowStrength;
-          c.shadowColor = color;
-          c.shadowBlur = glowStrength;
+          if (glowStrength > 0) {
+            c.strokeStyle = glowColor;
+            c.lineWidth = lineWidth + glowStrength;
+            c.shadowColor = color;
+            c.shadowBlur = glowStrength;
+            c.beginPath();
+            c.moveTo(p1.x, p1.y);
+            c.lineTo(p2.x, p2.y);
+            c.stroke();
+          }
+
+          c.shadowBlur = 0;
+          c.strokeStyle = color;
+          c.lineWidth = lineWidth;
           c.beginPath();
           c.moveTo(p1.x, p1.y);
           c.lineTo(p2.x, p2.y);
           c.stroke();
         }
 
-        c.shadowBlur = 0;
-        c.strokeStyle = color;
-        c.lineWidth = lineWidth;
-        c.beginPath();
-        c.moveTo(p1.x, p1.y);
-        c.lineTo(p2.x, p2.y);
-        c.stroke();
-      }
+        // Joints
+        if (jointSize > 0) {
+          for (let i = 0; i < pts.length; i++) {
+            const p = pts[i]!;
+            const hue = ((i / pts.length) + hi * 0.3 + t * 0.1) % 1;
+            const color = this.hsla(hue * 360, saturation, 0.7, 1);
+            const glowColor = this.hsla(hue * 360, saturation, 0.5, 0.7);
 
-      // Joints
-      if (jointSize > 0) {
-        for (let i = 0; i < pts.length; i++) {
-          const p = pts[i]!;
-          const hue = ((i / pts.length) + hi * 0.3 + t * 0.1) % 1;
-          const color = this.hsla(hue * 360, saturation, 0.7, 1);
-          const glowColor = this.hsla(hue * 360, saturation, 0.5, 0.7);
+            if (glowStrength > 0) {
+              c.fillStyle = glowColor;
+              c.shadowColor = color;
+              c.shadowBlur = glowStrength;
+              c.beginPath();
+              c.arc(p.x, p.y, jointSize + glowStrength * 0.3, 0, Math.PI * 2);
+              c.fill();
+            }
 
-          if (glowStrength > 0) {
-            c.fillStyle = glowColor;
-            c.shadowColor = color;
-            c.shadowBlur = glowStrength;
+            c.shadowBlur = 0;
+            c.fillStyle = color;
             c.beginPath();
-            c.arc(p.x, p.y, jointSize + glowStrength * 0.3, 0, Math.PI * 2);
+            c.arc(p.x, p.y, jointSize, 0, Math.PI * 2);
             c.fill();
           }
-
-          c.shadowBlur = 0;
-          c.fillStyle = color;
-          c.beginPath();
-          c.arc(p.x, p.y, jointSize, 0, Math.PI * 2);
-          c.fill();
         }
       }
     }
@@ -413,7 +423,75 @@ export class HandTracking {
         c.quadraticCurveTo(bezCpX, bezCpY, p2.x, p2.y);
         c.stroke();
 
-        // Suppress unused warning for beamLen if needed
+        // === Flowing energy: animated dashed overlay ===
+        // A bright dashed layer whose offset animates over time — gives the
+        // impression of light streaming back and forth through the beam
+        if (energyFlow > 0.01) {
+          // Direction alternates per beam so energy moves both ways
+          const direction = (i % 2 === 0) ? 1 : -1;
+          const dashSpacing = Math.max(30, beamLen * 0.08);
+          const dashLen = dashSpacing * 0.35;
+
+          c.save();
+          c.setLineDash([dashLen, dashSpacing - dashLen]);
+          c.lineDashOffset = -direction * ctx.time * (50 + energySpeed * 150);
+
+          // Inner bright dash stream (overlaid for a "streaming light" look)
+          c.strokeStyle = this.hsla(hue * 360, saturation, 0.92, Math.min(1, energyFlow));
+          c.lineWidth = beamWidth * 0.9;
+          c.shadowColor = color;
+          c.shadowBlur = beamGlow * 0.5;
+          c.beginPath();
+          c.moveTo(p1.x, p1.y);
+          c.quadraticCurveTo(bezCpX, bezCpY, p2.x, p2.y);
+          c.stroke();
+          c.setLineDash([]);
+          c.restore();
+        }
+
+        // === Traveling energy pulses (discrete bright "packets") ===
+        if (energyPulses > 0 && energyFlow > 0.01) {
+          c.shadowBlur = 0;
+          for (let pi = 0; pi < energyPulses; pi++) {
+            // Alternate direction: even pulses go p1→p2, odd go p2→p1
+            const dir = (pi % 2 === 0) ? 1 : -1;
+            const phaseOffset = pi / energyPulses;
+            // Each pulse position cycles 0..1 along the beam
+            let tp = (ctx.time * energySpeed * 0.5 * dir + phaseOffset) % 1;
+            if (tp < 0) tp += 1;
+
+            // Evaluate quadratic bezier at tp
+            const mt = 1 - tp;
+            const bx = mt * mt * p1.x + 2 * mt * tp * bezCpX + tp * tp * p2.x;
+            const by = mt * mt * p1.y + 2 * mt * tp * bezCpY + tp * tp * p2.y;
+
+            // Pulse grows brighter in the middle of travel (fades at ends)
+            const envelope = Math.sin(tp * Math.PI);
+            const intensity = envelope * Math.min(1, energyFlow);
+            const pulseR = beamWidth * (1.2 + intensity * 1.8);
+
+            // Glow layer
+            const pulseColor = this.hsla(hue * 360, saturation, 0.85, intensity);
+            const pulseGlow = this.hsla(hue * 360, saturation, 0.6, intensity * 0.5);
+            c.shadowColor = pulseColor;
+            c.shadowBlur = 10 + intensity * 20;
+
+            c.fillStyle = pulseGlow;
+            c.beginPath();
+            c.arc(bx, by, pulseR * 2.5, 0, Math.PI * 2);
+            c.fill();
+
+            // Bright core
+            c.fillStyle = `rgba(255, 255, 255, ${intensity * 0.9})`;
+            c.shadowBlur = 6;
+            c.beginPath();
+            c.arc(bx, by, pulseR, 0, Math.PI * 2);
+            c.fill();
+          }
+          c.shadowBlur = 0;
+        }
+
+        // Suppress unused warning
         void beamLen;
       }
     }
