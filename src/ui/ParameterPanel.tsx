@@ -2,6 +2,7 @@ import { useSyncExternalStore, useCallback } from 'react';
 import type { ParameterStore } from '../core/ParameterStore';
 import type { ParameterValue, FloatParameterDef, IntParameterDef } from '../core/types';
 import { ControlFactory } from './controls/ControlFactory';
+import { CollapsibleSection } from './CollapsibleSection';
 
 interface ParameterPanelProps {
   parameterStore: ParameterStore;
@@ -96,18 +97,24 @@ function EffectParameters({
         </button>
       </div>
       {Array.from(groups.entries()).map(([groupName, params]) => (
-        <div key={`${instanceId}-${groupName}`} className="param-group">
-          <div className="param-group-header">{groupName}</div>
-          {params.map((def) => (
-            <ControlFactoryWrapper
-              key={def.id}
-              instanceId={instanceId}
-              def={def}
-              value={values[def.id] ?? def.default}
-              parameterStore={parameterStore}
-            />
-          ))}
-        </div>
+        <CollapsibleSection
+          key={`${instanceId}-${groupName}`}
+          title={groupName}
+          defaultOpen
+          className="param-group-collapsible"
+        >
+          <div className="param-group">
+            {params.map((def) => (
+              <ControlFactoryWrapper
+                key={def.id}
+                instanceId={instanceId}
+                def={def}
+                value={values[def.id] ?? def.default}
+                parameterStore={parameterStore}
+              />
+            ))}
+          </div>
+        </CollapsibleSection>
       ))}
     </>
   );

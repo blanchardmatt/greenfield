@@ -6,6 +6,7 @@ import { PresetBar } from './ui/PresetBar';
 import { Toolbar } from './ui/Toolbar';
 import { InputDebugOverlay } from './ui/InputDebugOverlay';
 import { ErrorBoundary } from './ui/ErrorBoundary';
+import { CollapsibleSection } from './ui/CollapsibleSection';
 import type { RenderPipeline } from './core/RenderPipeline';
 import { getEffectIds } from './effects';
 
@@ -131,22 +132,30 @@ export function App() {
             </button>
           </div>
         </div>
-        <EffectSelector
-          activeEffects={activeEffects}
-          onChange={handleEffectChange}
-        />
-        {pipeline && (
-          <ParameterPanel parameterStore={pipeline.parameterStore} />
-        )}
-        {pipeline && (
-          <Toolbar pipeline={pipeline} />
-        )}
-        {pipeline && (
-          <PresetBar
-            pipeline={pipeline}
+        <CollapsibleSection title="Effect" defaultOpen>
+          <EffectSelector
             activeEffects={activeEffects}
-            onLoadPreset={handleEffectChange}
+            onChange={handleEffectChange}
           />
+        </CollapsibleSection>
+        {pipeline && (
+          <CollapsibleSection title="Parameters" defaultOpen>
+            <ParameterPanel parameterStore={pipeline.parameterStore} />
+          </CollapsibleSection>
+        )}
+        {pipeline && (
+          <CollapsibleSection title="Inputs & Export" defaultOpen={false}>
+            <Toolbar pipeline={pipeline} />
+          </CollapsibleSection>
+        )}
+        {pipeline && (
+          <CollapsibleSection title="Presets" defaultOpen={false}>
+            <PresetBar
+              pipeline={pipeline}
+              activeEffects={activeEffects}
+              onLoadPreset={handleEffectChange}
+            />
+          </CollapsibleSection>
         )}
       </div>
     </div>

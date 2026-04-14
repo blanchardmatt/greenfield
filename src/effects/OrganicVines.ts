@@ -10,9 +10,9 @@ const DESCRIPTOR: EffectNodeDescriptor = {
     { id: 'thickness', type: 'float', label: 'Stroke Weight', min: 1, max: 6, step: 0.1, default: 2.5, group: 'Shape' },
     { id: 'branchChance', type: 'float', label: 'Branch Chance', min: 0, max: 0.08, step: 0.001, default: 0.025, group: 'Shape' },
     { id: 'dotSize', type: 'float', label: 'Dot Size', min: 0, max: 6, step: 0.1, default: 2.5, group: 'Ornaments' },
-    { id: 'leafChance', type: 'float', label: 'Leaf Chance', min: 0, max: 0.2, step: 0.001, default: 0.06, group: 'Ornaments' },
-    { id: 'flowerChance', type: 'float', label: 'Flower Chance', min: 0, max: 0.05, step: 0.001, default: 0.008, group: 'Ornaments' },
-    { id: 'flowerSize', type: 'float', label: 'Flower Size', min: 4, max: 30, step: 0.5, default: 14, group: 'Ornaments' },
+    { id: 'leafChance', type: 'float', label: 'Leaf Chance', min: 0, max: 0.2, step: 0.001, default: 0.08, group: 'Ornaments' },
+    { id: 'flowerChance', type: 'float', label: 'Flower Chance', min: 0, max: 0.1, step: 0.001, default: 0.025, group: 'Ornaments' },
+    { id: 'flowerSize', type: 'float', label: 'Flower Size', min: 4, max: 40, step: 0.5, default: 16, group: 'Ornaments' },
     { id: 'invertColors', type: 'bool', label: 'White on Black', default: false, group: 'Style' },
     { id: 'mouseInfluence', type: 'float', label: 'Mouse Influence', min: 0, max: 1, step: 0.01, default: 0.3, group: 'Interaction' },
   ],
@@ -371,12 +371,12 @@ export class OrganicVines {
           this.drawLeaf(c, v.x, v.y, leafAngle, leafLen);
         }
 
-        // Procedural flowers — rare, end-of-life or random chance
-        if (flowerChance > 0 && Math.random() < flowerChance && lifeRatio > 0.15 && lifeRatio < 0.7 && v.thickness > 1.0) {
-          const fSize = flowerSize * (0.6 + Math.random() * 0.6) * lifeRatio;
+        // Procedural flowers — random bloom
+        if (flowerChance > 0 && Math.random() < flowerChance && lifeRatio > 0.1 && lifeRatio < 0.85 && v.totalSteps > 4) {
+          const fSize = flowerSize * (0.7 + Math.random() * 0.5) * (0.5 + lifeRatio * 0.5);
           this.drawFlower(c, v.x, v.y, fSize, Math.random() * Math.PI * 2);
-          // Flowers cost life (the vine "spends" energy blooming)
-          v.life *= 0.85;
+          // Flowers cost some life (the vine "spends" energy blooming)
+          v.life *= 0.92;
         }
 
         // Branch
