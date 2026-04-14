@@ -34,8 +34,11 @@ const DESCRIPTOR: EffectNodeDescriptor = {
       { value: '2', label: 'Fingertips' },
       { value: '3', label: 'Palms only' },
     ], default: '2', group: 'Beams' },
-    { id: 'beamWidth', type: 'float', label: 'Beam Width', min: 0.5, max: 10, step: 0.5, default: 3, group: 'Beams' },
-    { id: 'beamGlow', type: 'float', label: 'Beam Glow', min: 0, max: 50, step: 1, default: 20, group: 'Beams' },
+    { id: 'beamWidth', type: 'float', label: 'Beam Width', min: 0.5, max: 10, step: 0.5, default: 2, group: 'Beams' },
+    { id: 'beamGlow', type: 'float', label: 'Beam Glow', min: 0, max: 50, step: 1, default: 24, group: 'Beams' },
+    { id: 'beamOpacity', type: 'float', label: 'Beam Opacity', min: 0, max: 1, step: 0.01, default: 0.55, group: 'Beams' },
+    { id: 'beamJitter', type: 'float', label: 'Plasma Jitter', min: 0, max: 1, step: 0.01, default: 0.5, group: 'Beams' },
+    { id: 'beamFilaments', type: 'int', label: 'Filaments', min: 1, max: 5, default: 3, group: 'Beams' },
     { id: 'energyFlow', type: 'float', label: 'Energy Flow', min: 0, max: 2, step: 0.01, default: 1.0, group: 'Beams' },
     { id: 'energySpeed', type: 'float', label: 'Flow Speed', min: 0, max: 5, step: 0.05, default: 1.5, group: 'Beams' },
     { id: 'energyPulses', type: 'int', label: 'Pulse Count', min: 0, max: 8, default: 3, group: 'Beams' },
@@ -151,6 +154,9 @@ export class HandTracking {
     const beamMode = parseInt(params.beamMode as string, 10);
     const beamWidth = params.beamWidth as number;
     const beamGlow = params.beamGlow as number;
+    const beamOpacity = params.beamOpacity as number;
+    const beamJitter = params.beamJitter as number;
+    const beamFilaments = params.beamFilaments as number;
     const energyFlow = params.energyFlow as number;
     const energySpeed = params.energySpeed as number;
     const energyPulses = params.energyPulses as number;
@@ -389,39 +395,74 @@ export class HandTracking {
 
         // Color
         const hue = ((i / pairs.length) + t * 0.15) % 1;
-        const color = this.hsla(hue * 360, saturation, 0.65, 1);
-        const glowColor = this.hsla(hue * 360, saturation, 0.5, 0.5);
 
-        // For quadratic bezier to pass THROUGH the desired midpoint, we need to
-        // set the control point so that the curve is displaced properly.
-        // Use a quadratic: P(t) = (1-t)^2*P0 + 2(1-t)t*CP + t^2*P1
-        // At t=0.5, P(0.5) = 0.25*P0 + 0.5*CP + 0.25*P1 = midpoint of (P0,P1) + 0.5*(CP - midpoint)
-        // If we want the curve's midpoint to be at our displaced point D, then CP = 2*D - midpoint(P0,P1).
-        const targetMidX = ctrlX;
-        const targetMidY = ctrlY;
-        const bezCpX = 2 * targetMidX - mx2;
-        const bezCpY = 2 * targetMidY - my2;
+        // Base bezier control point (so curve midpoint lands at target midpoint)
+        const bezCpX = 2 * ctrlX - mx2;
+        const bezCpY = 2 * ctrlY - my2;
 
-        // Outer glow
+        // Perpendicular to beam direction — used to scatter filaments sideways
+        const beamDx = p2.x - p1.x;
+        const beamDy = p2.y - p1.y;
+        const beamMag = Math.max(1, Math.hypot(beamDx, beamDy));
+        const perpX = -beamDy / beamMag;
+        const perpY = beamDx / beamMag;
+
+        // Render beam using additive blending for true plasma glow
+        c.save();
+        c.globalCompositeOperation = 'lighter';
+
+        // 1) Soft outer halo — wide, very transparent, blurred
         if (beamGlow > 0) {
-          c.strokeStyle = glowColor;
-          c.lineWidth = beamWidth + beamGlow * 0.6;
-          c.shadowColor = color;
-          c.shadowBlur = beamGlow;
+          c.strokeStyle = this.hsla(hue * 360, saturation, 0.45, 0.18 * beamOpacity);
+          c.lineWidth = beamWidth + beamGlow * 1.2;
+          c.shadowColor = this.hsla(hue * 360, saturation, 0.55, 1);
+          c.shadowBlur = beamGlow * 1.5;
           c.beginPath();
           c.moveTo(p1.x, p1.y);
           c.quadraticCurveTo(bezCpX, bezCpY, p2.x, p2.y);
           c.stroke();
         }
 
-        // Inner bright beam
+        // 2) Multiple thin jittering filaments — the "plasma" body
+        const filamentCount = Math.max(1, beamFilaments);
+        const jitterAmount = beamJitter * (20 + beamGlow * 0.5);
+        // Per-filament time offset so they wave independently
+        for (let fi = 0; fi < filamentCount; fi++) {
+          // Each filament has its own phase & side offset
+          const phase1 = t * 3 + i * 2.1 + fi * 1.3;
+          const phase2 = t * 4.3 + i * 3.7 + fi * 2.7;
+          // Time-varying perpendicular offset at the control point
+          const jx = (Math.sin(phase1) + Math.sin(phase1 * 1.7 + 0.8)) * jitterAmount * 0.5;
+          const jy = (Math.sin(phase2) + Math.cos(phase2 * 1.3 + 0.5)) * jitterAmount * 0.5;
+          // Center filaments cluster near the base; others fan slightly
+          const sideOffset = (fi - (filamentCount - 1) / 2) * (beamWidth * 1.2);
+          const fcpX = bezCpX + perpX * (jx + sideOffset) + jx * 0.3;
+          const fcpY = bezCpY + perpY * (jy + sideOffset) + jy * 0.3;
+
+          // Slight hue shift + brightness variation per filament
+          const fhue = (hue + fi * 0.02) % 1;
+          const flicker = 0.7 + 0.3 * Math.sin(t * 7 + i * 3 + fi * 5);
+          c.strokeStyle = this.hsla(fhue * 360, saturation, 0.7, beamOpacity * flicker * 0.85);
+          c.lineWidth = beamWidth * (0.5 + Math.random() * 0.2);
+          c.shadowColor = this.hsla(fhue * 360, saturation, 0.65, 1);
+          c.shadowBlur = beamGlow * 0.4;
+
+          c.beginPath();
+          c.moveTo(p1.x, p1.y);
+          c.quadraticCurveTo(fcpX, fcpY, p2.x, p2.y);
+          c.stroke();
+        }
+
+        // 3) Thin hot core (subtle — only on central filament)
+        c.strokeStyle = this.hsla(hue * 360, saturation * 0.3, 0.95, beamOpacity * 0.45);
+        c.lineWidth = Math.max(0.8, beamWidth * 0.35);
         c.shadowBlur = 0;
-        c.strokeStyle = color;
-        c.lineWidth = beamWidth;
         c.beginPath();
         c.moveTo(p1.x, p1.y);
         c.quadraticCurveTo(bezCpX, bezCpY, p2.x, p2.y);
         c.stroke();
+
+        c.restore();
 
         // === Flowing energy: animated dashed overlay ===
         // A bright dashed layer whose offset animates over time — gives the
@@ -433,14 +474,15 @@ export class HandTracking {
           const dashLen = dashSpacing * 0.35;
 
           c.save();
+          c.globalCompositeOperation = 'lighter';
           c.setLineDash([dashLen, dashSpacing - dashLen]);
           c.lineDashOffset = -direction * ctx.time * (50 + energySpeed * 150);
 
-          // Inner bright dash stream (overlaid for a "streaming light" look)
-          c.strokeStyle = this.hsla(hue * 360, saturation, 0.92, Math.min(1, energyFlow));
-          c.lineWidth = beamWidth * 0.9;
-          c.shadowColor = color;
-          c.shadowBlur = beamGlow * 0.5;
+          // Translucent streaming dashes — additive blend for plasma feel
+          c.strokeStyle = this.hsla(hue * 360, saturation, 0.85, Math.min(0.65, energyFlow * 0.5));
+          c.lineWidth = beamWidth * 0.6;
+          c.shadowColor = this.hsla(hue * 360, saturation, 0.7, 1);
+          c.shadowBlur = beamGlow * 0.4;
           c.beginPath();
           c.moveTo(p1.x, p1.y);
           c.quadraticCurveTo(bezCpX, bezCpY, p2.x, p2.y);
