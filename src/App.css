@@ -205,6 +205,31 @@ html, body, #root {
   padding: 5px 8px;
 }
 
+.param-row--column {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.param-text-input,
+.param-textarea {
+  width: 100%;
+  padding: 6px 8px;
+  background: #1a1a25;
+  color: #e0e0e0;
+  border: 1px solid #3a3a4a;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.param-text-input:focus,
+.param-textarea:focus {
+  outline: none;
+  border-color: #6666ff;
+}
+
 .param-group {
   padding: 8px 16px;
   overflow: hidden;

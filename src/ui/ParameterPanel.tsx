@@ -6,6 +6,11 @@ import { CollapsibleSection } from './CollapsibleSection';
 
 // Effect display labels (kept in sync with EffectSelector)
 const EFFECT_LABELS: Record<string, string> = {
+  'media-source': 'Media',
+  'text-layer': 'Text Layer',
+  'kinetic-type': 'Kinetic Type',
+  'text-mask': 'Text Mask',
+  'ascii-filter': 'ASCII Filter',
   'noise-flow-field': 'Noise Flow Field',
   'voronoi-liquid': 'Voronoi Liquid',
   'domain-warp-tunnel': 'Domain Warp',
@@ -181,5 +186,5 @@ function ControlFactoryWrapper({
     [parameterStore, instanceId, def.id],
   );
 
-  return <ControlFactory def={def} value={value} onChange={handleChange} />;
+  return <ControlFactory def={def} value={value} onChange={handleChange} effectId={instanceId} />;
 }

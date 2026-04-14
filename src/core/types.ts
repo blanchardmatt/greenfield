@@ -2,7 +2,7 @@
 // Parameter System
 // ──────────────────────────────────────────────
 
-export type ParameterType = 'float' | 'int' | 'bool' | 'color' | 'enum' | 'vec2';
+export type ParameterType = 'float' | 'int' | 'bool' | 'color' | 'enum' | 'vec2' | 'string' | 'action';
 
 export interface ParameterDefBase {
   id: string;
@@ -48,15 +48,38 @@ export interface Vec2ParameterDef extends ParameterDefBase {
   default: [number, number];
 }
 
+export interface StringParameterDef extends ParameterDefBase {
+  type: 'string';
+  default: string;
+  multiline?: boolean;
+  placeholder?: string;
+}
+
+/** Action params don't store data — they trigger an event when clicked.
+ *  Effects subscribe via `EffectActions.on(effectId, actionId, handler)`. */
+export interface ActionParameterDef extends ParameterDefBase {
+  type: 'action';
+  default: 0;
+  buttonLabel: string;
+  actionId: string;
+}
+
 export type ParameterDef =
   | FloatParameterDef
   | IntParameterDef
   | BoolParameterDef
   | ColorParameterDef
   | EnumParameterDef
-  | Vec2ParameterDef;
+  | Vec2ParameterDef
+  | StringParameterDef
+  | ActionParameterDef;
 
-export type ParameterValue = number | boolean | string | [number, number, number, number] | [number, number];
+export type ParameterValue =
+  | number
+  | boolean
+  | string
+  | [number, number, number, number]
+  | [number, number];
 
 export type ParameterValues = Record<string, ParameterValue>;
 

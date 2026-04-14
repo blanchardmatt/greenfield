@@ -10,6 +10,11 @@ import { RaymarchedMetaballs } from './RaymarchedMetaballs';
 import { DomainWarpTunnel } from './DomainWarpTunnel';
 import { OrganicVines } from './OrganicVines';
 import { HandTracking } from './HandTracking';
+import { MediaSource } from './MediaSource';
+import { TextLayer } from './TextLayer';
+import { AsciiFilter } from './AsciiFilter';
+import { KineticType } from './KineticType';
+import { TextMask } from './TextMask';
 
 type EffectFactory = () => EffectNode;
 
@@ -25,6 +30,11 @@ export const effectRegistry = new Map<string, EffectFactory>([
   ['domain-warp-tunnel', () => new DomainWarpTunnel()],
   ['organic-vines', () => new OrganicVines()],
   ['hand-tracking', () => new HandTracking()],
+  ['media-source', () => new MediaSource()],
+  ['text-layer', () => new TextLayer()],
+  ['kinetic-type', () => new KineticType()],
+  ['text-mask', () => new TextMask()],
+  ['ascii-filter', () => new AsciiFilter()],
 ]);
 
 export function getEffectDescriptors(): EffectNodeDescriptor[] {

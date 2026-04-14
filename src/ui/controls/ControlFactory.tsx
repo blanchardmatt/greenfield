@@ -3,14 +3,17 @@ import { SliderControl } from './SliderControl';
 import { ColorControl } from './ColorControl';
 import { DropdownControl } from './DropdownControl';
 import { ToggleControl } from './ToggleControl';
+import { StringControl } from './StringControl';
+import { ActionControl } from './ActionControl';
 
 interface ControlFactoryProps {
   def: ParameterDef;
   value: ParameterValue;
   onChange: (value: ParameterValue) => void;
+  effectId?: string;
 }
 
-export function ControlFactory({ def, value, onChange }: ControlFactoryProps) {
+export function ControlFactory({ def, value, onChange, effectId }: ControlFactoryProps) {
   switch (def.type) {
     case 'float':
     case 'int':
@@ -45,8 +48,17 @@ export function ControlFactory({ def, value, onChange }: ControlFactoryProps) {
           onChange={onChange}
         />
       );
+    case 'string':
+      return (
+        <StringControl
+          def={def}
+          value={value as string}
+          onChange={onChange}
+        />
+      );
+    case 'action':
+      return effectId ? <ActionControl def={def} effectId={effectId} /> : null;
     case 'vec2':
-      // For now, render as two sliders
       return null;
     default:
       return null;

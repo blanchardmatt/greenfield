@@ -14,6 +14,10 @@ interface EffectInfo {
 }
 
 const EFFECTS: Record<string, EffectInfo> = {
+  'media-source': { label: 'Media (Image / Video / Webcam)', category: 'Source' },
+  'text-layer': { label: 'Text Layer', category: 'Text' },
+  'kinetic-type': { label: 'Kinetic Type', category: 'Text' },
+  'text-mask': { label: 'Text Mask', category: 'Text' },
   'noise-flow-field': { label: 'Noise Flow Field', category: 'Generative' },
   'voronoi-liquid': { label: 'Voronoi Liquid', category: 'Generative' },
   'domain-warp-tunnel': { label: 'Domain Warp', category: 'Generative' },
@@ -23,6 +27,7 @@ const EFFECTS: Record<string, EffectInfo> = {
   'particle-system': { label: 'Particle System', category: 'Simulation' },
   'organic-vines': { label: 'Ornamental Flourish', category: 'Simulation' },
   'feedback-echo': { label: 'Feedback Echo', category: 'Post-FX' },
+  'ascii-filter': { label: 'ASCII Filter', category: 'Post-FX' },
   'audio-waveform': { label: 'Audio Waveform', category: 'Reactive' },
   'hand-tracking': { label: 'Hand Tracking', category: 'Reactive' },
 };
