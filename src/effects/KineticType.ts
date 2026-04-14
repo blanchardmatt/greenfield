@@ -109,25 +109,44 @@ export class KineticType {
     const c = this.textCtx!;
     c.clearRect(0, 0, this.w, this.h);
     c.fillStyle = 'white';
-    c.font = `${fontSize}px ${fontFamily}`;
-    c.textAlign = 'center';
-    // Use alphabetic baseline + measured ascent/descent for accurate centering
-    // (textBaseline='middle' clips descenders for tall fonts like Impact).
-    c.textBaseline = 'alphabetic';
+    // Auto-shrink fontSize to ensure the text fits within the canvas vertically
+    // (with a 10% margin) and horizontally (with a 5% margin). This guarantees
+    // no clipping for tall display fonts at large sizes regardless of canvas
+    // aspect ratio.
     const lines = text.split('\n');
-    // Use the widest line to get representative metrics
-    const widest = lines.reduce((a, b) => (a.length >= b.length ? a : b));
-    const metrics = c.measureText(widest || 'M');
-    const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
-    const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
-    const lineHeightPx = ascent + descent;
-    const lineGap = lineHeightPx * lineHeight;
-    const totalH = (lines.length - 1) * lineGap + lineHeightPx;
-    const topY = this.h / 2 - totalH / 2;
-    const firstBaselineY = topY + ascent;
+    const setFont = (size: number) => {
+      c.font = `${size}px ${fontFamily}`;
+    };
+    setFont(fontSize);
+    let widest = lines.reduce((a, b) => {
+      const wa = c.measureText(a).width;
+      const wb = c.measureText(b).width;
+      return wa >= wb ? a : b;
+    }, lines[0] ?? 'M');
+    if (!widest) widest = 'M';
+
+    // Estimate per-line height as fontSize * 1.0 (em box). Fit check.
+    const fitFontSize = (size: number) => {
+      setFont(size);
+      const w = c.measureText(widest).width;
+      const h = size * lineHeight * lines.length + size * 0.4; // include descender margin
+      const maxW = this.w * 0.95;
+      const maxH = this.h * 0.9;
+      const scale = Math.min(maxW / w, maxH / h, 1);
+      return size * scale;
+    };
+    const finalSize = Math.max(8, Math.floor(fitFontSize(fontSize)));
+    setFont(finalSize);
+
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+
+    const lineGap = finalSize * lineHeight;
+    const blockHeight = (lines.length - 1) * lineGap;
     const cx = this.w / 2;
+    const baseY = this.h / 2 - blockHeight / 2;
     for (let i = 0; i < lines.length; i++) {
-      c.fillText(lines[i]!, cx, firstBaselineY + i * lineGap);
+      c.fillText(lines[i]!, cx, baseY + i * lineGap);
     }
 
     if (this.w === 0 || this.h === 0) return;
