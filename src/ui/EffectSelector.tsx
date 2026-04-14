@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { getEffectIds } from '../effects';
 
 interface EffectSelectorProps {
@@ -27,6 +27,9 @@ const EFFECTS: Record<string, EffectInfo> = {
 
 export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps) {
   const allIds = getEffectIds();
+  const chainListRef = useRef<HTMLDivElement>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dropIndex, setDropIndex] = useState<number | null>(null);
 
   // Group by category
   const categories = new Map<string, string[]>();
@@ -66,6 +69,65 @@ export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps)
 
   const getLabel = (id: string) => EFFECTS[id]?.label ?? id;
 
+  // --- Drag to reorder ---
+  const computeDropIndex = useCallback((clientY: number): number => {
+    const list = chainListRef.current;
+    if (!list) return 0;
+    const rows = Array.from(list.querySelectorAll<HTMLDivElement>('.chain-row'));
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i]!.getBoundingClientRect();
+      if (clientY < r.top + r.height / 2) return i;
+    }
+    return rows.length;
+  }, []);
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>, index: number) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const target = e.currentTarget;
+      target.setPointerCapture(e.pointerId);
+      setDragIndex(index);
+      setDropIndex(index);
+    },
+    [],
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (dragIndex === null) return;
+      e.preventDefault();
+      setDropIndex(computeDropIndex(e.clientY));
+    },
+    [dragIndex, computeDropIndex],
+  );
+
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (dragIndex === null) {
+        return;
+      }
+      const target = e.currentTarget;
+      if (target.hasPointerCapture(e.pointerId)) {
+        target.releasePointerCapture(e.pointerId);
+      }
+      const finalDrop = computeDropIndex(e.clientY);
+      const from = dragIndex;
+      // Adjust target index if we removed an earlier item
+      let to = finalDrop > from ? finalDrop - 1 : finalDrop;
+      to = Math.max(0, Math.min(activeEffects.length - 1, to));
+      setDragIndex(null);
+      setDropIndex(null);
+      if (to !== from) {
+        const next = [...activeEffects];
+        const [moved] = next.splice(from, 1);
+        next.splice(to, 0, moved!);
+        onChange(next);
+      }
+    },
+    [dragIndex, computeDropIndex, activeEffects, onChange],
+  );
+
   return (
     <div className="effect-selector">
       <label>Active Effect</label>
@@ -83,19 +145,41 @@ export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps)
 
       {activeEffects.length > 1 && (
         <div style={{ marginTop: 8 }}>
-          <label style={{ fontSize: 11, color: '#888' }}>Effect Chain</label>
-          {activeEffects.map((id, i) => (
-            <div key={id} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
-              <span style={{ fontSize: 12, color: '#aaa', flex: 1 }}>
-                {i + 1}. {getLabel(id)}
-              </span>
-              {activeEffects.length > 1 && (
-                <button className="btn btn-danger" onClick={() => handleRemoveEffect(id)} style={{ padding: '2px 6px', fontSize: 11 }}>
+          <label style={{ fontSize: 11, color: '#888' }}>Effect Chain (drag to reorder)</label>
+          <div ref={chainListRef} className="chain-list">
+            {activeEffects.map((id, i) => (
+              <div
+                key={id}
+                className={`chain-row ${dragIndex === i ? 'chain-row--dragging' : ''} ${
+                  dragIndex !== null && dropIndex === i && dragIndex !== i ? 'chain-row--drop-above' : ''
+                } ${
+                  dragIndex !== null && dropIndex === i + 1 && dragIndex !== i && i === activeEffects.length - 1 ? 'chain-row--drop-below' : ''
+                }`}
+              >
+                <button
+                  className="chain-drag-handle"
+                  onPointerDown={(e) => handlePointerDown(e, i)}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                  onPointerCancel={handlePointerUp}
+                  aria-label="Drag to reorder"
+                  title="Drag to reorder"
+                >
+                  {'\u2630'}
+                </button>
+                <span className="chain-row-label">
+                  {i + 1}. {getLabel(id)}
+                </span>
+                <button
+                  className="btn btn-danger chain-remove"
+                  onClick={() => handleRemoveEffect(id)}
+                  aria-label="Remove"
+                >
                   x
                 </button>
-              )}
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
