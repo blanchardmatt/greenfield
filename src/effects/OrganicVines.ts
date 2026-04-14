@@ -29,6 +29,12 @@ const DESCRIPTOR: EffectNodeDescriptor = {
     { id: 'lightSeeking', type: 'float', label: 'Seek Empty Space', min: 0, max: 2, step: 0.01, default: 0.8, group: 'Behavior' },
     { id: 'mouseAttract', type: 'float', label: 'Seek Mouse', min: 0, max: 2, step: 0.01, default: 0.6, group: 'Behavior' },
     { id: 'mouseInfluence', type: 'float', label: 'Touch Bend', min: 0, max: 1, step: 0.01, default: 0.3, group: 'Behavior' },
+    { id: 'inputGuide', type: 'enum', label: 'Use Input Layer', options: [
+      { value: 'off', label: 'Off' },
+      { value: 'follow-bright', label: 'Grow on bright (use as scaffold)' },
+      { value: 'avoid-bright', label: 'Grow around bright (avoid)' },
+    ], default: 'off', group: 'Behavior' },
+    { id: 'inputGuideStrength', type: 'float', label: 'Input Guide Strength', min: 0, max: 5, step: 0.01, default: 2.0, group: 'Behavior' },
   ],
   inputs: [{ id: 'input0', label: 'Background', type: 'texture' }],
   outputs: [{ id: 'output0', label: 'Result', type: 'texture' }],
@@ -94,9 +100,107 @@ export class OrganicVines {
   private gridCellW = 0;
   private gridCellH = 0;
 
+  // Input texture brightness sampling (low-res readback) for "use input as guide"
+  private readonly inputGridW = 80;
+  private readonly inputGridH = 60;
+  private inputBrightness: Float32Array = new Float32Array(this.inputGridW * this.inputGridH);
+  private inputFBO: WebGLFramebuffer | null = null;
+  private inputFBOTex: WebGLTexture | null = null;
+  private inputReadBuf: Uint8Array = new Uint8Array(this.inputGridW * this.inputGridH * 4);
+  private inputSampleProgram: WebGLProgram | null = null;
+  private inputSampleTexLoc: WebGLUniformLocation | null = null;
+  private inputSampleVAO: WebGLVertexArrayObject | null = null;
+  private inputFrameCounter = 0;
+  private hasInputBrightness = false;
+
   init(gl: WebGL2RenderingContext): void {
     this.gl = gl;
     this.texture = gl.createTexture()!;
+    this.initInputSampler(gl);
+  }
+
+  private initInputSampler(gl: WebGL2RenderingContext): void {
+    // Tiny FBO we render the input texture into, then readPixels for CPU sampling
+    this.inputFBOTex = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, this.inputFBOTex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.inputGridW, this.inputGridH, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+    this.inputFBO = gl.createFramebuffer()!;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.inputFBO);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.inputFBOTex, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    // Minimal blit shader (no flip — readback uses raw orientation)
+    const vs = `#version 300 es
+    const vec2 pos[6] = vec2[](vec2(-1,-1),vec2(1,-1),vec2(-1,1),vec2(-1,1),vec2(1,-1),vec2(1,1));
+    out vec2 vUv;
+    void main() { gl_Position = vec4(pos[gl_VertexID], 0, 1); vUv = pos[gl_VertexID] * 0.5 + 0.5; }`;
+    const fs = `#version 300 es
+    precision mediump float;
+    uniform sampler2D uTex;
+    in vec2 vUv;
+    out vec4 fragColor;
+    void main() { fragColor = texture(uTex, vUv); }`;
+    const compile = (type: number, src: string) => {
+      const s = gl.createShader(type)!;
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
+    };
+    const p = gl.createProgram()!;
+    gl.attachShader(p, compile(gl.VERTEX_SHADER, vs));
+    gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(p);
+    this.inputSampleProgram = p;
+    this.inputSampleTexLoc = gl.getUniformLocation(p, 'uTex');
+    this.inputSampleVAO = gl.createVertexArray()!;
+  }
+
+  /** Render the input texture into the small FBO and read back brightness. */
+  private updateInputBrightness(gl: WebGL2RenderingContext, inputTex: WebGLTexture): void {
+    if (!this.inputFBO || !this.inputSampleProgram) return;
+    // Throttle: every 3 frames is plenty for slow vine growth
+    this.inputFrameCounter++;
+    if (this.inputFrameCounter % 3 !== 0) return;
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.inputFBO);
+    gl.viewport(0, 0, this.inputGridW, this.inputGridH);
+    gl.disable(gl.BLEND);
+    gl.disable(gl.DEPTH_TEST);
+    gl.useProgram(this.inputSampleProgram);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, inputTex);
+    gl.uniform1i(this.inputSampleTexLoc, 0);
+    gl.bindVertexArray(this.inputSampleVAO);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.bindVertexArray(null);
+
+    // Read pixels into Uint8Array
+    gl.readPixels(0, 0, this.inputGridW, this.inputGridH, gl.RGBA, gl.UNSIGNED_BYTE, this.inputReadBuf);
+
+    // Convert to luminance grid. Note: GL Y=0 is bottom of texture, but our
+    // canvas coords are Y=0 at top. Flip when storing into inputBrightness.
+    const buf = this.inputReadBuf;
+    const out = this.inputBrightness;
+    for (let y = 0; y < this.inputGridH; y++) {
+      const srcRow = (this.inputGridH - 1 - y) * this.inputGridW * 4;
+      const dstRow = y * this.inputGridW;
+      for (let x = 0; x < this.inputGridW; x++) {
+        const i = srcRow + x * 4;
+        const r = buf[i]! / 255;
+        const g = buf[i + 1]! / 255;
+        const b = buf[i + 2]! / 255;
+        out[dstRow + x] = 0.299 * r + 0.587 * g + 0.114 * b;
+      }
+    }
+    this.hasInputBrightness = true;
+
+    // Unbind FBO
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
 
   resize(width: number, height: number): void {
@@ -105,16 +209,26 @@ export class OrganicVines {
     this.gridCellW = width / this.gridRes;
     this.gridCellH = height / this.gridRes;
 
+    // Supersample factor — render canvas at 2x then downsample via GL_LINEAR
+    // for smooth anti-aliased edges on lines, dots, and curves.
+    const ss = 2;
+    const cw = Math.floor(width * ss);
+    const ch = Math.floor(height * ss);
+
     // Create 2D canvas for drawing vines (OffscreenCanvas with fallback)
     if (typeof OffscreenCanvas !== 'undefined') {
-      this.canvas2d = new OffscreenCanvas(width, height);
+      this.canvas2d = new OffscreenCanvas(cw, ch);
     } else {
       const el = document.createElement('canvas');
-      el.width = width;
-      el.height = height;
+      el.width = cw;
+      el.height = ch;
       this.canvas2d = el;
     }
     this.ctx2d = this.canvas2d.getContext('2d')! as CanvasRenderingContext2D;
+    // Scale all draw operations so the rest of the code works in logical coords (this.w x this.h)
+    this.ctx2d.scale(ss, ss);
+    this.ctx2d.imageSmoothingEnabled = true;
+    (this.ctx2d as { imageSmoothingQuality?: ImageSmoothingQuality }).imageSmoothingQuality = 'high';
 
     // Clear density grid and canvas
     this.densityGrid.fill(0);
@@ -158,9 +272,23 @@ export class OrganicVines {
     this.densityGrid[idx] = Math.min(10, this.densityGrid[idx]! + amount);
   }
 
-  /** Find the angle that points toward the most empty space */
-  private findOpenAngle(x: number, y: number, currentAngle: number, lookDist: number): number {
-    // Sample 7 candidate directions within ~120 degrees of current angle
+  /** Sample input brightness 0..1 at world-space point (canvas coords) */
+  private sampleInputBrightness(x: number, y: number): number {
+    if (!this.hasInputBrightness) return 0.5;
+    const u = Math.max(0, Math.min(0.999, x / this.w));
+    const v = Math.max(0, Math.min(0.999, y / this.h));
+    const gx = Math.floor(u * this.inputGridW);
+    const gy = Math.floor(v * this.inputGridH);
+    return this.inputBrightness[gy * this.inputGridW + gx]!;
+  }
+
+  /** Find the angle that points toward the most empty space, optionally
+   *  biased by the input layer's brightness (follow or avoid bright). */
+  private findOpenAngle(
+    x: number, y: number, currentAngle: number, lookDist: number,
+    inputGuide: 'off' | 'follow-bright' | 'avoid-bright',
+    inputGuideStrength: number,
+  ): number {
     let bestAngle = currentAngle;
     let bestScore = Infinity;
     const spread = Math.PI * 0.66;
@@ -170,13 +298,25 @@ export class OrganicVines {
       const a = currentAngle + offset;
       const sx = x + Math.cos(a) * lookDist;
       const sy = y + Math.sin(a) * lookDist;
-      // Penalty for going out of bounds
+
       let score = this.sampleDensity(sx, sy);
       if (sx < 0 || sx >= this.w || sy < 0 || sy >= this.h) {
         score += 5;
       }
-      // Small bias to favor forward direction (stability)
       score += Math.abs(offset) * 0.1;
+
+      // Input layer guidance
+      if (inputGuide !== 'off' && this.hasInputBrightness) {
+        const b = this.sampleInputBrightness(sx, sy);
+        if (inputGuide === 'follow-bright') {
+          // Lower score (better) where bright
+          score -= b * inputGuideStrength;
+        } else {
+          // avoid-bright: higher score (worse) where bright
+          score += b * inputGuideStrength;
+        }
+      }
+
       if (score < bestScore) {
         bestScore = score;
         bestAngle = a;
@@ -403,6 +543,15 @@ export class OrganicVines {
     const mouseInf = params.mouseInfluence as number;
     const lightSeeking = params.lightSeeking as number;
     const mouseAttract = params.mouseAttract as number;
+    const inputGuide = params.inputGuide as 'off' | 'follow-bright' | 'avoid-bright';
+    const inputGuideStrength = params.inputGuideStrength as number;
+
+    // Sample input texture's brightness at low res for vine guidance
+    if (inputTex && inputGuide !== 'off') {
+      this.updateInputBrightness(gl, inputTex);
+    } else {
+      this.hasInputBrightness = false;
+    }
 
     this.updateColors(palette, transparentBg);
 
@@ -452,13 +601,22 @@ export class OrganicVines {
           v.angle += diff * pull;
         }
 
-        // Light-seeking: steer toward empty space (sample every few steps for perf)
-        if (lightSeeking > 0 && v.totalSteps % 3 === 0) {
+        // Light-seeking: steer toward empty space (and bias by input layer)
+        const useInputGuide = inputGuide !== 'off' && this.hasInputBrightness;
+        if ((lightSeeking > 0 || useInputGuide) && v.totalSteps % 3 === 0) {
           const lookDist = this.gridCellW * 2.5;
-          const openAngle = this.findOpenAngle(v.x, v.y, v.angle, lookDist);
+          const openAngle = this.findOpenAngle(
+            v.x, v.y, v.angle, lookDist,
+            inputGuide,
+            useInputGuide ? inputGuideStrength : 0,
+          );
           let diff = openAngle - v.angle;
           diff = ((diff + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
-          v.angle += diff * lightSeeking * 0.25;
+          // Steering strength: prefer the larger of lightSeeking and a baseline
+          // when input guide is active (so the input still influences even if
+          // user has light seeking turned off)
+          const steerWeight = useInputGuide ? Math.max(lightSeeking, 0.6) : lightSeeking;
+          v.angle += diff * steerWeight * 0.25;
         }
 
         // Segment length shrinks as vine dies (tighter spirals at tips)
@@ -708,6 +866,10 @@ export class OrganicVines {
     if (this.texture) gl.deleteTexture(this.texture);
     if (this.blitProgram) gl.deleteProgram(this.blitProgram);
     if (this.blitVAO) gl.deleteVertexArray(this.blitVAO);
+    if (this.inputFBO) gl.deleteFramebuffer(this.inputFBO);
+    if (this.inputFBOTex) gl.deleteTexture(this.inputFBOTex);
+    if (this.inputSampleProgram) gl.deleteProgram(this.inputSampleProgram);
+    if (this.inputSampleVAO) gl.deleteVertexArray(this.inputSampleVAO);
     this.canvas2d = null;
     this.ctx2d = null;
   }
