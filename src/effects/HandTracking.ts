@@ -295,7 +295,9 @@ export class HandTracking {
   private uploadAndBlit(gl: WebGL2RenderingContext): void {
     if (!this.canvas2d) return;
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas2d);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.viewport(0, 0, this.w, this.h);
     gl.disable(gl.BLEND);
     if (!this.blitProgram) this.initBlit(gl);

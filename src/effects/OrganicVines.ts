@@ -14,7 +14,9 @@ const DESCRIPTOR: EffectNodeDescriptor = {
     { id: 'flowerChance', type: 'float', label: 'Flower Chance', min: 0, max: 0.1, step: 0.001, default: 0.025, group: 'Ornaments' },
     { id: 'flowerSize', type: 'float', label: 'Flower Size', min: 4, max: 40, step: 0.5, default: 16, group: 'Ornaments' },
     { id: 'invertColors', type: 'bool', label: 'White on Black', default: false, group: 'Style' },
-    { id: 'mouseInfluence', type: 'float', label: 'Mouse Influence', min: 0, max: 1, step: 0.01, default: 0.3, group: 'Interaction' },
+    { id: 'lightSeeking', type: 'float', label: 'Seek Empty Space', min: 0, max: 2, step: 0.01, default: 0.8, group: 'Behavior' },
+    { id: 'mouseAttract', type: 'float', label: 'Seek Mouse', min: 0, max: 2, step: 0.01, default: 0.6, group: 'Behavior' },
+    { id: 'mouseInfluence', type: 'float', label: 'Touch Bend', min: 0, max: 1, step: 0.01, default: 0.3, group: 'Behavior' },
   ],
   inputs: [{ id: 'input0', label: 'Background', type: 'texture' }],
   outputs: [{ id: 'output0', label: 'Result', type: 'texture' }],
@@ -71,6 +73,12 @@ export class OrganicVines {
   private generationCount = 0;
   private lastSpawnTime = 0;
 
+  // Density grid for light-seeking behavior (coarse grid tracks vine coverage)
+  private readonly gridRes = 40;
+  private densityGrid: Float32Array = new Float32Array(this.gridRes * this.gridRes);
+  private gridCellW = 0;
+  private gridCellH = 0;
+
   init(gl: WebGL2RenderingContext): void {
     this.gl = gl;
     this.texture = gl.createTexture()!;
@@ -79,6 +87,8 @@ export class OrganicVines {
   resize(width: number, height: number): void {
     this.w = width;
     this.h = height;
+    this.gridCellW = width / this.gridRes;
+    this.gridCellH = height / this.gridRes;
 
     // Create 2D canvas for drawing vines (OffscreenCanvas with fallback)
     if (typeof OffscreenCanvas !== 'undefined') {
@@ -91,7 +101,8 @@ export class OrganicVines {
     }
     this.ctx2d = this.canvas2d.getContext('2d')! as CanvasRenderingContext2D;
 
-    // Clear to background
+    // Clear density grid and canvas
+    this.densityGrid.fill(0);
     this.resetCanvas();
 
     // Seed initial vines from edges
@@ -113,6 +124,50 @@ export class OrganicVines {
     ctx.fillStyle = this.bgColor;
     ctx.fillRect(0, 0, this.w, this.h);
     this.pixelsCovered = 0;
+    this.densityGrid.fill(0);
+  }
+
+  /** Sample density at a world-space point, with bilinear smoothing */
+  private sampleDensity(x: number, y: number): number {
+    const gx = Math.max(0, Math.min(this.gridRes - 1, Math.floor(x / this.gridCellW)));
+    const gy = Math.max(0, Math.min(this.gridRes - 1, Math.floor(y / this.gridCellH)));
+    return this.densityGrid[gy * this.gridRes + gx]!;
+  }
+
+  /** Add to density grid at a world-space point */
+  private depositDensity(x: number, y: number, amount: number): void {
+    if (x < 0 || x >= this.w || y < 0 || y >= this.h) return;
+    const gx = Math.floor(x / this.gridCellW);
+    const gy = Math.floor(y / this.gridCellH);
+    const idx = gy * this.gridRes + gx;
+    this.densityGrid[idx] = Math.min(10, this.densityGrid[idx]! + amount);
+  }
+
+  /** Find the angle that points toward the most empty space */
+  private findOpenAngle(x: number, y: number, currentAngle: number, lookDist: number): number {
+    // Sample 7 candidate directions within ~120 degrees of current angle
+    let bestAngle = currentAngle;
+    let bestScore = Infinity;
+    const spread = Math.PI * 0.66;
+    const samples = 7;
+    for (let i = 0; i < samples; i++) {
+      const offset = ((i / (samples - 1)) - 0.5) * spread;
+      const a = currentAngle + offset;
+      const sx = x + Math.cos(a) * lookDist;
+      const sy = y + Math.sin(a) * lookDist;
+      // Penalty for going out of bounds
+      let score = this.sampleDensity(sx, sy);
+      if (sx < 0 || sx >= this.w || sy < 0 || sy >= this.h) {
+        score += 5;
+      }
+      // Small bias to favor forward direction (stability)
+      score += Math.abs(offset) * 0.1;
+      if (score < bestScore) {
+        bestScore = score;
+        bestAngle = a;
+      }
+    }
+    return bestAngle;
   }
 
   private spawnEdgeVines(count: number): void {
@@ -274,6 +329,8 @@ export class OrganicVines {
     const flowerSize = params.flowerSize as number;
     const invert = params.invertColors as boolean;
     const mouseInf = params.mouseInfluence as number;
+    const lightSeeking = params.lightSeeking as number;
+    const mouseAttract = params.mouseAttract as number;
 
     this.updateColors(invert);
 
@@ -301,16 +358,35 @@ export class OrganicVines {
         v.curvature += Math.sin(v.seed + v.totalSteps * 0.08) * 0.003;
         v.angle += v.curvature;
 
-        // Mouse influence
+        // Global mouse attraction (gentle, always on)
         const dmx = mx - v.x;
         const dmy = my - v.y;
         const mDist = Math.sqrt(dmx * dmx + dmy * dmy);
+        if (mDist > 1 && mouseAttract > 0) {
+          // Gentle global pull — stronger when farther from mouse, falls off as we get close
+          const pullStrength = mouseAttract * 0.02 * Math.min(1, mDist / (this.w * 0.3));
+          const ta = Math.atan2(dmy, dmx);
+          let diff = ta - v.angle;
+          diff = ((diff + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+          v.angle += diff * pullStrength;
+        }
+
+        // Close-range mouse bend (existing behavior — responds to touch)
         if (mDist > 1 && mouseInf > 0) {
           const pull = mouseInf * 0.12 * Math.exp(-mDist / (this.w * 0.2));
           const ta = Math.atan2(dmy, dmx);
           let diff = ta - v.angle;
           diff = ((diff + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
           v.angle += diff * pull;
+        }
+
+        // Light-seeking: steer toward empty space (sample every few steps for perf)
+        if (lightSeeking > 0 && v.totalSteps % 3 === 0) {
+          const lookDist = this.gridCellW * 2.5;
+          const openAngle = this.findOpenAngle(v.x, v.y, v.angle, lookDist);
+          let diff = openAngle - v.angle;
+          diff = ((diff + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+          v.angle += diff * lightSeeking * 0.25;
         }
 
         // Segment length shrinks as vine dies (tighter spirals at tips)
@@ -332,6 +408,10 @@ export class OrganicVines {
         c.moveTo(v.prevX, v.prevY);
         c.quadraticCurveTo(cpx, cpy, nx, ny);
         c.stroke();
+
+        // Deposit density in the grid along the segment
+        this.depositDensity(v.x, v.y, 1.0);
+        this.depositDensity((v.x + nx) * 0.5, (v.y + ny) * 0.5, 0.5);
 
         // Decorative dots on outside of curve
         v.stepsSinceLastDot++;
@@ -422,12 +502,23 @@ export class OrganicVines {
       this.hueRotation += 60 + Math.random() * 60;
       this.updateColors(invert);
       this.pixelsCovered = 0;
+      // Gently fade density so new generation still has reference but can grow over old
+      for (let i = 0; i < this.densityGrid.length; i++) {
+        this.densityGrid[i]! *= 0.3;
+      }
       this.spawnEdgeVines(4);
     }
 
-    // Upload canvas to GL texture
+    // Passive density decay — encourages revisiting old areas eventually
+    for (let i = 0; i < this.densityGrid.length; i++) {
+      this.densityGrid[i]! *= 0.9995;
+    }
+
+    // Upload canvas to GL texture (flip Y so canvas top maps to screen top)
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas2d);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 
     // Draw fullscreen quad with texture
     // Simple blit — set up minimal shader-free approach using the pipeline's FBO
