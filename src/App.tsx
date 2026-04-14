@@ -53,6 +53,9 @@ export function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [shuffleActive, setShuffleActive] = useState(false);
   const [focusedEffect, setFocusedEffect] = useState<string | null>(null);
+  const [showDebug, setShowDebug] = useState<boolean>(() => {
+    try { return localStorage.getItem('procedural-art-show-debug') === '1'; } catch { return false; }
+  });
   const shuffleTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeEffectsRef = useRef<string[]>(activeEffects);
@@ -143,6 +146,14 @@ export function App() {
     setTick((t) => t + 1);
   }, []);
 
+  const toggleDebug = useCallback(() => {
+    setShowDebug((v) => {
+      const next = !v;
+      try { localStorage.setItem('procedural-art-show-debug', next ? '1' : '0'); } catch { /* ignore */ }
+      return next;
+    });
+  }, []);
+
   // Shuffle mode — auto-cycle effects
   const toggleShuffle = useCallback(() => {
     setShuffleActive((active) => {
@@ -179,7 +190,7 @@ export function App() {
         <ErrorBoundary>
           <Canvas onPipelineReady={onPipelineReady} />
         </ErrorBoundary>
-        <InputDebugOverlay pipeline={pipeline} />
+        <InputDebugOverlay pipeline={pipeline} visible={showDebug} />
         <button className="menu-toggle" onClick={toggleSidebar} aria-label="Toggle menu">
           {sidebarOpen ? '\u2715' : '\u2630'}
         </button>
@@ -189,6 +200,13 @@ export function App() {
         <div className="sidebar-header">
           <h1>Procedural Art</h1>
           <div className="header-actions">
+            <button
+              className={`btn header-btn ${showDebug ? 'btn-active' : ''}`}
+              onClick={toggleDebug}
+              title="Toggle FPS / debug overlay"
+            >
+              Debug
+            </button>
             <button
               className="btn header-btn"
               onClick={handleReset}
