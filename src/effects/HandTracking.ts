@@ -186,6 +186,15 @@ export class HandTracking {
       this.currentLandmarks = result.landmarks ?? [];
     }
 
+    // Compute video cover-fit transform (used for video draw AND landmark mapping)
+    const vw = this.video?.videoWidth || 640;
+    const vh = this.video?.videoHeight || 480;
+    const scale = Math.max(this.w / vw, this.h / vh);
+    const dw = vw * scale;
+    const dh = vh * scale;
+    const dx = (this.w - dw) / 2;
+    const dy = (this.h - dh) / 2;
+
     // Draw video frame
     if (showVideo && this.video) {
       c.save();
@@ -194,14 +203,6 @@ export class HandTracking {
         c.translate(this.w, 0);
         c.scale(-1, 1);
       }
-      // Cover-fit the video to canvas
-      const vw = this.video.videoWidth || 640;
-      const vh = this.video.videoHeight || 480;
-      const scale = Math.max(this.w / vw, this.h / vh);
-      const dw = vw * scale;
-      const dh = vh * scale;
-      const dx = (this.w - dw) / 2;
-      const dy = (this.h - dh) / 2;
       c.drawImage(this.video, dx, dy, dw, dh);
       c.restore();
     }
@@ -209,13 +210,15 @@ export class HandTracking {
     // Draw hand skeletons with neon rainbow
     const t = ctx.time * colorSpeed;
 
-    // Project all hands to canvas space
+    // Project all hands to canvas space using SAME cover-fit transform as video
+    // MediaPipe landmarks are in video-frame normalized coords (0..1 of video)
     const allHands = this.currentLandmarks
       .filter((h) => h && h.length >= 21)
       .map((hand) =>
         hand.map((lm) => {
-          let px = lm.x * this.w;
-          const py = lm.y * this.h;
+          // Scale to video rect on canvas
+          let px = dx + lm.x * dw;
+          const py = dy + lm.y * dh;
           if (mirror) px = this.w - px;
           return { x: px, y: py, z: lm.z };
         }),
@@ -288,7 +291,7 @@ export class HandTracking {
     let orbCx = 0, orbCy = 0, orbRadius = 0, orbIntensity = 0, orbHue = 0;
     let hasOrb = false;
 
-    if (allHands.length >= 2) {
+    if (allHands.length >= 2 && orbSize > 0) {
       const c1 = allHands[0]![9]!;
       const c2 = allHands[1]![9]!;
       orbCx = (c1.x + c2.x) * 0.5;
@@ -304,7 +307,14 @@ export class HandTracking {
       orbRadius = orbSize * distFactor * pulse;
       orbIntensity = Math.min(2.5, distFactor); // used for glow & beam push
       orbHue = (t * 0.3) % 1;
-      hasOrb = orbSize > 0;
+      hasOrb = true;
+    }
+
+    // === Render orb FIRST (behind beams) ===
+    // This makes the beams appear to wrap in front of the orb, simulating
+    // the orb sitting "inside" the volume defined by the beams.
+    if (hasOrb) {
+      this.drawOrb(c, orbCx, orbCy, orbRadius, orbIntensity, orbHue, orbGlow, saturation);
     }
 
     // === Inter-hand beams (bow outward, pushed by the orb) ===
@@ -408,50 +418,47 @@ export class HandTracking {
       }
     }
 
-    // === Central glowing orb between the hands (rendered last, on top) ===
-    if (hasOrb) {
-      const cx = orbCx;
-      const cy = orbCy;
-      const r = orbRadius;
-      // Glow radius scales with intensity — much larger when hands spread
-      const glowR = (orbGlow * (0.7 + orbIntensity * 0.8));
-
-      // Intensity-boosted alpha for outer gradient
-      const alphaBoost = Math.min(1, 0.3 + orbIntensity * 0.5);
-
-      const grad = c.createRadialGradient(cx, cy, 0, cx, cy, r + glowR);
-      grad.addColorStop(0, this.hsla(orbHue * 360, saturation, 0.95, 1));
-      grad.addColorStop(0.12, this.hsla(orbHue * 360, saturation, 0.75, alphaBoost));
-      grad.addColorStop(0.35, this.hsla(((orbHue + 0.1) % 1) * 360, saturation, 0.55, alphaBoost * 0.6));
-      grad.addColorStop(0.7, this.hsla(((orbHue + 0.2) % 1) * 360, saturation, 0.4, alphaBoost * 0.2));
-      grad.addColorStop(1, this.hsla(((orbHue + 0.3) % 1) * 360, saturation, 0.3, 0));
-
-      c.shadowBlur = 0;
-      c.globalCompositeOperation = 'lighter';
-      c.fillStyle = grad;
-      c.beginPath();
-      c.arc(cx, cy, r + glowR, 0, Math.PI * 2);
-      c.fill();
-
-      // Bright core — scales with intensity
-      const coreR = r * (0.45 + orbIntensity * 0.15);
-      const coreGrad = c.createRadialGradient(cx, cy, 0, cx, cy, coreR);
-      coreGrad.addColorStop(0, `rgba(255, 255, 255, ${Math.min(1, 0.8 + orbIntensity * 0.2)})`);
-      coreGrad.addColorStop(0.5, this.hsla(orbHue * 360, saturation * 0.5, 0.95, 0.8));
-      coreGrad.addColorStop(1, this.hsla(orbHue * 360, saturation, 0.6, 0));
-      c.fillStyle = coreGrad;
-      c.beginPath();
-      c.arc(cx, cy, coreR, 0, Math.PI * 2);
-      c.fill();
-
-      c.globalCompositeOperation = 'source-over';
-    }
-
     // Reset shadow
     c.shadowBlur = 0;
 
     // Upload to GL and draw
     this.uploadAndBlit(gl);
+  }
+
+  private drawOrb(
+    c: CanvasRenderingContext2D,
+    cx: number, cy: number, r: number, intensity: number,
+    hue: number, orbGlow: number, saturation: number,
+  ): void {
+    const glowR = orbGlow * (0.7 + intensity * 0.8);
+    const alphaBoost = Math.min(1, 0.3 + intensity * 0.5);
+
+    const grad = c.createRadialGradient(cx, cy, 0, cx, cy, r + glowR);
+    grad.addColorStop(0, this.hsla(hue * 360, saturation, 0.95, 1));
+    grad.addColorStop(0.12, this.hsla(hue * 360, saturation, 0.75, alphaBoost));
+    grad.addColorStop(0.35, this.hsla(((hue + 0.1) % 1) * 360, saturation, 0.55, alphaBoost * 0.6));
+    grad.addColorStop(0.7, this.hsla(((hue + 0.2) % 1) * 360, saturation, 0.4, alphaBoost * 0.2));
+    grad.addColorStop(1, this.hsla(((hue + 0.3) % 1) * 360, saturation, 0.3, 0));
+
+    c.shadowBlur = 0;
+    c.globalCompositeOperation = 'lighter';
+    c.fillStyle = grad;
+    c.beginPath();
+    c.arc(cx, cy, r + glowR, 0, Math.PI * 2);
+    c.fill();
+
+    // Bright core
+    const coreR = r * (0.45 + intensity * 0.15);
+    const coreGrad = c.createRadialGradient(cx, cy, 0, cx, cy, coreR);
+    coreGrad.addColorStop(0, `rgba(255, 255, 255, ${Math.min(1, 0.8 + intensity * 0.2)})`);
+    coreGrad.addColorStop(0.5, this.hsla(hue * 360, saturation * 0.5, 0.95, 0.8));
+    coreGrad.addColorStop(1, this.hsla(hue * 360, saturation, 0.6, 0));
+    c.fillStyle = coreGrad;
+    c.beginPath();
+    c.arc(cx, cy, coreR, 0, Math.PI * 2);
+    c.fill();
+
+    c.globalCompositeOperation = 'source-over';
   }
 
   private hsla(h: number, s: number, l: number, a: number): string {

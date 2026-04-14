@@ -135,13 +135,9 @@ export class OrganicVines {
   }
 
   private resetCanvas(): void {
-    const ctx = this.ctx2d!;
-    if (this.bgColor === 'rgba(0,0,0,0)') {
-      ctx.clearRect(0, 0, this.w, this.h);
-    } else {
-      ctx.fillStyle = this.bgColor;
-      ctx.fillRect(0, 0, this.w, this.h);
-    }
+    // Canvas is ALWAYS cleared to transparent. Background color is applied
+    // at blit time via the shader (so toggling transparentBg doesn't lose progress).
+    this.ctx2d!.clearRect(0, 0, this.w, this.h);
     this.pixelsCovered = 0;
     this.densityGrid.fill(0);
   }
@@ -615,7 +611,7 @@ export class OrganicVines {
     gl.uniform1i(this.blitTexLoc, 0);
 
     // Unit 1: the input texture from previous effect (if any)
-    if (inputTex && transparentBg) {
+    if (inputTex) {
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, inputTex);
       gl.uniform1i(this.blitInputLoc, 1);
@@ -623,6 +619,10 @@ export class OrganicVines {
     } else {
       gl.uniform1i(this.blitHasInputLoc, 0);
     }
+
+    gl.uniform1i(this.blitTransparentLoc, transparentBg ? 1 : 0);
+    const [br, bg2, bb] = this.bgColorRGB();
+    gl.uniform3f(this.blitBgColorLoc, br, bg2, bb);
 
     gl.bindVertexArray(this.blitVAO);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -634,6 +634,8 @@ export class OrganicVines {
   private blitTexLoc: WebGLUniformLocation | null = null;
   private blitInputLoc: WebGLUniformLocation | null = null;
   private blitHasInputLoc: WebGLUniformLocation | null = null;
+  private blitTransparentLoc: WebGLUniformLocation | null = null;
+  private blitBgColorLoc: WebGLUniformLocation | null = null;
   private blitVAO: WebGLVertexArrayObject | null = null;
 
   private initBlit(gl: WebGL2RenderingContext): void {
@@ -646,17 +648,26 @@ export class OrganicVines {
     uniform sampler2D uTex;
     uniform sampler2D uInput;
     uniform int uHasInput;
+    uniform int uTransparent;
+    uniform vec3 uBgColor;
     in vec2 vUv;
     out vec4 fragColor;
     void main() {
+      // 'top' is the vine canvas (always transparent RGBA now)
       vec4 top = texture(uTex, vUv);
-      if (uHasInput == 1) {
-        // Standard over compositing: result = top + bg*(1-top.a)
-        vec4 bg = texture(uInput, vUv);
-        fragColor = vec4(top.rgb + bg.rgb * (1.0 - top.a), 1.0);
+      // Source-over: result.rgb = top.rgb + backdrop.rgb * (1 - top.a)
+      vec3 backdrop;
+      if (uTransparent == 1 && uHasInput == 1) {
+        // Composite over the previous effect
+        backdrop = texture(uInput, vUv).rgb;
       } else {
-        fragColor = top;
+        // Composite over a solid bg color (either the palette bg, or black if none)
+        backdrop = uBgColor;
       }
+      vec3 rgb = top.rgb + backdrop * (1.0 - top.a);
+      // Output alpha: 1 if opaque mode, or preserve if transparent (for chaining)
+      float alpha = (uTransparent == 1 && uHasInput == 0) ? top.a : 1.0;
+      fragColor = vec4(rgb, alpha);
     }`;
 
     const compile = (type: number, src: string) => {
@@ -673,7 +684,22 @@ export class OrganicVines {
     this.blitTexLoc = gl.getUniformLocation(p, 'uTex');
     this.blitInputLoc = gl.getUniformLocation(p, 'uInput');
     this.blitHasInputLoc = gl.getUniformLocation(p, 'uHasInput');
+    this.blitTransparentLoc = gl.getUniformLocation(p, 'uTransparent');
+    this.blitBgColorLoc = gl.getUniformLocation(p, 'uBgColor');
     this.blitVAO = gl.createVertexArray()!;
+  }
+
+  /** Parse the bgColor string into RGB floats (0-1) for the shader */
+  private bgColorRGB(): [number, number, number] {
+    const c = this.bgColor;
+    if (c === 'rgba(0,0,0,0)') return [0, 0, 0];
+    if (c.startsWith('#')) {
+      const r = parseInt(c.slice(1, 3), 16) / 255;
+      const g = parseInt(c.slice(3, 5), 16) / 255;
+      const b = parseInt(c.slice(5, 7), 16) / 255;
+      return [r, g, b];
+    }
+    return [0, 0, 0];
   }
 
   dispose(): void {
