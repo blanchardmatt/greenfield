@@ -7,6 +7,7 @@ import { Toolbar } from './ui/Toolbar';
 import { InputDebugOverlay } from './ui/InputDebugOverlay';
 import { ErrorBoundary } from './ui/ErrorBoundary';
 import { CollapsibleSection } from './ui/CollapsibleSection';
+import { PopoutWindow } from './ui/PopoutWindow';
 import type { RenderPipeline } from './core/RenderPipeline';
 import type { ParameterValue } from './core/types';
 import { getEffectIds } from './effects';
@@ -56,6 +57,7 @@ export function App() {
   const [showDebug, setShowDebug] = useState<boolean>(() => {
     try { return localStorage.getItem('procedural-art-show-debug') === '1'; } catch { return false; }
   });
+  const [popoutOpen, setPopoutOpen] = useState(false);
   const shuffleTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeEffectsRef = useRef<string[]>(activeEffects);
@@ -184,6 +186,77 @@ export function App() {
 
   const pipeline = pipelineRef.current;
 
+  const sidebarContents = (
+    <>
+      <div className="sidebar-header">
+        <h1>Procedural Art</h1>
+        <div className="header-actions">
+          <button
+            className={`btn header-btn ${showDebug ? 'btn-active' : ''}`}
+            onClick={toggleDebug}
+            title="Toggle FPS / debug overlay"
+          >
+            Debug
+          </button>
+          <button
+            className="btn header-btn"
+            onClick={handleReset}
+            title="Reset all layer state (clears canvases, particles, feedback) without changing the chain or parameters"
+          >
+            Reset
+          </button>
+          <button
+            className={`btn header-btn ${shuffleActive ? 'btn-active' : ''}`}
+            onClick={toggleShuffle}
+            title="Auto-cycle through effects"
+          >
+            {shuffleActive ? 'Stop' : 'Shuffle'}
+          </button>
+          <button className="btn header-btn" onClick={handleShare} title="Copy shareable link">
+            Share
+          </button>
+          <button
+            className={`btn header-btn ${popoutOpen ? 'btn-active' : ''}`}
+            onClick={() => setPopoutOpen((v) => !v)}
+            title={popoutOpen ? 'Close pop-out window' : 'Open parameters in a separate window'}
+          >
+            {popoutOpen ? 'Dock' : 'Pop out'}
+          </button>
+        </div>
+      </div>
+      <CollapsibleSection title="Effect" defaultOpen>
+        <EffectSelector
+          activeEffects={activeEffects}
+          onChange={handleEffectChange}
+          focusedEffect={focusedEffect}
+          onFocusEffect={setFocusedEffect}
+        />
+      </CollapsibleSection>
+      {pipeline && (
+        <CollapsibleSection title="Parameters" defaultOpen>
+          <ParameterPanel
+            parameterStore={pipeline.parameterStore}
+            focusedEffectId={focusedEffect}
+          />
+        </CollapsibleSection>
+      )}
+      {pipeline && (
+        <CollapsibleSection title="Inputs & Export" defaultOpen={false}>
+          <Toolbar pipeline={pipeline} />
+        </CollapsibleSection>
+      )}
+      {pipeline && (
+        <CollapsibleSection title="Presets" defaultOpen={false}>
+          <PresetBar
+            pipeline={pipeline}
+            activeEffects={activeEffects}
+            onLoadPreset={handleEffectChange}
+          />
+        </CollapsibleSection>
+      )}
+    </>
+  );
+
   return (
     <div className="app">
       <div className="canvas-area">
@@ -195,68 +268,23 @@ export function App() {
           {sidebarOpen ? '\u2715' : '\u2630'}
         </button>
       </div>
-      {sidebarOpen && <div className="sidebar-backdrop" onClick={toggleSidebar} />}
-      <div className={`sidebar ${sidebarOpen ? 'sidebar--open' : ''}`}>
-        <div className="sidebar-header">
-          <h1>Procedural Art</h1>
-          <div className="header-actions">
-            <button
-              className={`btn header-btn ${showDebug ? 'btn-active' : ''}`}
-              onClick={toggleDebug}
-              title="Toggle FPS / debug overlay"
-            >
-              Debug
-            </button>
-            <button
-              className="btn header-btn"
-              onClick={handleReset}
-              title="Reset all layer state (clears canvases, particles, feedback) without changing the chain or parameters"
-            >
-              Reset
-            </button>
-            <button
-              className={`btn header-btn ${shuffleActive ? 'btn-active' : ''}`}
-              onClick={toggleShuffle}
-              title="Auto-cycle through effects"
-            >
-              {shuffleActive ? 'Stop' : 'Shuffle'}
-            </button>
-            <button className="btn header-btn" onClick={handleShare} title="Copy shareable link">
-              Share
-            </button>
-          </div>
+      {sidebarOpen && !popoutOpen && <div className="sidebar-backdrop" onClick={toggleSidebar} />}
+      {/* When popped out, hide the docked sidebar */}
+      {!popoutOpen && (
+        <div className={`sidebar ${sidebarOpen ? 'sidebar--open' : ''}`}>
+          {sidebarContents}
         </div>
-        <CollapsibleSection title="Effect" defaultOpen>
-          <EffectSelector
-            activeEffects={activeEffects}
-            onChange={handleEffectChange}
-            focusedEffect={focusedEffect}
-            onFocusEffect={setFocusedEffect}
-          />
-        </CollapsibleSection>
-        {pipeline && (
-          <CollapsibleSection title="Parameters" defaultOpen>
-            <ParameterPanel
-              parameterStore={pipeline.parameterStore}
-              focusedEffectId={focusedEffect}
-            />
-          </CollapsibleSection>
-        )}
-        {pipeline && (
-          <CollapsibleSection title="Inputs & Export" defaultOpen={false}>
-            <Toolbar pipeline={pipeline} />
-          </CollapsibleSection>
-        )}
-        {pipeline && (
-          <CollapsibleSection title="Presets" defaultOpen={false}>
-            <PresetBar
-              pipeline={pipeline}
-              activeEffects={activeEffects}
-              onLoadPreset={handleEffectChange}
-            />
-          </CollapsibleSection>
-        )}
-      </div>
+      )}
+      {popoutOpen && (
+        <PopoutWindow
+          title="Procedural Art — Controls"
+          onClose={() => setPopoutOpen(false)}
+        >
+          <div className="sidebar sidebar--popout">
+            {sidebarContents}
+          </div>
+        </PopoutWindow>
+      )}
     </div>
   );
 }

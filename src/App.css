@@ -45,6 +45,14 @@ html, body, #root {
   touch-action: pan-y;
 }
 
+/* When mounted in a popout window, fill the entire window */
+.sidebar--popout {
+  width: 100%;
+  min-width: 0;
+  height: 100vh;
+  border-left: none;
+}
+
 .sidebar-header {
   padding: 12px 16px;
   border-bottom: 1px solid #2a2a3a;

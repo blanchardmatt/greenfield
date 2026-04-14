@@ -5,7 +5,8 @@ const DESCRIPTOR: EffectNodeDescriptor = {
   name: 'Text Mask',
   description: 'Use text as a window revealing the input layer beneath',
   parameters: [
-    { id: 'text', type: 'string', label: 'Text', default: 'WONDER', placeholder: 'Type here…', group: 'Content' },
+    { id: 'text', type: 'string', label: 'Text', default: 'WONDER', placeholder: 'Type here\u2026 (Enter for new line)', multiline: true, group: 'Content' },
+    { id: 'lineHeight', type: 'float', label: 'Line Height', min: 0.6, max: 2.5, step: 0.05, default: 1.1, group: 'Content' },
     { id: 'fontFamily', type: 'enum', label: 'Font', options: [
       { value: 'system-ui, sans-serif', label: 'Sans' },
       { value: 'Georgia, serif', label: 'Serif' },
@@ -121,6 +122,7 @@ export class TextMask {
     const text = (params.text as string) || '';
     const fontFamily = params.fontFamily as string;
     const fontSize = params.fontSize as number;
+    const lineHeight = (params.lineHeight as number) ?? 1.1;
     const invertMask = params.invertMask as boolean;
     const animSpeed = params.animSpeed as number;
     const panAmplitude = params.panAmplitude as number;
@@ -144,7 +146,22 @@ export class TextMask {
         c.shadowColor = '#fff';
         c.shadowBlur = feather;
       }
-      c.fillText(text, posX * this.w + panX, posY * this.h + panY);
+      // Use alphabetic baseline + measured metrics for accurate centering
+      c.textBaseline = 'alphabetic';
+      const lines = text.split('\n');
+      const widest = lines.reduce((a, b) => (a.length >= b.length ? a : b));
+      const metrics = c.measureText(widest || 'M');
+      const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
+      const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
+      const lineHeightPx = ascent + descent;
+      const lineGap = lineHeightPx * lineHeight;
+      const totalH = (lines.length - 1) * lineGap + lineHeightPx;
+      const cx = posX * this.w + panX;
+      const topY = posY * this.h + panY - totalH / 2;
+      const firstBaselineY = topY + ascent;
+      for (let i = 0; i < lines.length; i++) {
+        c.fillText(lines[i]!, cx, firstBaselineY + i * lineGap);
+      }
       c.shadowBlur = 0;
     }
 

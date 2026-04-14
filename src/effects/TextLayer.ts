@@ -5,7 +5,8 @@ const DESCRIPTOR: EffectNodeDescriptor = {
   name: 'Text Layer',
   description: 'Animated typography with warping, glow, glitch, and marquee modes',
   parameters: [
-    { id: 'text', type: 'string', label: 'Text', default: 'PROCEDURAL', placeholder: 'Type here…', group: 'Content' },
+    { id: 'text', type: 'string', label: 'Text', default: 'PROCEDURAL', placeholder: 'Type here\u2026 (Enter for new line)', multiline: true, group: 'Content' },
+    { id: 'lineHeight', type: 'float', label: 'Line Height', min: 0.6, max: 2.5, step: 0.05, default: 1.1, group: 'Content' },
     { id: 'fontFamily', type: 'enum', label: 'Font', options: [
       { value: 'system-ui, sans-serif', label: 'Sans' },
       { value: 'Georgia, serif', label: 'Serif' },
@@ -127,11 +128,31 @@ export class TextLayer {
     c.textBaseline = 'middle';
     c.textAlign = 'center';
 
-    // Compute char positions for per-character animation
-    const chars = Array.from(text);
-    // Measure each char width with letterSpacing
-    const widths = chars.map((ch) => c.measureText(ch).width + letterSpacing);
-    const totalW = widths.reduce((a, b) => a + b, 0) - letterSpacing;
+    const lineHeight = (params.lineHeight as number) ?? 1.1;
+
+    // Split into lines and pre-compute each line's chars + widths + total
+    const lines = text.split('\n');
+    const lineData = lines.map((line) => {
+      const chars = Array.from(line);
+      const widths = chars.map((ch) => c.measureText(ch).width + letterSpacing);
+      const totalW = widths.length === 0 ? 0 : widths.reduce((a, b) => a + b, 0) - letterSpacing;
+      return { chars, widths, totalW };
+    });
+    // Use measured ascent+descent for accurate line height (avoids descender clipping for tall fonts like Impact)
+    const widestLine = lines.reduce((a, b) => (a.length >= b.length ? a : b));
+    const metrics = c.measureText(widestLine || 'M');
+    const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
+    const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
+    const measuredLineHeight = ascent + descent;
+    const lineGap = measuredLineHeight * lineHeight;
+    // Total chars across all lines (for typewriter & glitch indexing)
+    const totalChars = lineData.reduce((a, l) => a + l.chars.length, 0);
+    // Block centering offset so multi-line text is centered around posY,
+    // accounting for ascent/descent asymmetry so it doesn't clip
+    const blockHeight = (lines.length - 1) * lineGap;
+    // Line center offset: shift down by (ascent - descent)/2 so middle baseline lines up with the visual center
+    const visualCenterShift = (descent - ascent) / 2;
+    const startYOffset = -blockHeight / 2 + visualCenterShift;
 
     const baseX = posX * this.w;
     const baseY = posY * this.h;
@@ -141,22 +162,15 @@ export class TextLayer {
     c.rotate(rotation);
     c.globalAlpha = opacity;
 
-    // Marquee: shift the whole row horizontally based on time
-    let scrollX = 0;
-    if (mode === 'marquee') {
-      const scrollDist = totalW + this.w;
-      scrollX = ((this.w / 2 + totalW / 2) - ((t * 80) % scrollDist));
-    }
-
-    // Typewriter: limit visible chars
-    let visibleCount = chars.length;
+    // Typewriter: limit visible chars across the whole multi-line block
+    let visibleCount = totalChars;
     if (mode === 'typewriter') {
-      const cycle = chars.length + 8;
-      visibleCount = Math.min(chars.length, Math.floor((t * 5) % cycle));
+      const cycle = totalChars + 8;
+      visibleCount = Math.min(totalChars, Math.floor((t * 5) % cycle));
     }
 
     // Helper to render a single char with all the styling
-    const drawChar = (ch: string, cx: number, cy: number, charIdx: number) => {
+    const drawChar = (ch: string, cx: number, cy: number, charIdx: number, lineCharCount: number) => {
       // Glow
       if (glow > 0) {
         c.shadowColor = this.rgbaToCss(color1, 1);
@@ -168,7 +182,7 @@ export class TextLayer {
       // Color
       let fillCss: string | CanvasGradient;
       if (fillStyle === 'rainbow') {
-        const hue = ((charIdx / Math.max(1, chars.length)) + t * 0.1) % 1;
+        const hue = ((charIdx / Math.max(1, lineCharCount)) + t * 0.1) % 1;
         fillCss = `hsl(${hue * 360}, 80%, 60%)`;
       } else if (fillStyle === 'gradient') {
         const grad = c.createLinearGradient(0, -fontSize * 0.5, 0, fontSize * 0.5);
@@ -190,7 +204,6 @@ export class TextLayer {
         c.fillStyle = `rgba(60, 80, 255, 0.7)`;
         c.fillText(ch, cx - chromatic, cy);
         c.globalCompositeOperation = 'source-over';
-        // Re-enable shadow for stroke pass below
         if (glow > 0) {
           c.shadowColor = this.rgbaToCss(color1, 1);
           c.shadowBlur = glow;
@@ -208,52 +221,70 @@ export class TextLayer {
       }
     };
 
-    // Glitch: occasionally substitute random chars + offset
-    const glitchOffsets: Array<{ dx: number; dy: number; sub: string | null }> = [];
-    if (mode === 'glitch') {
-      const glitchChars = '!@#$%^&*▓█▒░│▌▐';
+    let globalCharIdx = 0;
+    let drawnSoFar = 0;
+
+    for (let li = 0; li < lineData.length; li++) {
+      const { chars, widths, totalW } = lineData[li]!;
+      const lineY = startYOffset + li * lineGap;
+
+      // Marquee: shift this line horizontally based on time
+      let scrollX = 0;
+      if (mode === 'marquee') {
+        const scrollDist = totalW + this.w;
+        scrollX = ((this.w / 2 + totalW / 2) - ((t * 80 + li * 200) % scrollDist));
+      }
+
+      // Glitch offsets per char in this line
+      const glitchOffsets: Array<{ dx: number; dy: number; sub: string | null }> = [];
+      if (mode === 'glitch') {
+        const glitchChars = '!@#$%^&*▓█▒░│▌▐';
+        for (let i = 0; i < chars.length; i++) {
+          const intensity = 0.3 + Math.sin(t * 4 + globalCharIdx + i) * 0.5;
+          const glitch = Math.random() < intensity * 0.05;
+          glitchOffsets.push({
+            dx: glitch ? (Math.random() - 0.5) * amplitude * 0.5 : 0,
+            dy: glitch ? (Math.random() - 0.5) * amplitude * 0.5 : 0,
+            sub: glitch ? glitchChars[Math.floor(Math.random() * glitchChars.length)]! : null,
+          });
+        }
+      }
+
+      let cursorX = scrollX - totalW / 2;
       for (let i = 0; i < chars.length; i++) {
-        const intensity = 0.3 + Math.sin(t * 4 + i) * 0.5;
-        const glitch = Math.random() < intensity * 0.05;
-        glitchOffsets.push({
-          dx: glitch ? (Math.random() - 0.5) * amplitude * 0.5 : 0,
-          dy: glitch ? (Math.random() - 0.5) * amplitude * 0.5 : 0,
-          sub: glitch ? glitchChars[Math.floor(Math.random() * glitchChars.length)]! : null,
-        });
-      }
-    }
+        if (drawnSoFar >= visibleCount) break;
+        const ch = chars[i]!;
+        const w = widths[i]!;
+        const charCx = cursorX + w / 2;
+        let charCy = lineY;
 
-    let cursorX = scrollX - totalW / 2;
-    for (let i = 0; i < chars.length; i++) {
-      if (i >= visibleCount) break;
-      const ch = chars[i]!;
-      const w = widths[i]!;
-      const charCx = cursorX + w / 2;
-      let charCy = 0;
+        if (mode === 'wave') {
+          charCy = lineY + Math.sin(t * 3 + (globalCharIdx + i) * 0.5) * amplitude;
+        } else if (mode === 'pulse') {
+          const scale = 1.0 + Math.sin(t * 4 + (globalCharIdx + i) * 0.4) * (amplitude * 0.01);
+          c.save();
+          c.translate(charCx, lineY);
+          c.scale(scale, scale);
+          drawChar(ch, 0, 0, globalCharIdx + i, chars.length);
+          c.restore();
+          cursorX += w;
+          drawnSoFar++;
+          continue;
+        } else if (mode === 'glitch') {
+          const g = glitchOffsets[i]!;
+          const sub = g.sub ?? ch;
+          drawChar(sub, charCx + g.dx, lineY + g.dy, globalCharIdx + i, chars.length);
+          cursorX += w;
+          drawnSoFar++;
+          continue;
+        }
 
-      // Per-char animation
-      if (mode === 'wave') {
-        charCy = Math.sin(t * 3 + i * 0.5) * amplitude;
-      } else if (mode === 'pulse') {
-        const scale = 1.0 + Math.sin(t * 4 + i * 0.4) * (amplitude * 0.01);
-        c.save();
-        c.translate(charCx, charCy);
-        c.scale(scale, scale);
-        const sub = chars[i]!;
-        drawChar(sub, 0, 0, i);
-        c.restore();
+        drawChar(ch, charCx, charCy, globalCharIdx + i, chars.length);
         cursorX += w;
-        continue;
-      } else if (mode === 'glitch') {
-        const g = glitchOffsets[i]!;
-        const sub = g.sub ?? ch;
-        drawChar(sub, charCx + g.dx, charCy + g.dy, i);
-        cursorX += w;
-        continue;
+        drawnSoFar++;
       }
-
-      drawChar(ch, charCx, charCy, i);
-      cursorX += w;
+      globalCharIdx += chars.length;
+      if (drawnSoFar >= visibleCount) break;
     }
 
     c.restore();

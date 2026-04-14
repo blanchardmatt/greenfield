@@ -14,7 +14,8 @@ const DESCRIPTOR: EffectNodeDescriptor = {
   name: 'Kinetic Type',
   description: 'Text rendered as a swarm of particles that scatter and reassemble',
   parameters: [
-    { id: 'text', type: 'string', label: 'Text', default: 'HELLO', placeholder: 'Type here…', group: 'Content' },
+    { id: 'text', type: 'string', label: 'Text', default: 'HELLO', placeholder: 'Type here\u2026 (Enter for new line)', multiline: true, group: 'Content' },
+    { id: 'lineHeight', type: 'float', label: 'Line Height', min: 0.6, max: 2.5, step: 0.05, default: 1.1, group: 'Content' },
     { id: 'fontFamily', type: 'enum', label: 'Font', options: [
       { value: 'system-ui, sans-serif', label: 'Sans' },
       { value: 'Georgia, serif', label: 'Serif' },
@@ -104,14 +105,30 @@ export class KineticType {
     this.lastTextKey = ''; // force resample
   }
 
-  private resampleTextPoints(text: string, fontFamily: string, fontSize: number): void {
+  private resampleTextPoints(text: string, fontFamily: string, fontSize: number, lineHeight: number): void {
     const c = this.textCtx!;
     c.clearRect(0, 0, this.w, this.h);
     c.fillStyle = 'white';
     c.font = `${fontSize}px ${fontFamily}`;
     c.textAlign = 'center';
-    c.textBaseline = 'middle';
-    c.fillText(text, this.w / 2, this.h / 2);
+    // Use alphabetic baseline + measured ascent/descent for accurate centering
+    // (textBaseline='middle' clips descenders for tall fonts like Impact).
+    c.textBaseline = 'alphabetic';
+    const lines = text.split('\n');
+    // Use the widest line to get representative metrics
+    const widest = lines.reduce((a, b) => (a.length >= b.length ? a : b));
+    const metrics = c.measureText(widest || 'M');
+    const ascent = metrics.actualBoundingBoxAscent || fontSize * 0.8;
+    const descent = metrics.actualBoundingBoxDescent || fontSize * 0.2;
+    const lineHeightPx = ascent + descent;
+    const lineGap = lineHeightPx * lineHeight;
+    const totalH = (lines.length - 1) * lineGap + lineHeightPx;
+    const topY = this.h / 2 - totalH / 2;
+    const firstBaselineY = topY + ascent;
+    const cx = this.w / 2;
+    for (let i = 0; i < lines.length; i++) {
+      c.fillText(lines[i]!, cx, firstBaselineY + i * lineGap);
+    }
 
     if (this.w === 0 || this.h === 0) return;
     const data = c.getImageData(0, 0, this.w, this.h).data;
@@ -259,9 +276,10 @@ export class KineticType {
     const text = (params.text as string) || '';
     const fontFamily = params.fontFamily as string;
     const fontSize = params.fontSize as number;
-    const key = `${text}|${fontFamily}|${fontSize}|${this.w}|${this.h}`;
+    const lineHeight = (params.lineHeight as number) ?? 1.1;
+    const key = `${text}|${fontFamily}|${fontSize}|${lineHeight}|${this.w}|${this.h}`;
     if (key !== this.lastTextKey) {
-      this.resampleTextPoints(text, fontFamily, fontSize);
+      this.resampleTextPoints(text, fontFamily, fontSize, lineHeight);
       this.lastTextKey = key;
     }
 
