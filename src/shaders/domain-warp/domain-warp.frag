@@ -18,6 +18,7 @@ uniform int u_patternMode;
 
 uniform sampler2D u_inputTexture;
 uniform int u_hasInput;
+uniform float u_warpInput;
 
 out vec4 fragColor;
 
@@ -123,17 +124,27 @@ void main() {
     // Apply domain warping
     vec2 warped = domainWarp(p, t, mouseUV);
 
-    // Evaluate pattern at warped coordinates
-    vec3 color = evaluatePattern(warped, t);
-    color *= u_brightness;
+    // Evaluate the synthetic pattern at warped coordinates
+    vec3 patternColor = evaluatePattern(warped, t);
+    patternColor *= u_brightness;
 
     // Vignette
     float vig = 1.0 - length(uv - 0.5) * 0.6;
-    color *= vig;
+    patternColor *= vig;
 
+    vec3 color = patternColor;
     if (u_hasInput == 1) {
-        vec4 inputColor = texture(u_inputTexture, uv);
-        color = mix(inputColor.rgb, color, 0.75);
+        // Compute a UV offset from the difference between warped and unwarped
+        // domain coords. Scale back to UV space (was multiplied by u_warpScale earlier).
+        vec2 warpOffset = (warped - p) / u_warpScale * 0.5;
+        // Sample the input texture at warped UVs — this distorts the actual image
+        vec2 warpedUv = clamp(uv + warpOffset, vec2(0.0), vec2(1.0));
+        vec3 warpedInput = texture(u_inputTexture, warpedUv).rgb;
+        // u_warpInput controls the mix:
+        //   1.0 = pure warped image (no synthetic pattern)
+        //   0.0 = synthetic pattern blended with raw input (legacy behavior)
+        vec3 blendedSynthetic = mix(texture(u_inputTexture, uv).rgb, patternColor, 0.75);
+        color = mix(blendedSynthetic, warpedInput, u_warpInput);
     }
 
     fragColor = vec4(color, 1.0);

@@ -23,6 +23,7 @@ const DESCRIPTOR: EffectNodeDescriptor = {
     { id: 'glowAmount', type: 'float', label: 'Glow', min: 0, max: 2, step: 0.01, default: 0.5, group: 'Color' },
     { id: 'brightness', type: 'float', label: 'Brightness', min: 0.2, max: 2, step: 0.01, default: 1.0, group: 'Color' },
     { id: 'mouseInfluence', type: 'float', label: 'Mouse Influence', min: 0, max: 3, step: 0.01, default: 1.0, group: 'Interaction' },
+    { id: 'warpInput', type: 'float', label: 'Warp Input Image', min: 0, max: 1, step: 0.01, default: 1.0, group: 'Input' },
   ],
   inputs: [{ id: 'input0', label: 'Background', type: 'texture' }],
   outputs: [{ id: 'output0', label: 'Result', type: 'texture' }],
@@ -59,6 +60,7 @@ export class DomainWarpTunnel extends BaseEffect {
     s.setFloat('u_glowAmount', params.glowAmount as number);
     s.setFloat('u_brightness', params.brightness as number);
     s.setFloat('u_mouseInfluence', params.mouseInfluence as number);
+    s.setFloat('u_warpInput', params.warpInput as number);
 
     const inputTex = inputTextures.get('input0');
     if (inputTex) {
