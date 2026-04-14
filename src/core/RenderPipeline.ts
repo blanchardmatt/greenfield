@@ -35,16 +35,34 @@ export class RenderPipeline {
   }
 
   setEffectChain(effectIds: string[]): void {
-    // Dispose old effects
-    for (const effect of this.activeEffects) {
-      this.parameterStore.unregisterEffect(effect.descriptor.id);
-      effect.dispose();
+    // Smart diff: keep existing effect instances when their IDs are still in
+    // the chain, dispose only those that were removed, and create only newly
+    // added ones. Adding a new layer no longer resets prior layers.
+    const oldById = new Map<string, EffectNode>();
+    for (let i = 0; i < this.activeEffects.length; i++) {
+      oldById.set(this.activeIds[i]!, this.activeEffects[i]!);
     }
+    const newSet = new Set(effectIds);
+
+    // Dispose effects that aren't in the new chain
+    for (const [id, effect] of oldById) {
+      if (!newSet.has(id)) {
+        this.parameterStore.unregisterEffect(id);
+        effect.dispose();
+        oldById.delete(id);
+      }
+    }
+
+    // Build the new chain in order, reusing where possible
     this.activeEffects = [];
     this.activeIds = [];
-
-    // Create new effects
     for (const id of effectIds) {
+      const existing = oldById.get(id);
+      if (existing) {
+        this.activeEffects.push(existing);
+        this.activeIds.push(id);
+        continue;
+      }
       const factory = effectRegistry.get(id);
       if (!factory) {
         console.warn(`Unknown effect: ${id}`);
@@ -56,6 +74,43 @@ export class RenderPipeline {
       this.parameterStore.registerEffect(effect.descriptor.id, effect.descriptor);
       this.activeEffects.push(effect);
       this.activeIds.push(id);
+    }
+  }
+
+  /** Tear down and recreate ALL active effects. Use for a global reset:
+   *  vine canvases clear, particles reseed, feedback echo zeros, etc.
+   *  Parameter values are preserved. */
+  resetAll(): void {
+    if (this.activeEffects.length === 0) return;
+    // Snapshot params per effect (defaults will be replaced by recreated effect)
+    const snapshot: Record<string, ReturnType<typeof this.parameterStore.getValues>> = {};
+    for (const id of this.activeIds) {
+      snapshot[id] = this.parameterStore.getValues(id);
+    }
+    const ids = [...this.activeIds];
+    // Dispose everything
+    for (const effect of this.activeEffects) {
+      this.parameterStore.unregisterEffect(effect.descriptor.id);
+      effect.dispose();
+    }
+    this.activeEffects = [];
+    this.activeIds = [];
+    // Recreate from scratch
+    for (const id of ids) {
+      const factory = effectRegistry.get(id);
+      if (!factory) continue;
+      const effect = factory();
+      effect.init(this.gl);
+      effect.resize(this.width, this.height);
+      this.parameterStore.registerEffect(effect.descriptor.id, effect.descriptor);
+      this.activeEffects.push(effect);
+      this.activeIds.push(id);
+    }
+    // Restore params
+    for (const id of ids) {
+      if (snapshot[id]) {
+        this.parameterStore.setValues(id, snapshot[id]!);
+      }
     }
   }
 

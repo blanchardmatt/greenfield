@@ -136,6 +136,13 @@ export function App() {
     });
   }, [activeEffects]);
 
+  // Global reset — clear all layer state (vine canvases, particles, feedback
+  // history, etc.) but preserve the chain and parameter values.
+  const handleReset = useCallback(() => {
+    pipelineRef.current?.resetAll();
+    setTick((t) => t + 1);
+  }, []);
+
   // Shuffle mode — auto-cycle effects
   const toggleShuffle = useCallback(() => {
     setShuffleActive((active) => {
@@ -182,6 +189,13 @@ export function App() {
         <div className="sidebar-header">
           <h1>Procedural Art</h1>
           <div className="header-actions">
+            <button
+              className="btn header-btn"
+              onClick={handleReset}
+              title="Reset all layer state (clears canvases, particles, feedback) without changing the chain or parameters"
+            >
+              Reset
+            </button>
             <button
               className={`btn header-btn ${shuffleActive ? 'btn-active' : ''}`}
               onClick={toggleShuffle}

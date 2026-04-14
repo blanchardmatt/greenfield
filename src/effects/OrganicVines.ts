@@ -25,7 +25,7 @@ const DESCRIPTOR: EffectNodeDescriptor = {
       { value: 'random', label: 'Random (changes)' },
     ], default: 'mono-dark', group: 'Style' },
     { id: 'paletteChangeRate', type: 'float', label: 'Color Shift Rate', min: 0, max: 5, step: 0.05, default: 1.0, group: 'Style' },
-    { id: 'transparentBg', type: 'bool', label: 'Transparent BG', default: false, group: 'Style' },
+    { id: 'transparentBg', type: 'bool', label: 'Transparent BG', default: true, group: 'Style' },
     { id: 'lightSeeking', type: 'float', label: 'Seek Empty Space', min: 0, max: 2, step: 0.01, default: 0.8, group: 'Behavior' },
     { id: 'mouseAttract', type: 'float', label: 'Seek Mouse', min: 0, max: 2, step: 0.01, default: 0.6, group: 'Behavior' },
     { id: 'mouseInfluence', type: 'float', label: 'Touch Bend', min: 0, max: 1, step: 0.01, default: 0.3, group: 'Behavior' },
