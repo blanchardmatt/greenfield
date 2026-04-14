@@ -457,7 +457,7 @@ html, body, #root {
   font-size: 12px;
 }
 
-/* Menu Toggle Button */
+/* Menu Toggle Button — always visible so user can toggle sidebar at any size */
 .menu-toggle {
   position: absolute;
   top: 12px;
@@ -470,8 +470,8 @@ html, body, #root {
   border-radius: 8px;
   font-size: 20px;
   cursor: pointer;
-  z-index: 100;
-  display: none;
+  z-index: 250;
+  display: flex;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(4px);
@@ -500,12 +500,8 @@ html, body, #root {
   display: none;
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-  .menu-toggle {
-    display: flex;
-  }
-
+/* Mobile Responsive — triggers on narrow width OR short height (landscape phones) */
+@media (max-width: 768px), (max-height: 600px) {
   .sidebar {
     position: fixed;
     top: 0;
