@@ -292,12 +292,105 @@ html, body, #root {
   cursor: pointer;
 }
 
+/* Custom slider track with shift=fine, alt=coarse, click-value-to-edit */
+.slider-track {
+  flex: 1;
+  min-width: 0;
+  height: 16px;
+  position: relative;
+  cursor: ew-resize;
+  touch-action: none;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+}
+
+.slider-track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 4px;
+  margin-top: -2px;
+  background: #2a2a3a;
+  border-radius: 2px;
+}
+
+.slider-fill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 4px;
+  margin-top: -2px;
+  background: #5555cc;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.slider-thumb {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #8888ff;
+  border: 1px solid #aaaaff;
+  transform: translateX(-50%);
+  pointer-events: none;
+  box-shadow: 0 0 4px rgba(120, 120, 255, 0.4);
+  transition: background 0.1s;
+}
+
+.slider-track:hover .slider-thumb,
+.slider-track:focus .slider-thumb {
+  background: #aaaaff;
+}
+
+.slider-track:focus {
+  box-shadow: inset 0 0 0 1px #5555cc;
+  border-radius: 4px;
+}
+
 .param-value {
   flex: 0 0 42px;
   font-size: 11px;
   color: #888;
   text-align: right;
   font-family: 'SF Mono', Monaco, 'Fira Code', monospace;
+}
+
+.param-value--clickable {
+  cursor: text;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: background 0.1s, color 0.1s;
+}
+
+.param-value--clickable:hover {
+  background: #1a1a25;
+  color: #ddd;
+}
+
+.param-value-input {
+  flex: 0 0 56px;
+  font-size: 11px;
+  color: #fff;
+  text-align: right;
+  font-family: 'SF Mono', Monaco, 'Fira Code', monospace;
+  background: #1a1a25;
+  border: 1px solid #5555cc;
+  border-radius: 3px;
+  padding: 2px 4px;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.param-value-input::-webkit-outer-spin-button,
+.param-value-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .param-control input[type="color"] {
@@ -688,6 +781,15 @@ html, body, #root {
   .param-control input[type="range"]::-webkit-slider-thumb {
     width: 20px;
     height: 20px;
+  }
+
+  .slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  .slider-track {
+    height: 24px;
   }
 
   .toolbar-btn {
