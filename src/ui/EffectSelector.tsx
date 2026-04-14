@@ -22,6 +22,7 @@ const EFFECTS: Record<string, EffectInfo> = {
   'organic-vines': { label: 'Ornamental Flourish', category: 'Simulation' },
   'feedback-echo': { label: 'Feedback Echo', category: 'Post-FX' },
   'audio-waveform': { label: 'Audio Waveform', category: 'Reactive' },
+  'hand-tracking': { label: 'Hand Tracking', category: 'Reactive' },
 };
 
 export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps) {

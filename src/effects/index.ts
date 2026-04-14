@@ -9,6 +9,7 @@ import { VoronoiLiquid } from './VoronoiLiquid';
 import { RaymarchedMetaballs } from './RaymarchedMetaballs';
 import { DomainWarpTunnel } from './DomainWarpTunnel';
 import { OrganicVines } from './OrganicVines';
+import { HandTracking } from './HandTracking';
 
 type EffectFactory = () => EffectNode;
 
@@ -23,6 +24,7 @@ export const effectRegistry = new Map<string, EffectFactory>([
   ['raymarched-metaballs', () => new RaymarchedMetaballs()],
   ['domain-warp-tunnel', () => new DomainWarpTunnel()],
   ['organic-vines', () => new OrganicVines()],
+  ['hand-tracking', () => new HandTracking()],
 ]);
 
 export function getEffectDescriptors(): EffectNodeDescriptor[] {
