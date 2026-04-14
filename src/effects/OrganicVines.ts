@@ -13,7 +13,19 @@ const DESCRIPTOR: EffectNodeDescriptor = {
     { id: 'leafChance', type: 'float', label: 'Leaf Chance', min: 0, max: 0.2, step: 0.001, default: 0.08, group: 'Ornaments' },
     { id: 'flowerChance', type: 'float', label: 'Flower Chance', min: 0, max: 0.1, step: 0.001, default: 0.025, group: 'Ornaments' },
     { id: 'flowerSize', type: 'float', label: 'Flower Size', min: 4, max: 40, step: 0.5, default: 16, group: 'Ornaments' },
-    { id: 'invertColors', type: 'bool', label: 'White on Black', default: false, group: 'Style' },
+    { id: 'palette', type: 'enum', label: 'Palette', options: [
+      { value: 'mono-dark', label: 'Monochrome (dark)' },
+      { value: 'mono-light', label: 'Monochrome (light)' },
+      { value: 'rainbow', label: 'Rainbow Layers' },
+      { value: 'subtle', label: 'Subtle / Pastel' },
+      { value: 'warm', label: 'Warm (sunset)' },
+      { value: 'cool', label: 'Cool (ocean)' },
+      { value: 'earth', label: 'Earth (botanical)' },
+      { value: 'neon', label: 'Neon' },
+      { value: 'random', label: 'Random (changes)' },
+    ], default: 'mono-dark', group: 'Style' },
+    { id: 'paletteChangeRate', type: 'float', label: 'Color Shift Rate', min: 0, max: 5, step: 0.05, default: 1.0, group: 'Style' },
+    { id: 'transparentBg', type: 'bool', label: 'Transparent BG', default: false, group: 'Style' },
     { id: 'lightSeeking', type: 'float', label: 'Seek Empty Space', min: 0, max: 2, step: 0.01, default: 0.8, group: 'Behavior' },
     { id: 'mouseAttract', type: 'float', label: 'Seek Mouse', min: 0, max: 2, step: 0.01, default: 0.6, group: 'Behavior' },
     { id: 'mouseInfluence', type: 'float', label: 'Touch Bend', min: 0, max: 1, step: 0.01, default: 0.3, group: 'Behavior' },
@@ -69,6 +81,9 @@ export class OrganicVines {
   private hueRotation = 0;
   private currentColor = '#000000';
   private bgColor = '#ffffff';
+  private veinColor = 'rgba(0,0,0,0.6)';
+  private randomPalette: string | null = null;
+  private lastRandomGen = -1;
   private pixelsCovered = 0;
   private generationCount = 0;
   private lastSpawnTime = 0;
@@ -121,8 +136,12 @@ export class OrganicVines {
 
   private resetCanvas(): void {
     const ctx = this.ctx2d!;
-    ctx.fillStyle = this.bgColor;
-    ctx.fillRect(0, 0, this.w, this.h);
+    if (this.bgColor === 'rgba(0,0,0,0)') {
+      ctx.clearRect(0, 0, this.w, this.h);
+    } else {
+      ctx.fillStyle = this.bgColor;
+      ctx.fillRect(0, 0, this.w, this.h);
+    }
     this.pixelsCovered = 0;
     this.densityGrid.fill(0);
   }
@@ -211,19 +230,73 @@ export class OrganicVines {
     }
   }
 
-  private updateColors(invert: boolean): void {
-    if (invert) {
-      this.bgColor = '#000000';
-    } else {
-      this.bgColor = '#ffffff';
+  private updateColors(palette: string, transparentBg: boolean): void {
+    // If "random", resolve to a current random palette (stored in activePalette)
+    let effective = palette;
+    if (palette === 'random') {
+      if (!this.randomPalette || this.generationCount !== this.lastRandomGen) {
+        const options = ['mono-dark', 'mono-light', 'rainbow', 'subtle', 'warm', 'cool', 'earth', 'neon'];
+        this.randomPalette = options[Math.floor(Math.random() * options.length)]!;
+        this.lastRandomGen = this.generationCount;
+      }
+      effective = this.randomPalette;
     }
 
-    if (this.generationCount === 0) {
-      this.currentColor = invert ? '#ffffff' : '#000000';
+    // Background color
+    if (transparentBg) {
+      this.bgColor = 'rgba(0,0,0,0)';
+    } else if (effective === 'mono-light' || effective === 'subtle' || effective === 'earth') {
+      this.bgColor = '#ffffff';
     } else {
-      const [r, g, b] = hsl(this.hueRotation % 360, 0.7, invert ? 0.65 : 0.35);
-      this.currentColor = `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`;
+      this.bgColor = effective === 'neon' ? '#0a0012' : '#000000';
     }
+
+    // Foreground color based on palette and generation
+    const g = this.generationCount;
+    const h = (this.hueRotation % 360 + 360) % 360;
+
+    let rgb: [number, number, number];
+
+    switch (effective) {
+      case 'mono-dark':
+        rgb = g === 0 ? [1, 1, 1] : hsl(h, 0.05, 0.95);
+        break;
+      case 'mono-light':
+        rgb = g === 0 ? [0, 0, 0] : hsl(h, 0.05, 0.15);
+        break;
+      case 'rainbow':
+        rgb = g === 0 ? [0.95, 0.95, 0.95] : hsl(h, 0.75, 0.6);
+        break;
+      case 'subtle':
+        rgb = hsl(h, 0.25, 0.4 + g * 0.02);
+        break;
+      case 'warm': {
+        const warmH = (h * 0.2) % 60;
+        rgb = hsl(warmH, 0.7, g === 0 ? 0.35 : 0.55);
+        break;
+      }
+      case 'cool': {
+        const coolH = 160 + ((h * 0.3) % 100);
+        rgb = hsl(coolH, 0.6, g === 0 ? 0.3 : 0.55);
+        break;
+      }
+      case 'earth': {
+        const earthH = 30 + ((h * 0.4) % 100);
+        rgb = hsl(earthH, 0.45, 0.3 + g * 0.05);
+        break;
+      }
+      case 'neon':
+        rgb = hsl(h, 1.0, 0.6);
+        break;
+      default:
+        rgb = [1, 1, 1];
+    }
+
+    const [r, gc, b] = rgb;
+    this.currentColor = `rgb(${Math.round(r * 255)},${Math.round(gc * 255)},${Math.round(b * 255)})`;
+
+    const isLightBg = effective === 'mono-light' || effective === 'subtle' || effective === 'earth';
+    this.veinColor = isLightBg ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)';
   }
 
   private drawLeaf(
@@ -249,7 +322,7 @@ export class OrganicVines {
     c.fill();
 
     // Leaf vein
-    c.strokeStyle = this.bgColor;
+    c.strokeStyle = this.veinColor;
     c.lineWidth = 0.7;
     c.beginPath();
     c.moveTo(x, y);
@@ -286,8 +359,8 @@ export class OrganicVines {
       c.fill();
     }
 
-    // Center disc (bg color for contrast)
-    c.fillStyle = this.bgColor;
+    // Center disc (vein color for contrast — works on any bg)
+    c.fillStyle = this.veinColor;
     c.beginPath();
     c.arc(cx, cy, size * 0.22, 0, twoPi);
     c.fill();
@@ -313,10 +386,11 @@ export class OrganicVines {
   render(
     ctx: FrameContext,
     params: ParameterValues,
-    _inputTextures: Map<string, WebGLTexture>,
+    inputTextures: Map<string, WebGLTexture>,
   ): void {
     const gl = this.gl!;
     if (!this.ctx2d || !this.canvas2d) return;
+    const inputTex = inputTextures.get('input0') ?? null;
 
     const c = this.ctx2d;
     const growSpeed = params.growSpeed as number;
@@ -327,12 +401,14 @@ export class OrganicVines {
     const leafChance = params.leafChance as number;
     const flowerChance = params.flowerChance as number;
     const flowerSize = params.flowerSize as number;
-    const invert = params.invertColors as boolean;
+    const palette = params.palette as string;
+    const paletteChangeRate = params.paletteChangeRate as number;
+    const transparentBg = params.transparentBg as boolean;
     const mouseInf = params.mouseInfluence as number;
     const lightSeeking = params.lightSeeking as number;
     const mouseAttract = params.mouseAttract as number;
 
-    this.updateColors(invert);
+    this.updateColors(palette, transparentBg);
 
     // Steps per frame based on grow speed
     const steps = Math.floor(growSpeed);
@@ -495,12 +571,17 @@ export class OrganicVines {
       this.spawnEdgeVines(2);
     }
 
-    // When screen is mostly covered → new color generation
+    // When screen is covered enough → new color generation
+    // Higher rate → shifts more often (lower threshold)
+    // Rate 0 means never shift color (still refreshes composition on full coverage)
     const coverageRatio = this.pixelsCovered / (this.w * this.h);
-    if (coverageRatio > 0.15 && this.vines.length < 5) {
+    const shiftThreshold = paletteChangeRate > 0
+      ? Math.max(0.03, 0.4 / paletteChangeRate)
+      : 1.0;
+    if (coverageRatio > shiftThreshold && this.vines.length < 5) {
       this.generationCount++;
       this.hueRotation += 60 + Math.random() * 60;
-      this.updateColors(invert);
+      this.updateColors(palette, transparentBg);
       this.pixelsCovered = 0;
       // Gently fade density so new generation still has reference but can grow over old
       for (let i = 0; i < this.densityGrid.length; i++) {
@@ -520,23 +601,29 @@ export class OrganicVines {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas2d);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 
-    // Draw fullscreen quad with texture
-    // Simple blit — set up minimal shader-free approach using the pipeline's FBO
+    // Draw fullscreen quad with texture (composite over input if provided)
     gl.viewport(0, 0, this.w, this.h);
     gl.disable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
 
-    // Use framebuffer blit via copyTexSubImage or just draw manually
-    // Since we don't have a blit shader, use the simplest approach:
-    // Write pixel data directly
-    // Actually we need a simple passthrough shader — let's just draw the texture
-
-    // We'll use a minimal embedded shader for this
     if (!this.blitProgram) this.initBlit(gl);
     gl.useProgram(this.blitProgram);
+
+    // Unit 0: the vine canvas texture
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.uniform1i(this.blitTexLoc, 0);
+
+    // Unit 1: the input texture from previous effect (if any)
+    if (inputTex && transparentBg) {
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, inputTex);
+      gl.uniform1i(this.blitInputLoc, 1);
+      gl.uniform1i(this.blitHasInputLoc, 1);
+    } else {
+      gl.uniform1i(this.blitHasInputLoc, 0);
+    }
+
     gl.bindVertexArray(this.blitVAO);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
     gl.bindVertexArray(null);
@@ -545,6 +632,8 @@ export class OrganicVines {
   // Minimal blit shader
   private blitProgram: WebGLProgram | null = null;
   private blitTexLoc: WebGLUniformLocation | null = null;
+  private blitInputLoc: WebGLUniformLocation | null = null;
+  private blitHasInputLoc: WebGLUniformLocation | null = null;
   private blitVAO: WebGLVertexArrayObject | null = null;
 
   private initBlit(gl: WebGL2RenderingContext): void {
@@ -555,9 +644,20 @@ export class OrganicVines {
     const fs = `#version 300 es
     precision mediump float;
     uniform sampler2D uTex;
+    uniform sampler2D uInput;
+    uniform int uHasInput;
     in vec2 vUv;
     out vec4 fragColor;
-    void main() { fragColor = texture(uTex, vUv); }`;
+    void main() {
+      vec4 top = texture(uTex, vUv);
+      if (uHasInput == 1) {
+        // Standard over compositing: result = top + bg*(1-top.a)
+        vec4 bg = texture(uInput, vUv);
+        fragColor = vec4(top.rgb + bg.rgb * (1.0 - top.a), 1.0);
+      } else {
+        fragColor = top;
+      }
+    }`;
 
     const compile = (type: number, src: string) => {
       const s = gl.createShader(type)!;
@@ -571,6 +671,8 @@ export class OrganicVines {
     gl.linkProgram(p);
     this.blitProgram = p;
     this.blitTexLoc = gl.getUniformLocation(p, 'uTex');
+    this.blitInputLoc = gl.getUniformLocation(p, 'uInput');
+    this.blitHasInputLoc = gl.getUniformLocation(p, 'uHasInput');
     this.blitVAO = gl.createVertexArray()!;
   }
 

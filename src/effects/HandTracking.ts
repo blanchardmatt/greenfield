@@ -22,11 +22,22 @@ const HAND_CONNECTIONS: Array<[number, number]> = [
 const DESCRIPTOR: EffectNodeDescriptor = {
   id: 'hand-tracking',
   name: 'Hand Tracking',
-  description: 'Neon rainbow skeleton drawn on detected hands via webcam',
+  description: 'Neon skeleton with inter-hand beams and glowing orb',
   parameters: [
-    { id: 'lineWidth', type: 'float', label: 'Line Width', min: 1, max: 12, step: 0.5, default: 4, group: 'Appearance' },
-    { id: 'glowStrength', type: 'float', label: 'Glow', min: 0, max: 30, step: 0.5, default: 12, group: 'Appearance' },
-    { id: 'jointSize', type: 'float', label: 'Joint Size', min: 0, max: 15, step: 0.5, default: 5, group: 'Appearance' },
+    { id: 'lineWidth', type: 'float', label: 'Line Width', min: 1, max: 12, step: 0.5, default: 4, group: 'Skeleton' },
+    { id: 'glowStrength', type: 'float', label: 'Glow', min: 0, max: 30, step: 0.5, default: 12, group: 'Skeleton' },
+    { id: 'jointSize', type: 'float', label: 'Joint Size', min: 0, max: 15, step: 0.5, default: 5, group: 'Skeleton' },
+    { id: 'beamMode', type: 'enum', label: 'Inter-hand Beams', options: [
+      { value: '0', label: 'Off' },
+      { value: '1', label: 'All landmarks' },
+      { value: '2', label: 'Fingertips' },
+      { value: '3', label: 'Palms only' },
+    ], default: '2', group: 'Beams' },
+    { id: 'beamWidth', type: 'float', label: 'Beam Width', min: 0.5, max: 10, step: 0.5, default: 3, group: 'Beams' },
+    { id: 'beamGlow', type: 'float', label: 'Beam Glow', min: 0, max: 50, step: 1, default: 20, group: 'Beams' },
+    { id: 'orbSize', type: 'float', label: 'Orb Size', min: 0, max: 80, step: 1, default: 25, group: 'Orb' },
+    { id: 'orbGlow', type: 'float', label: 'Orb Glow', min: 0, max: 80, step: 1, default: 40, group: 'Orb' },
+    { id: 'orbPulse', type: 'float', label: 'Orb Pulse', min: 0, max: 1, step: 0.01, default: 0.4, group: 'Orb' },
     { id: 'colorSpeed', type: 'float', label: 'Color Speed', min: 0, max: 5, step: 0.05, default: 1.0, group: 'Color' },
     { id: 'saturation', type: 'float', label: 'Saturation', min: 0, max: 1, step: 0.01, default: 0.9, group: 'Color' },
     { id: 'showVideo', type: 'bool', label: 'Show Webcam', default: true, group: 'Display' },
@@ -132,6 +143,12 @@ export class HandTracking {
     const lineWidth = params.lineWidth as number;
     const glowStrength = params.glowStrength as number;
     const jointSize = params.jointSize as number;
+    const beamMode = parseInt(params.beamMode as string, 10);
+    const beamWidth = params.beamWidth as number;
+    const beamGlow = params.beamGlow as number;
+    const orbSize = params.orbSize as number;
+    const orbGlow = params.orbGlow as number;
+    const orbPulse = params.orbPulse as number;
     const colorSpeed = params.colorSpeed as number;
     const saturation = params.saturation as number;
     const showVideo = params.showVideo as boolean;
@@ -192,33 +209,35 @@ export class HandTracking {
     // Draw hand skeletons with neon rainbow
     const t = ctx.time * colorSpeed;
 
-    for (let hi = 0; hi < this.currentLandmarks.length; hi++) {
-      const hand = this.currentLandmarks[hi]!;
-      if (!hand || hand.length < 21) continue;
+    // Project all hands to canvas space
+    const allHands = this.currentLandmarks
+      .filter((h) => h && h.length >= 21)
+      .map((hand) =>
+        hand.map((lm) => {
+          let px = lm.x * this.w;
+          const py = lm.y * this.h;
+          if (mirror) px = this.w - px;
+          return { x: px, y: py, z: lm.z };
+        }),
+      );
 
-      // Project landmarks to canvas space
-      const pts = hand.map((lm) => {
-        let px = lm.x * this.w;
-        const py = lm.y * this.h;
-        if (mirror) px = this.w - px;
-        return { x: px, y: py, z: lm.z };
-      });
+    c.lineCap = 'round';
+    c.lineJoin = 'round';
 
-      // Draw connections with glow
-      c.lineCap = 'round';
-      c.lineJoin = 'round';
+    // Draw skeletons
+    for (let hi = 0; hi < allHands.length; hi++) {
+      const pts = allHands[hi]!;
 
+      // Connections with glow
       for (let i = 0; i < HAND_CONNECTIONS.length; i++) {
         const [a, b] = HAND_CONNECTIONS[i]!;
         const p1 = pts[a]!;
         const p2 = pts[b]!;
 
-        // Rainbow color based on connection index, hand, and time
         const hue = ((i / HAND_CONNECTIONS.length) + hi * 0.3 + t * 0.1) % 1;
         const color = this.hsla(hue * 360, saturation, 0.6, 1);
         const glowColor = this.hsla(hue * 360, saturation, 0.5, 0.6);
 
-        // Outer glow pass
         if (glowStrength > 0) {
           c.strokeStyle = glowColor;
           c.lineWidth = lineWidth + glowStrength;
@@ -230,7 +249,6 @@ export class HandTracking {
           c.stroke();
         }
 
-        // Inner bright line
         c.shadowBlur = 0;
         c.strokeStyle = color;
         c.lineWidth = lineWidth;
@@ -240,7 +258,7 @@ export class HandTracking {
         c.stroke();
       }
 
-      // Draw joints
+      // Joints
       if (jointSize > 0) {
         for (let i = 0; i < pts.length; i++) {
           const p = pts[i]!;
@@ -264,6 +282,102 @@ export class HandTracking {
           c.fill();
         }
       }
+    }
+
+    // === Inter-hand beams ===
+    if (beamMode > 0 && allHands.length >= 2) {
+      const handA = allHands[0]!;
+      const handB = allHands[1]!;
+
+      // Which landmarks to connect
+      let pairs: number[] = [];
+      if (beamMode === 1) {
+        // All 21 landmarks
+        for (let i = 0; i < 21; i++) pairs.push(i);
+      } else if (beamMode === 2) {
+        // Fingertips: thumb=4, index=8, middle=12, ring=16, pinky=20
+        pairs = [4, 8, 12, 16, 20];
+      } else if (beamMode === 3) {
+        // Palms: wrist=0, index base=5, middle base=9, ring base=13, pinky base=17
+        pairs = [0, 5, 9, 13, 17];
+      }
+
+      c.lineCap = 'round';
+      for (let i = 0; i < pairs.length; i++) {
+        const idx = pairs[i]!;
+        const p1 = handA[idx]!;
+        const p2 = handB[idx]!;
+
+        // Each beam has its own hue that cycles over time
+        const hue = ((i / pairs.length) + t * 0.15) % 1;
+        const color = this.hsla(hue * 360, saturation, 0.65, 1);
+        const glowColor = this.hsla(hue * 360, saturation, 0.5, 0.5);
+
+        // Outer glow
+        if (beamGlow > 0) {
+          c.strokeStyle = glowColor;
+          c.lineWidth = beamWidth + beamGlow * 0.6;
+          c.shadowColor = color;
+          c.shadowBlur = beamGlow;
+          c.beginPath();
+          c.moveTo(p1.x, p1.y);
+          c.lineTo(p2.x, p2.y);
+          c.stroke();
+        }
+
+        // Inner bright beam
+        c.shadowBlur = 0;
+        c.strokeStyle = color;
+        c.lineWidth = beamWidth;
+        c.beginPath();
+        c.moveTo(p1.x, p1.y);
+        c.lineTo(p2.x, p2.y);
+        c.stroke();
+      }
+    }
+
+    // === Central glowing orb between the hands ===
+    if (orbSize > 0 && allHands.length >= 2) {
+      // Use palm centers (landmark 9 = middle-finger MCP) as anchors
+      const c1 = allHands[0]![9]!;
+      const c2 = allHands[1]![9]!;
+      const cx = (c1.x + c2.x) * 0.5;
+      const cy = (c1.y + c2.y) * 0.5;
+      const handDist = Math.hypot(c2.x - c1.x, c2.y - c1.y);
+
+      // Orb grows larger as hands move apart (more "energy gathered")
+      const distFactor = Math.min(2, handDist / (this.w * 0.25));
+      // Pulse
+      const pulse = 1.0 + Math.sin(ctx.time * 4) * orbPulse;
+      const r = orbSize * distFactor * pulse;
+
+      // Multi-layer radial gradient for rich glow
+      const orbHue = (t * 0.3) % 1;
+      const grad = c.createRadialGradient(cx, cy, 0, cx, cy, r + orbGlow);
+      grad.addColorStop(0, this.hsla(orbHue * 360, saturation, 0.9, 1));
+      grad.addColorStop(0.15, this.hsla(orbHue * 360, saturation, 0.7, 0.9));
+      grad.addColorStop(0.4, this.hsla(((orbHue + 0.1) % 1) * 360, saturation, 0.5, 0.5));
+      grad.addColorStop(0.75, this.hsla(((orbHue + 0.2) % 1) * 360, saturation, 0.4, 0.15));
+      grad.addColorStop(1, this.hsla(((orbHue + 0.3) % 1) * 360, saturation, 0.3, 0));
+
+      c.shadowBlur = 0;
+      c.globalCompositeOperation = 'lighter';
+      c.fillStyle = grad;
+      c.beginPath();
+      c.arc(cx, cy, r + orbGlow, 0, Math.PI * 2);
+      c.fill();
+
+      // Bright core
+      const coreGrad = c.createRadialGradient(cx, cy, 0, cx, cy, r * 0.5);
+      coreGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      coreGrad.addColorStop(0.5, this.hsla(orbHue * 360, saturation * 0.5, 0.95, 0.8));
+      coreGrad.addColorStop(1, this.hsla(orbHue * 360, saturation, 0.6, 0));
+      c.fillStyle = coreGrad;
+      c.beginPath();
+      c.arc(cx, cy, r * 0.5, 0, Math.PI * 2);
+      c.fill();
+
+      c.globalCompositeOperation = 'source-over';
     }
 
     // Reset shadow
