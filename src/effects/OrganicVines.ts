@@ -3,13 +3,16 @@ import type { EffectNodeDescriptor, FrameContext, ParameterValues } from '../cor
 const DESCRIPTOR: EffectNodeDescriptor = {
   id: 'organic-vines',
   name: 'Ornamental Flourish',
-  description: 'Endlessly growing decorative scrollwork with color layering',
+  description: 'Endlessly growing decorative scrollwork with leaves, flowers, and color layering',
   parameters: [
     { id: 'growSpeed', type: 'float', label: 'Grow Speed', min: 0.5, max: 8, step: 0.1, default: 3.0, group: 'Growth' },
     { id: 'curliness', type: 'float', label: 'Curl Tightness', min: 0.02, max: 0.15, step: 0.001, default: 0.06, group: 'Shape' },
     { id: 'thickness', type: 'float', label: 'Stroke Weight', min: 1, max: 6, step: 0.1, default: 2.5, group: 'Shape' },
     { id: 'branchChance', type: 'float', label: 'Branch Chance', min: 0, max: 0.08, step: 0.001, default: 0.025, group: 'Shape' },
     { id: 'dotSize', type: 'float', label: 'Dot Size', min: 0, max: 6, step: 0.1, default: 2.5, group: 'Ornaments' },
+    { id: 'leafChance', type: 'float', label: 'Leaf Chance', min: 0, max: 0.2, step: 0.001, default: 0.06, group: 'Ornaments' },
+    { id: 'flowerChance', type: 'float', label: 'Flower Chance', min: 0, max: 0.05, step: 0.001, default: 0.008, group: 'Ornaments' },
+    { id: 'flowerSize', type: 'float', label: 'Flower Size', min: 4, max: 30, step: 0.5, default: 14, group: 'Ornaments' },
     { id: 'invertColors', type: 'bool', label: 'White on Black', default: false, group: 'Style' },
     { id: 'mouseInfluence', type: 'float', label: 'Mouse Influence', min: 0, max: 1, step: 0.01, default: 0.3, group: 'Interaction' },
   ],
@@ -168,6 +171,90 @@ export class OrganicVines {
     }
   }
 
+  private drawLeaf(
+    c: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+    x: number, y: number, angle: number, length: number,
+  ): void {
+    const tipX = x + Math.cos(angle) * length;
+    const tipY = y + Math.sin(angle) * length;
+    const perpAngle = angle + Math.PI * 0.5;
+    const leafWidth = length * (0.22 + Math.random() * 0.12);
+    // Offset the control points toward the tip for a more natural leaf shape
+    const bulge = 0.45;
+    const mid1X = x + Math.cos(angle) * length * bulge + Math.cos(perpAngle) * leafWidth;
+    const mid1Y = y + Math.sin(angle) * length * bulge + Math.sin(perpAngle) * leafWidth;
+    const mid2X = x + Math.cos(angle) * length * bulge - Math.cos(perpAngle) * leafWidth;
+    const mid2Y = y + Math.sin(angle) * length * bulge - Math.sin(perpAngle) * leafWidth;
+
+    c.fillStyle = this.currentColor;
+    c.beginPath();
+    c.moveTo(x, y);
+    c.quadraticCurveTo(mid1X, mid1Y, tipX, tipY);
+    c.quadraticCurveTo(mid2X, mid2Y, x, y);
+    c.fill();
+
+    // Leaf vein
+    c.strokeStyle = this.bgColor;
+    c.lineWidth = 0.7;
+    c.beginPath();
+    c.moveTo(x, y);
+    c.lineTo(tipX, tipY);
+    c.stroke();
+  }
+
+  private drawFlower(
+    c: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+    cx: number, cy: number, size: number, rotation: number,
+  ): void {
+    const petalCount = 5 + Math.floor(Math.random() * 4); // 5-8 petals
+    const petalLength = size;
+    const petalWidth = size * 0.45;
+    const twoPi = Math.PI * 2;
+
+    c.fillStyle = this.currentColor;
+
+    // Petals
+    for (let i = 0; i < petalCount; i++) {
+      const a = rotation + (i / petalCount) * twoPi;
+      const tipX = cx + Math.cos(a) * petalLength;
+      const tipY = cy + Math.sin(a) * petalLength;
+      const perpA = a + Math.PI * 0.5;
+      const mid1X = cx + Math.cos(a) * petalLength * 0.5 + Math.cos(perpA) * petalWidth;
+      const mid1Y = cy + Math.sin(a) * petalLength * 0.5 + Math.sin(perpA) * petalWidth;
+      const mid2X = cx + Math.cos(a) * petalLength * 0.5 - Math.cos(perpA) * petalWidth;
+      const mid2Y = cy + Math.sin(a) * petalLength * 0.5 - Math.sin(perpA) * petalWidth;
+
+      c.beginPath();
+      c.moveTo(cx, cy);
+      c.quadraticCurveTo(mid1X, mid1Y, tipX, tipY);
+      c.quadraticCurveTo(mid2X, mid2Y, cx, cy);
+      c.fill();
+    }
+
+    // Center disc (bg color for contrast)
+    c.fillStyle = this.bgColor;
+    c.beginPath();
+    c.arc(cx, cy, size * 0.22, 0, twoPi);
+    c.fill();
+
+    // Center dot (fg color)
+    c.fillStyle = this.currentColor;
+    c.beginPath();
+    c.arc(cx, cy, size * 0.1, 0, twoPi);
+    c.fill();
+
+    // Small decorative dots around the center (stamen)
+    const stamenCount = 6;
+    for (let i = 0; i < stamenCount; i++) {
+      const a = rotation + (i / stamenCount) * twoPi + Math.PI / stamenCount;
+      const sx = cx + Math.cos(a) * size * 0.17;
+      const sy = cy + Math.sin(a) * size * 0.17;
+      c.beginPath();
+      c.arc(sx, sy, size * 0.035, 0, twoPi);
+      c.fill();
+    }
+  }
+
   render(
     ctx: FrameContext,
     params: ParameterValues,
@@ -182,6 +269,9 @@ export class OrganicVines {
     const baseThickness = params.thickness as number;
     const branchChance = params.branchChance as number;
     const dotSize = params.dotSize as number;
+    const leafChance = params.leafChance as number;
+    const flowerChance = params.flowerChance as number;
+    const flowerSize = params.flowerSize as number;
     const invert = params.invertColors as boolean;
     const mouseInf = params.mouseInfluence as number;
 
@@ -271,42 +361,22 @@ export class OrganicVines {
           }
         }
 
-        // Ornamental leaves
+        // Ornamental leaves — random chance
         v.stepsSinceLastLeaf++;
-        if (dotSize > 0.5 && v.stepsSinceLastLeaf > 15 && lifeRatio > 0.3 && lifeRatio < 0.9 && v.thickness > 1.5) {
+        if (leafChance > 0 && v.stepsSinceLastLeaf > 6 && Math.random() < leafChance && lifeRatio > 0.25 && lifeRatio < 0.92 && v.thickness > 1.2) {
           v.stepsSinceLastLeaf = 0;
-          const side = v.totalSteps % 2 === 0 ? 1 : -1;
-          const leafAngle = v.angle + side * (0.6 + Math.random() * 0.6);
-          const leafLen = (8 + dotSize * 3) * lifeRatio;
-          const leafBase = { x: v.x, y: v.y };
-          const leafTip = {
-            x: v.x + Math.cos(leafAngle) * leafLen,
-            y: v.y + Math.sin(leafAngle) * leafLen,
-          };
-          // Draw leaf as a filled bezier shape
-          const perpAngle = leafAngle + Math.PI * 0.5;
-          const leafWidth = leafLen * 0.25;
-          const midX = (leafBase.x + leafTip.x) * 0.5;
-          const midY = (leafBase.y + leafTip.y) * 0.5;
-          const cp1x = midX + Math.cos(perpAngle) * leafWidth;
-          const cp1y = midY + Math.sin(perpAngle) * leafWidth;
-          const cp2x = midX - Math.cos(perpAngle) * leafWidth;
-          const cp2y = midY - Math.sin(perpAngle) * leafWidth;
+          const side = Math.random() > 0.5 ? 1 : -1;
+          const leafAngle = v.angle + side * (0.5 + Math.random() * 0.8);
+          const leafLen = (10 + Math.random() * 16) * (0.5 + lifeRatio * 0.5);
+          this.drawLeaf(c, v.x, v.y, leafAngle, leafLen);
+        }
 
-          c.fillStyle = this.currentColor;
-          c.beginPath();
-          c.moveTo(leafBase.x, leafBase.y);
-          c.quadraticCurveTo(cp1x, cp1y, leafTip.x, leafTip.y);
-          c.quadraticCurveTo(cp2x, cp2y, leafBase.x, leafBase.y);
-          c.fill();
-
-          // Leaf vein (center line)
-          c.strokeStyle = this.bgColor;
-          c.lineWidth = 0.5;
-          c.beginPath();
-          c.moveTo(leafBase.x, leafBase.y);
-          c.lineTo(leafTip.x, leafTip.y);
-          c.stroke();
+        // Procedural flowers — rare, end-of-life or random chance
+        if (flowerChance > 0 && Math.random() < flowerChance && lifeRatio > 0.15 && lifeRatio < 0.7 && v.thickness > 1.0) {
+          const fSize = flowerSize * (0.6 + Math.random() * 0.6) * lifeRatio;
+          this.drawFlower(c, v.x, v.y, fSize, Math.random() * Math.PI * 2);
+          // Flowers cost life (the vine "spends" energy blooming)
+          v.life *= 0.85;
         }
 
         // Branch
