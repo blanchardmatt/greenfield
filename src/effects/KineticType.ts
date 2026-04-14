@@ -235,13 +235,16 @@ export class KineticType {
     }
 
     // Pack render data
+    // Particles are stored in canvas coords (Y=0 at top), but the render
+    // shader interprets position as 0-1 in clip space (Y=0 at bottom). Flip Y.
     const r = this.renderData!;
+    const invH = 1 / this.h;
+    const invW = 1 / this.w;
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const so = i * STRIDE;
       const ro = i * RENDER_STRIDE;
-      // Convert pixel coords → 0-1 normalized
-      r[ro] = p[so + POS_X]! / this.w;
-      r[ro + 1] = p[so + POS_Y]! / this.h;
+      r[ro] = p[so + POS_X]! * invW;
+      r[ro + 1] = 1 - p[so + POS_Y]! * invH;
       r[ro + 2] = p[so + LIFE]!;
       r[ro + 3] = p[so + SIZE]!;
     }
