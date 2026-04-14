@@ -4,6 +4,8 @@ import { getEffectIds } from '../effects';
 interface EffectSelectorProps {
   activeEffects: string[];
   onChange: (effectIds: string[]) => void;
+  focusedEffect?: string | null;
+  onFocusEffect?: (id: string) => void;
 }
 
 interface EffectInfo {
@@ -25,7 +27,7 @@ const EFFECTS: Record<string, EffectInfo> = {
   'hand-tracking': { label: 'Hand Tracking', category: 'Reactive' },
 };
 
-export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps) {
+export function EffectSelector({ activeEffects, onChange, focusedEffect, onFocusEffect }: EffectSelectorProps) {
   const allIds = getEffectIds();
   const chainListRef = useRef<HTMLDivElement>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -41,9 +43,11 @@ export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps)
 
   const handlePrimaryChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      onChange([e.target.value]);
+      const id = e.target.value;
+      onChange([id]);
+      onFocusEffect?.(id);
     },
-    [onChange],
+    [onChange, onFocusEffect],
   );
 
   const handleAddEffect = useCallback(
@@ -51,10 +55,11 @@ export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps)
       const id = e.target.value;
       if (id && !activeEffects.includes(id)) {
         onChange([...activeEffects, id]);
+        onFocusEffect?.(id);
       }
       e.target.value = '';
     },
-    [activeEffects, onChange],
+    [activeEffects, onChange, onFocusEffect],
   );
 
   const handleRemoveEffect = useCallback(
@@ -145,7 +150,7 @@ export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps)
 
       {activeEffects.length > 1 && (
         <div style={{ marginTop: 8 }}>
-          <label style={{ fontSize: 11, color: '#888' }}>Effect Chain (drag to reorder)</label>
+          <label style={{ fontSize: 11, color: '#888' }}>Effect Chain (drag to reorder, tap to edit)</label>
           <div ref={chainListRef} className="chain-list">
             {activeEffects.map((id, i) => (
               <div
@@ -154,7 +159,9 @@ export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps)
                   dragIndex !== null && dropIndex === i && dragIndex !== i ? 'chain-row--drop-above' : ''
                 } ${
                   dragIndex !== null && dropIndex === i + 1 && dragIndex !== i && i === activeEffects.length - 1 ? 'chain-row--drop-below' : ''
-                }`}
+                } ${focusedEffect === id ? 'chain-row--focused' : ''}`}
+                onClick={() => onFocusEffect?.(id)}
+                role="button"
               >
                 <button
                   className="chain-drag-handle"
@@ -162,6 +169,7 @@ export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps)
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
                   onPointerCancel={handlePointerUp}
+                  onClick={(e) => e.stopPropagation()}
                   aria-label="Drag to reorder"
                   title="Drag to reorder"
                 >
@@ -172,7 +180,10 @@ export function EffectSelector({ activeEffects, onChange }: EffectSelectorProps)
                 </span>
                 <button
                   className="btn btn-danger chain-remove"
-                  onClick={() => handleRemoveEffect(id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveEffect(id);
+                  }}
                   aria-label="Remove"
                 >
                   x

@@ -52,6 +52,7 @@ export function App() {
   const [, setTick] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [shuffleActive, setShuffleActive] = useState(false);
+  const [focusedEffect, setFocusedEffect] = useState<string | null>(null);
   const shuffleTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeEffectsRef = useRef<string[]>(activeEffects);
@@ -197,11 +198,16 @@ export function App() {
           <EffectSelector
             activeEffects={activeEffects}
             onChange={handleEffectChange}
+            focusedEffect={focusedEffect}
+            onFocusEffect={setFocusedEffect}
           />
         </CollapsibleSection>
         {pipeline && (
           <CollapsibleSection title="Parameters" defaultOpen>
-            <ParameterPanel parameterStore={pipeline.parameterStore} />
+            <ParameterPanel
+              parameterStore={pipeline.parameterStore}
+              focusedEffectId={focusedEffect}
+            />
           </CollapsibleSection>
         )}
         {pipeline && (

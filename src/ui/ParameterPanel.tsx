@@ -1,19 +1,34 @@
-import { useSyncExternalStore, useCallback } from 'react';
+import { useSyncExternalStore, useCallback, useState, useEffect, useRef } from 'react';
 import type { ParameterStore } from '../core/ParameterStore';
 import type { ParameterValue, FloatParameterDef, IntParameterDef } from '../core/types';
 import { ControlFactory } from './controls/ControlFactory';
 import { CollapsibleSection } from './CollapsibleSection';
 
+// Effect display labels (kept in sync with EffectSelector)
+const EFFECT_LABELS: Record<string, string> = {
+  'noise-flow-field': 'Noise Flow Field',
+  'voronoi-liquid': 'Voronoi Liquid',
+  'domain-warp-tunnel': 'Domain Warp',
+  'kaleidoscope': 'Kaleidoscope',
+  'fractal-explorer': 'Fractal Explorer',
+  'raymarched-metaballs': 'Raymarched Metaballs',
+  'particle-system': 'Particle System',
+  'organic-vines': 'Ornamental Flourish',
+  'feedback-echo': 'Feedback Echo',
+  'audio-waveform': 'Audio Waveform',
+  'hand-tracking': 'Hand Tracking',
+};
+
 interface ParameterPanelProps {
   parameterStore: ParameterStore;
+  focusedEffectId?: string | null;
 }
 
-export function ParameterPanel({ parameterStore }: ParameterPanelProps) {
+export function ParameterPanel({ parameterStore, focusedEffectId }: ParameterPanelProps) {
   const version = useSyncExternalStore(
     parameterStore.subscribe,
     parameterStore.getSnapshot,
   );
-
   void version;
 
   const instanceIds = parameterStore.getAllInstanceIds();
@@ -21,34 +36,56 @@ export function ParameterPanel({ parameterStore }: ParameterPanelProps) {
   return (
     <div className="parameter-panel">
       {instanceIds.map((instanceId) => (
-        <EffectParameters
+        <EffectSection
           key={instanceId}
           instanceId={instanceId}
           parameterStore={parameterStore}
+          focused={focusedEffectId === instanceId}
+          // If no explicit focus, default to the first effect being open
+          defaultOpen={focusedEffectId == null && instanceIds[0] === instanceId}
         />
       ))}
     </div>
   );
 }
 
-function EffectParameters({
+function EffectSection({
   instanceId,
   parameterStore,
+  focused,
+  defaultOpen,
 }: {
   instanceId: string;
   parameterStore: ParameterStore;
+  focused: boolean;
+  defaultOpen: boolean;
 }) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(focused || defaultOpen);
+
+  // When focus arrives, open + scroll into view
+  useEffect(() => {
+    if (focused) {
+      setOpen(true);
+      // Defer to next frame so layout is settled
+      requestAnimationFrame(() => {
+        sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, [focused]);
+
   const descriptor = parameterStore.getDescriptor(instanceId);
   const values = parameterStore.getValues(instanceId);
-  if (!descriptor) return null;
 
   const handleReset = useCallback(() => {
+    if (!descriptor) return;
     for (const param of descriptor.parameters) {
       parameterStore.setValue(instanceId, param.id, param.default);
     }
   }, [descriptor, parameterStore, instanceId]);
 
   const handleRandomize = useCallback(() => {
+    if (!descriptor) return;
     for (const param of descriptor.parameters) {
       let newValue: ParameterValue = param.default;
       switch (param.type) {
@@ -78,7 +115,9 @@ function EffectParameters({
     }
   }, [descriptor, parameterStore, instanceId]);
 
-  // Group parameters
+  if (!descriptor) return null;
+
+  // Group parameters by their `group` tag
   const groups = new Map<string, typeof descriptor.parameters[number][]>();
   for (const param of descriptor.parameters) {
     const group = param.group ?? 'General';
@@ -86,15 +125,19 @@ function EffectParameters({
     groups.get(group)!.push(param);
   }
 
+  const label = EFFECT_LABELS[instanceId] ?? descriptor.name ?? instanceId;
+
   return (
-    <>
+    <CollapsibleSection
+      ref={sectionRef}
+      title={label}
+      open={open}
+      onToggle={() => setOpen((v) => !v)}
+      className={`effect-section ${focused ? 'effect-section--focused' : ''}`}
+    >
       <div className="param-actions">
-        <button className="btn param-action-btn" onClick={handleReset}>
-          Reset
-        </button>
-        <button className="btn param-action-btn" onClick={handleRandomize}>
-          Randomize
-        </button>
+        <button className="btn param-action-btn" onClick={handleReset}>Reset</button>
+        <button className="btn param-action-btn" onClick={handleRandomize}>Randomize</button>
       </div>
       {Array.from(groups.entries()).map(([groupName, params]) => (
         <CollapsibleSection
@@ -116,7 +159,7 @@ function EffectParameters({
           </div>
         </CollapsibleSection>
       ))}
-    </>
+    </CollapsibleSection>
   );
 }
 

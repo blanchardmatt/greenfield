@@ -121,6 +121,16 @@ html, body, #root {
   border-radius: 4px;
   transition: border-color 0.12s, background 0.12s, opacity 0.12s;
   position: relative;
+  cursor: pointer;
+}
+
+.chain-row:hover {
+  background: #22223a;
+}
+
+.chain-row--focused {
+  background: #2a2a4a;
+  border-color: #5555bb;
 }
 
 .chain-row--dragging {
@@ -456,6 +466,31 @@ html, body, #root {
 
 .collapsible-content {
   background: transparent;
+}
+
+/* Per-effect section (wraps an entire effect's parameters) */
+.effect-section > .collapsible-header {
+  background: #141420;
+  padding: 8px 16px;
+}
+
+.effect-section > .collapsible-header:hover {
+  background: #1a1a28;
+}
+
+.effect-section > .collapsible-header .collapsible-title {
+  font-size: 11.5px;
+  color: #d8d8ee;
+  letter-spacing: 0.4px;
+}
+
+.effect-section--focused > .collapsible-header {
+  background: #1d1d35;
+  border-left: 2px solid #6666ff;
+}
+
+.effect-section--focused > .collapsible-header .collapsible-title {
+  color: #fff;
 }
 
 /* Parameter group accordion (nested inside Parameters section) */
