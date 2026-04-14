@@ -284,34 +284,103 @@ export class HandTracking {
       }
     }
 
-    // === Inter-hand beams ===
+    // === Compute orb parameters (needed by beams for bowing effect) ===
+    let orbCx = 0, orbCy = 0, orbRadius = 0, orbIntensity = 0, orbHue = 0;
+    let hasOrb = false;
+
+    if (allHands.length >= 2) {
+      const c1 = allHands[0]![9]!;
+      const c2 = allHands[1]![9]!;
+      orbCx = (c1.x + c2.x) * 0.5;
+      orbCy = (c1.y + c2.y) * 0.5;
+      const handDist = Math.hypot(c2.x - c1.x, c2.y - c1.y);
+
+      // Exponential growth with hand distance — very dramatic at full spread
+      const norm = handDist / (this.w * 0.5); // 0..1+ as hands spread
+      // Curve: 0.15 at idle → exponentially larger as hands spread
+      const distFactor = 0.25 + Math.pow(Math.min(1.5, norm), 2.2) * 2.5;
+      const pulse = 1.0 + Math.sin(ctx.time * 4) * orbPulse;
+
+      orbRadius = orbSize * distFactor * pulse;
+      orbIntensity = Math.min(2.5, distFactor); // used for glow & beam push
+      orbHue = (t * 0.3) % 1;
+      hasOrb = orbSize > 0;
+    }
+
+    // === Inter-hand beams (bow outward, pushed by the orb) ===
     if (beamMode > 0 && allHands.length >= 2) {
       const handA = allHands[0]!;
       const handB = allHands[1]!;
 
-      // Which landmarks to connect
       let pairs: number[] = [];
       if (beamMode === 1) {
-        // All 21 landmarks
         for (let i = 0; i < 21; i++) pairs.push(i);
       } else if (beamMode === 2) {
-        // Fingertips: thumb=4, index=8, middle=12, ring=16, pinky=20
         pairs = [4, 8, 12, 16, 20];
       } else if (beamMode === 3) {
-        // Palms: wrist=0, index base=5, middle base=9, ring base=13, pinky base=17
         pairs = [0, 5, 9, 13, 17];
       }
 
       c.lineCap = 'round';
+
+      // Amount the orb displaces beams — scales with orb radius & intensity
+      const pushStrength = hasOrb ? (orbRadius * 0.9 + 20) * orbIntensity : 0;
+
       for (let i = 0; i < pairs.length; i++) {
         const idx = pairs[i]!;
         const p1 = handA[idx]!;
         const p2 = handB[idx]!;
 
-        // Each beam has its own hue that cycles over time
+        // Beam midpoint and length
+        const mx2 = (p1.x + p2.x) * 0.5;
+        const my2 = (p1.y + p2.y) * 0.5;
+        const beamLen = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+
+        // Compute displaced control point: push the midpoint away from orb
+        let ctrlX = mx2;
+        let ctrlY = my2;
+
+        if (hasOrb && pushStrength > 0) {
+          let dx = mx2 - orbCx;
+          let dy = my2 - orbCy;
+          let offsetLen = Math.hypot(dx, dy);
+
+          if (offsetLen < 1) {
+            // Beam passes through orb center — use perpendicular to beam as push dir
+            // Pick a stable side based on beam index (alternates up/down)
+            const bx = p2.x - p1.x;
+            const by = p2.y - p1.y;
+            const sign = (i % 2 === 0) ? 1 : -1;
+            dx = -by * sign;
+            dy = bx * sign;
+            offsetLen = Math.hypot(dx, dy) || 1;
+          }
+
+          // Falloff: push is strong if midpoint is near the orb, falls off with distance
+          const falloff = Math.exp(-offsetLen / (orbRadius * 1.5 + 40));
+          const push = pushStrength * falloff;
+
+          // Normalize direction and offset the control point outward
+          const nx = dx / offsetLen;
+          const ny = dy / offsetLen;
+          ctrlX = mx2 + nx * push;
+          ctrlY = my2 + ny * push;
+        }
+
+        // Color
         const hue = ((i / pairs.length) + t * 0.15) % 1;
         const color = this.hsla(hue * 360, saturation, 0.65, 1);
         const glowColor = this.hsla(hue * 360, saturation, 0.5, 0.5);
+
+        // For quadratic bezier to pass THROUGH the desired midpoint, we need to
+        // set the control point so that the curve is displaced properly.
+        // Use a quadratic: P(t) = (1-t)^2*P0 + 2(1-t)t*CP + t^2*P1
+        // At t=0.5, P(0.5) = 0.25*P0 + 0.5*CP + 0.25*P1 = midpoint of (P0,P1) + 0.5*(CP - midpoint)
+        // If we want the curve's midpoint to be at our displaced point D, then CP = 2*D - midpoint(P0,P1).
+        const targetMidX = ctrlX;
+        const targetMidY = ctrlY;
+        const bezCpX = 2 * targetMidX - mx2;
+        const bezCpY = 2 * targetMidY - my2;
 
         // Outer glow
         if (beamGlow > 0) {
@@ -321,7 +390,7 @@ export class HandTracking {
           c.shadowBlur = beamGlow;
           c.beginPath();
           c.moveTo(p1.x, p1.y);
-          c.lineTo(p2.x, p2.y);
+          c.quadraticCurveTo(bezCpX, bezCpY, p2.x, p2.y);
           c.stroke();
         }
 
@@ -331,50 +400,48 @@ export class HandTracking {
         c.lineWidth = beamWidth;
         c.beginPath();
         c.moveTo(p1.x, p1.y);
-        c.lineTo(p2.x, p2.y);
+        c.quadraticCurveTo(bezCpX, bezCpY, p2.x, p2.y);
         c.stroke();
+
+        // Suppress unused warning for beamLen if needed
+        void beamLen;
       }
     }
 
-    // === Central glowing orb between the hands ===
-    if (orbSize > 0 && allHands.length >= 2) {
-      // Use palm centers (landmark 9 = middle-finger MCP) as anchors
-      const c1 = allHands[0]![9]!;
-      const c2 = allHands[1]![9]!;
-      const cx = (c1.x + c2.x) * 0.5;
-      const cy = (c1.y + c2.y) * 0.5;
-      const handDist = Math.hypot(c2.x - c1.x, c2.y - c1.y);
+    // === Central glowing orb between the hands (rendered last, on top) ===
+    if (hasOrb) {
+      const cx = orbCx;
+      const cy = orbCy;
+      const r = orbRadius;
+      // Glow radius scales with intensity — much larger when hands spread
+      const glowR = (orbGlow * (0.7 + orbIntensity * 0.8));
 
-      // Orb grows larger as hands move apart (more "energy gathered")
-      const distFactor = Math.min(2, handDist / (this.w * 0.25));
-      // Pulse
-      const pulse = 1.0 + Math.sin(ctx.time * 4) * orbPulse;
-      const r = orbSize * distFactor * pulse;
+      // Intensity-boosted alpha for outer gradient
+      const alphaBoost = Math.min(1, 0.3 + orbIntensity * 0.5);
 
-      // Multi-layer radial gradient for rich glow
-      const orbHue = (t * 0.3) % 1;
-      const grad = c.createRadialGradient(cx, cy, 0, cx, cy, r + orbGlow);
-      grad.addColorStop(0, this.hsla(orbHue * 360, saturation, 0.9, 1));
-      grad.addColorStop(0.15, this.hsla(orbHue * 360, saturation, 0.7, 0.9));
-      grad.addColorStop(0.4, this.hsla(((orbHue + 0.1) % 1) * 360, saturation, 0.5, 0.5));
-      grad.addColorStop(0.75, this.hsla(((orbHue + 0.2) % 1) * 360, saturation, 0.4, 0.15));
+      const grad = c.createRadialGradient(cx, cy, 0, cx, cy, r + glowR);
+      grad.addColorStop(0, this.hsla(orbHue * 360, saturation, 0.95, 1));
+      grad.addColorStop(0.12, this.hsla(orbHue * 360, saturation, 0.75, alphaBoost));
+      grad.addColorStop(0.35, this.hsla(((orbHue + 0.1) % 1) * 360, saturation, 0.55, alphaBoost * 0.6));
+      grad.addColorStop(0.7, this.hsla(((orbHue + 0.2) % 1) * 360, saturation, 0.4, alphaBoost * 0.2));
       grad.addColorStop(1, this.hsla(((orbHue + 0.3) % 1) * 360, saturation, 0.3, 0));
 
       c.shadowBlur = 0;
       c.globalCompositeOperation = 'lighter';
       c.fillStyle = grad;
       c.beginPath();
-      c.arc(cx, cy, r + orbGlow, 0, Math.PI * 2);
+      c.arc(cx, cy, r + glowR, 0, Math.PI * 2);
       c.fill();
 
-      // Bright core
-      const coreGrad = c.createRadialGradient(cx, cy, 0, cx, cy, r * 0.5);
-      coreGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      // Bright core — scales with intensity
+      const coreR = r * (0.45 + orbIntensity * 0.15);
+      const coreGrad = c.createRadialGradient(cx, cy, 0, cx, cy, coreR);
+      coreGrad.addColorStop(0, `rgba(255, 255, 255, ${Math.min(1, 0.8 + orbIntensity * 0.2)})`);
       coreGrad.addColorStop(0.5, this.hsla(orbHue * 360, saturation * 0.5, 0.95, 0.8));
       coreGrad.addColorStop(1, this.hsla(orbHue * 360, saturation, 0.6, 0));
       c.fillStyle = coreGrad;
       c.beginPath();
-      c.arc(cx, cy, r * 0.5, 0, Math.PI * 2);
+      c.arc(cx, cy, coreR, 0, Math.PI * 2);
       c.fill();
 
       c.globalCompositeOperation = 'source-over';
