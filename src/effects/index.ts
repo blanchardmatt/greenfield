@@ -16,6 +16,9 @@ import { AsciiFilter } from './AsciiFilter';
 import { KineticType } from './KineticType';
 import { TextMask } from './TextMask';
 
+import { Murmuration } from './Murmuration';
+import { WaveTerrain } from './WaveTerrain';
+
 type EffectFactory = () => EffectNode;
 
 export const effectRegistry = new Map<string, EffectFactory>([
@@ -35,6 +38,8 @@ export const effectRegistry = new Map<string, EffectFactory>([
   ['kinetic-type', () => new KineticType()],
   ['text-mask', () => new TextMask()],
   ['ascii-filter', () => new AsciiFilter()],
+  ['murmuration', () => new Murmuration()],
+  ['wave-terrain', () => new WaveTerrain()],
 ]);
 
 export function getEffectDescriptors(): EffectNodeDescriptor[] {
